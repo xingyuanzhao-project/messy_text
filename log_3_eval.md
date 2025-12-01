@@ -21,3 +21,4 @@ The Shannon entropy per victim of machine classifications within the same victim
 H_i = -Σ p_ij log₂(p_ij), Normalized_H_i = H_i / H_max
 
 # todo
+get 3 stage prompts
