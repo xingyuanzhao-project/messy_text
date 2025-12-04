@@ -7,6 +7,7 @@ from typing import Any
 def setup_logger(log_file: str = "processing.log") -> logging.Logger:
     """
     Sets up a file-based logger for long-running server jobs.
+    Also configures httpx logger to expose retry attempts.
     """
     logger = logging.getLogger("MessyTextProcessor")
     logger.setLevel(logging.INFO)
@@ -21,6 +22,13 @@ def setup_logger(log_file: str = "processing.log") -> logging.Logger:
     
     logger.addHandler(fh)
     logger.addHandler(sh)
+
+    # Configure httpx logger to show retries (WARNING to suppress success logs)
+    httpx_logger = logging.getLogger("httpx")
+    httpx_logger.setLevel(logging.WARNING)
+    httpx_logger.addHandler(fh)
+    httpx_logger.addHandler(sh)
+
     return logger
 
 def log_memory_usage(logger: logging.Logger, context: str = ""):

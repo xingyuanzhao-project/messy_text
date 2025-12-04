@@ -9,10 +9,10 @@ processed_df = process_dataframe_summary_and_classification(
     start_index=0,
     early_break=10,
     inner_loop_break=5,
-    show_resources=False,
-    print_prompts=False,
-    print_response=False,
-    print_progress=False
+    log_resources=False,
+    log_prompts=False,
+    log_response=False,
+    log_progress=False
 )
 '''
 
@@ -25,15 +25,17 @@ import yaml
 import json
 import time
 import gc
-from openai import OpenAI
+import asyncio
+from openai import OpenAI, AsyncOpenAI
+from tqdm.asyncio import tqdm as tqdm_async
 from tqdm.auto import tqdm
 
-from src.messy_text_processor import MessyTextProcessor
+from src.messy_text_processor import MessyTextProcessor, AsyncMessyTextProcessor
 from src.utils import setup_logger, log_memory_usage, check_gpu_info, check_vllm_server
 
 
 # =============================================================================
-# Step 3: Processing function (policy/orchestration layer)
+# Step 3: Processing function (Sync - Legacy Support)
 # =============================================================================
 def process_dataframe_summary_and_classification(
     df,
@@ -45,34 +47,39 @@ def process_dataframe_summary_and_classification(
     start_index=0,
     early_break=None,
     inner_loop_break=None,
-    show_resources=False,
-    print_prompts=False,
-    print_response=False,
-    print_progress=False,
-    use_progress_bar=True
+    log_resources=False,
+    log_prompts=False,
+    log_response=False,
+    log_progress=False,
+    use_progress_bar=True,
+    max_tokens_summary=1024,
+    max_tokens_classification=1048
 ):
     """
-    Processes a DataFrame to generate summaries and classifications for text data.
-    Maintains same interface as original notebook function.
-    
+    Processes a DataFrame to generate summaries and classifications for text data using a synchronous approach.
+
+    Maintains the same interface as the original notebook function for backward compatibility.
+
     Args:
-        df: Input DataFrame with 'text' column.
-        code_to_desc_map: Dict mapping classification codes to descriptions.
-        label_values_map: Dict mapping classification codes to possible values.
-        vllm_client: OpenAI-compatible client for vLLM.
-        model_name: Model name string.
-        log_file: Path to log file.
-        start_index: Row index to start processing from.
-        early_break: Stop after N rows (for testing).
-        inner_loop_break: Stop classification after N keys per row (for testing).
-        show_resources: Log memory usage per row.
-        print_prompts: Log prompts (not implemented - prompts are internal).
-        print_response: Log responses (not implemented - responses are internal).
-        print_progress: Enable verbose progress logging.
-        use_progress_bar: Use tqdm progress bar (True) or log milestones (False for server).
-    
+        df (pd.DataFrame): Input DataFrame containing a 'text' column.
+        code_to_desc_map (Dict[str, str]): Mapping of classification codes to descriptions.
+        label_values_map (Dict[str, List[str]]): Mapping of classification codes to possible values.
+        vllm_client (OpenAI): The synchronous OpenAI-compatible client.
+        model_name (str): The name of the model to use.
+        log_file (str): Path to the log file. Defaults to "processing.log".
+        start_index (int): Row index to start processing from. Defaults to 0.
+        early_break (Optional[int]): Stop after N rows (for testing). Defaults to None.
+        inner_loop_break (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
+        log_resources (bool): Whether to log memory usage per row. Defaults to False.
+        log_prompts (bool): Whether to log prompts (unused, internal implementation). Defaults to False.
+        log_response (bool): Whether to log full responses (unused, internal implementation). Defaults to False.
+        log_progress (bool): Enable verbose progress logging. Defaults to False.
+        use_progress_bar (bool): Use tqdm progress bar (True) or log milestones (False). Defaults to True.
+        max_tokens_summary (int): Max tokens for summary generation. Defaults to 1024.
+        max_tokens_classification (int): Max tokens for classification generation. Defaults to 1048.
+
     Returns:
-        pd.DataFrame: Processed DataFrame with summary and classification columns.
+        pd.DataFrame: The processed DataFrame with new summary and classification columns.
     """
     # Setup logger from config
     logger = setup_logger(log_file=log_file)
@@ -82,8 +89,8 @@ def process_dataframe_summary_and_classification(
         'model': {'name': model_name},
         'processing': {
             'temperature': 0.0,
-            'max_tokens_summary': 1024,
-            'max_tokens_classification': 1048
+            'max_tokens_summary': max_tokens_summary,
+            'max_tokens_classification': max_tokens_classification
         }
     }
     
@@ -128,7 +135,7 @@ def process_dataframe_summary_and_classification(
             
             pbar.set_description(f"Processing (Index: {row.Index})")
             
-            if print_progress:
+            if log_progress:
                 logger.info(f"Processing row {row.Index}")
             
             current_row_results = {'index': row.Index}
@@ -145,7 +152,7 @@ def process_dataframe_summary_and_classification(
             
             current_row_results['summary_all_context'] = summary
             
-            if print_response:
+            if log_response:
                 logger.info(f"Summary for {row.Index}: {summary[:100]}...")
             
             # Step 3: Classify (inner loop)
@@ -157,7 +164,7 @@ def process_dataframe_summary_and_classification(
                         classification = processor.classify_summary(summary, key)
                         current_row_results[f'{key}_classification'] = classification
                         
-                        if print_response:
+                        if log_response:
                             logger.info(f"  {key}: {classification}")
             
             # Fill remaining keys with empty if inner_loop_break was applied
@@ -168,7 +175,7 @@ def process_dataframe_summary_and_classification(
             results_list.append(current_row_results)
             
             # Memory logging
-            if show_resources:
+            if log_resources:
                 log_memory_usage(logger, f"After row {row.Index}")
             
             # Cleanup
@@ -205,14 +212,183 @@ def process_dataframe_summary_and_classification(
 
 
 # =============================================================================
+# Step 3b: Processing function (Async - High Performance)
+# =============================================================================
+async def process_row_async(row, processor, keys_to_classify, semaphore, all_keys):
+    """
+    Processes a single row asynchronously, including cleaning, summarization, and classification.
+
+    Args:
+        row (NamedTuple): A pandas row namedtuple containing the 'text' and 'Index'.
+        processor (AsyncMessyTextProcessor): The async processor instance.
+        keys_to_classify (List[str]): List of keys to classify for this row.
+        semaphore (asyncio.Semaphore): Semaphore to limit concurrent execution.
+        all_keys (List[str]): Complete list of keys to ensure all columns are present in output.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the processing results for the row.
+    """
+    async with semaphore:
+        current_row_results = {'index': row.Index}
+        
+        # Step 1: Clean text
+        text = str(row.text) if hasattr(row, 'text') else ""
+        cleaned_text = processor.clean_text(text)
+        
+        # Step 2: Summarize
+        if cleaned_text.strip():
+            summary = await processor.summarize_text(cleaned_text)
+        else:
+            summary = 'No relevant information found'
+        
+        current_row_results['summary_all_context'] = summary
+        
+        # Step 3: Classify (Parallel inner loop)
+        if summary and summary != 'No relevant information found':
+            # Create tasks for all keys to run in parallel
+            tasks = []
+            for key in keys_to_classify:
+                tasks.append(processor.classify_summary(summary, key))
+            
+            # Run all classifications concurrently
+            results = await asyncio.gather(*tasks)
+            
+            # Store results
+            for key, classification in zip(keys_to_classify, results):
+                current_row_results[f'{key}_classification'] = classification
+        
+        # Fill remaining keys or if no summary found
+        for key in all_keys:
+            if f'{key}_classification' not in current_row_results:
+                current_row_results[f'{key}_classification'] = ""
+                
+        return current_row_results
+
+async def process_dataframe_async(
+    df,
+    code_to_desc_map,
+    label_values_map,
+    vllm_client,
+    model_name,
+    log_file="processing.log",
+    start_index=0,
+    early_break=None,
+    inner_loop_break=None,
+    log_resources=False,
+    log_prompts=False,  # Kept for interface compatibility, unused
+    log_response=False, # Kept for interface compatibility, unused
+    log_progress=False, # Kept for interface compatibility, unused
+    use_progress_bar=True,
+    max_concurrent_rows=50,
+    max_tokens_summary=1024,
+    max_tokens_classification=1048
+):
+    """
+    Processes a DataFrame asynchronously using concurrent execution for high throughput.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing a 'text' column.
+        code_to_desc_map (Dict[str, str]): Mapping of classification codes to descriptions.
+        label_values_map (Dict[str, List[str]]): Mapping of classification codes to possible values.
+        vllm_client (AsyncOpenAI): The asynchronous OpenAI-compatible client.
+        model_name (str): The name of the model to use.
+        log_file (str): Path to the log file. Defaults to "processing.log".
+        start_index (int): Row index to start processing from. Defaults to 0.
+        early_break (Optional[int]): Stop after N rows (for testing). Defaults to None.
+        inner_loop_break (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
+        log_resources (bool): Whether to log memory usage per row. Defaults to False.
+        log_prompts (bool): Unused, kept for compatibility. Defaults to False.
+        log_response (bool): Unused, kept for compatibility. Defaults to False.
+        log_progress (bool): Unused, kept for compatibility. Defaults to False.
+        use_progress_bar (bool): Use tqdm progress bar. Defaults to True.
+        max_concurrent_rows (int): Maximum number of concurrent row processing tasks. Defaults to 50.
+        max_tokens_summary (int): Max tokens for summary generation. Defaults to 1024.
+        max_tokens_classification (int): Max tokens for classification generation. Defaults to 1048.
+
+    Returns:
+        pd.DataFrame: The processed DataFrame with new summary and classification columns.
+    """
+    # Setup logger from config
+    logger = setup_logger(log_file=log_file)
+    
+    config = {
+        'model': {'name': model_name},
+        'processing': {
+            'temperature': 0.0,
+            'max_tokens_summary': max_tokens_summary,
+            'max_tokens_classification': max_tokens_classification
+        }
+    }
+    
+    taxonomy = {
+        'context_definitions': code_to_desc_map,
+        'label_options': label_values_map
+    }
+    
+    # Instantiate Async processor
+    a = AsyncMessyTextProcessor(vllm_client, config, taxonomy, logger)
+    
+    all_keys = list(code_to_desc_map.keys())
+    keys_to_classify = all_keys[:inner_loop_break] if inner_loop_break else all_keys
+    
+    # Initialize columns in input df (optional, for structure)
+    df_processed = df.copy()
+    new_columns = ['summary_all_context'] + [f'{key}_classification' for key in all_keys]
+    for col in new_columns:
+        if col not in df_processed.columns:
+            df_processed[col] = ""
+            
+    df_to_process = df_processed.iloc[start_index:]
+    total_rows = len(df_to_process)
+    if early_break is not None and early_break < total_rows:
+        df_to_process = df_to_process.iloc[:early_break]
+        total_rows = early_break
+
+    # Concurrency Control
+    semaphore = asyncio.Semaphore(max_concurrent_rows)
+    
+    logger.info(f"Starting async processing with {max_concurrent_rows} concurrent rows.")
+    
+    # Create tasks
+    tasks = []
+    for row in df_to_process.itertuples():
+        task = process_row_async(row, processor, keys_to_classify, semaphore, all_keys)
+        tasks.append(task)
+    
+    # Run tasks with progress bar
+    results_list = []
+    for f in tqdm_async.as_completed(tasks, total=len(tasks), desc="Processing Rows", disable=not use_progress_bar):
+        result = await f
+        results_list.append(result)
+        if log_resources and len(results_list) % 100 == 0:
+             log_memory_usage(logger, f"Processed {len(results_list)} rows")
+
+    # Update DataFrame
+    if results_list:
+        results_df = pd.DataFrame(results_list).set_index('index')
+        df_processed.update(results_df)
+        
+    logger.info(f"Processing complete. Processed {len(results_list)} rows.")
+    return df_processed
+
+
+# =============================================================================
 # Step 4: Main function
 # =============================================================================
 def main():
+    """
+    Main entry point for the script.
+
+    Loads configuration, initializes clients, performs pre-flight checks, and executes the processing pipeline.
+    Supports both synchronous and asynchronous modes based on configuration.
+
+    Returns:
+        None
+    """
     # Step 1: Load config (first, so logger can use config)
     with open('config/settings.yaml', 'r', encoding='utf-8') as f:
         settings = yaml.safe_load(f)
     
-    # Setup logger from config
     logger = setup_logger(log_file=settings['logging']['file'])
     
     # Step 2: Load data
@@ -224,13 +400,12 @@ def main():
     code_to_desc_map = taxonomy['context_definitions']
     label_values_map = taxonomy['label_options']
     
-    # Step 3a: Create client
-    client = OpenAI(
+    # Step 3a: Create SYNC client for Pre-flight checks
+    sync_client = OpenAI(
         base_url=settings['model']['api_base'],
         api_key=settings['model']['api_key']
     )
     
-    # Pre-flight checks
     logger.info("=" * 50)
     logger.info("PRE-FLIGHT CHECKS")
     logger.info("=" * 50)
@@ -243,7 +418,7 @@ def main():
     
     # vLLM server check
     vllm_ok, available_models, test_result = check_vllm_server(
-        client,
+        sync_client,
         settings['model']['name'],
         logger
     )
@@ -255,23 +430,59 @@ def main():
     logger.info("Pre-flight checks PASSED")
     logger.info("=" * 50)
     
-    # Step 3b: Call processing function (all parameters from config)
-    processed_df = process_dataframe_summary_and_classification(
-        df=df_text,
-        code_to_desc_map=code_to_desc_map,
-        label_values_map=label_values_map,
-        vllm_client=client,
-        model_name=settings['model']['name'],
-        log_file=settings['logging']['file'],
-        start_index=settings['processing']['start_index'],
-        early_break=settings['processing']['early_break'],
-        inner_loop_break=settings['processing']['inner_loop_break'],
-        show_resources=settings['processing']['show_resources'],
-        print_prompts=settings['processing']['print_prompts'],
-        print_response=settings['processing']['print_response'],
-        print_progress=settings['processing']['print_progress'],
-        use_progress_bar=settings['processing']['use_progress_bar']
-    )
+    # Step 3b: Select Processing Mode
+    async_processing = settings['processing'].get('async_processing', True)
+    
+    if async_processing:
+        logger.info("Using ASYNC processing mode.")
+        max_retries = settings['processing'].get('max_retries', 2)
+        max_concurrent_rows = settings['processing'].get('max_concurrent_rows', 50)
+        
+        async_client = AsyncOpenAI(
+            base_url=settings['model']['api_base'],
+            api_key=settings['model']['api_key'],
+            max_retries=max_retries
+        )
+        
+        processed_df = asyncio.run(process_dataframe_async(
+            df=df_text,
+            code_to_desc_map=code_to_desc_map,
+            label_values_map=label_values_map,
+            vllm_client=async_client,
+            model_name=settings['model']['name'],
+            log_file=settings['logging']['file'],
+            start_index=settings['processing']['start_index'],
+            early_break=settings['processing']['early_break'],
+            inner_loop_break=settings['processing']['inner_loop_break'],
+            log_resources=settings['processing']['log_resources'],
+            log_prompts=settings['processing']['log_prompts'],
+            log_response=settings['processing']['log_response'],
+            log_progress=settings['processing']['log_progress'],
+            use_progress_bar=settings['processing']['use_progress_bar'],
+            max_concurrent_rows=max_concurrent_rows,
+            max_tokens_summary=settings['processing'].get('max_tokens_summary', 1024),
+            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048)
+        ))
+    else:
+        logger.info("Using SYNC processing mode (Legacy).")
+        processed_df = process_dataframe_summary_and_classification(
+            df=df_text,
+            code_to_desc_map=code_to_desc_map,
+            label_values_map=label_values_map,
+            vllm_client=sync_client,  # Reuse the sync client
+            model_name=settings['model']['name'],
+            log_file=settings['logging']['file'],
+            start_index=settings['processing']['start_index'],
+            early_break=settings['processing']['early_break'],
+            inner_loop_break=settings['processing']['inner_loop_break'],
+            log_resources=settings['processing']['log_resources'],
+            log_prompts=settings['processing']['log_prompts'],
+            log_response=settings['processing']['log_response'],
+            log_progress=settings['processing']['log_progress'],
+            use_progress_bar=settings['processing']['use_progress_bar'],
+            max_tokens_summary=settings['processing'].get('max_tokens_summary', 1024),
+            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048)
+        )
     
     # Save output
     processed_df.replace(['No information', 'No relevant information found'], '', inplace=True)

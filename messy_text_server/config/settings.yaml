@@ -5,20 +5,22 @@ model:
 
 processing:
   temperature: 0.0
-  max_tokens_summary: 1024
-  max_tokens_classification: 1048
+  max_tokens_summary: 8192
+  max_tokens_classification: 8192
   start_index: 0
-  early_break: 5
-  inner_loop_break: 5
-  show_resources: false
-  print_prompts: false
-  print_response: false
-  print_progress: false
-  use_progress_bar: false
+  early_break: null
+  inner_loop_break: null
+  log_resources: false
+  log_prompts: false
+  log_response: false
+  log_progress: True
+  use_progress_bar: True
+  async_processing: True
+  max_retries: 5
+  max_concurrent_rows: 100
 
 output:
   path: "df_text_clas_server.csv"
 
 logging:
   file: "processing.log"
-
