@@ -1,0 +1,192 @@
+% !TEX program = pdflatex
+% !TEX root = resume.tex
+\documentclass[11pt, a4paper]{article}
+
+% Packages
+\usepackage[left=0.75in, right=0.75in, top=0.6in, bottom=0.6in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+% Colors (Awesome CV style usually uses a dark red/accent color)
+\definecolor{awesome-red}{HTML}{DC3522}
+\definecolor{darkgray}{HTML}{333333}
+\definecolor{gray}{HTML}{5D5D5D}
+
+% Links setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=awesome-red,
+    filecolor=awesome-red,      
+    urlcolor=awesome-red,
+}
+
+% Fonts (Default LaTeX font is fine, or use helvet/arial if preferred)
+% \usepackage[default]{lato} % Requires lato package
+
+% Section Formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\color{awesome-red}
+}{}{0em}{}[\color{darkgray}\titlerule \vspace{-5pt}]
+
+% Subsection Formatting
+\titleformat{\subsection}{
+  \vspace{-2pt}\raggedright\large\bfseries\color{darkgray}
+}{}{0em}{}
+
+% Custom commands for the resume
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\begin{document}
+
+% Header
+\begin{center}
+    {\Huge \textbf{XINGYUAN ZHAO}} \\ \vspace{5pt}
+    \small McKinney, TX 75070, US $|$ \small +1 (806) 800 6806 $|$ \href{mailto:xingyuanzhao@pm.me}{xingyuanzhao@pm.me} $|$ \href{https://github.com/YOUR-GITHUB}{github.com/YOUR-GITHUB}
+\end{center}
+
+% Summary
+\section{Summary}
+\small Technical builder with hands-on experience in LLM fine-tuning, AI agent development, and GPU-accelerated ML pipelines. Independently designed and implemented novel algorithms integrating transformer attention mechanisms into causal inference methods. Built end-to-end NLP systems for event extraction and argument linking from large-scale unstructured text. Strong mathematical foundation in linear algebra, probability, and statistical inference. Fast learner who bridges cutting-edge ML research with practical implementation.
+
+% Skills
+\section{Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Technical}{: LLM Integration \& Fine-tuning, AI Agent Architecture, Machine Learning, Natural Language Processing, GPU-accelerated computations} \\
+     \textbf{Data Analysis}{: Statistical Analysis \& Experiment design, Causal Inference, Database Structures} \\
+     \textbf{Mathematics}{: Linear Algebra, Probability Theory, Statistical Inference, Optimization} \\
+     \textbf{Programming}{: Python (PyTorch, TensorFlow, HuggingFace Transformers, scikit-learn, pandas), R, SQL, Git}
+    }}
+\end{itemize}
+
+% Experience
+\section{Experience}
+\resumeSubHeadingListStart
+
+    \resumeSubheading
+      {University of Texas at Dallas}{Richardson, Texas, US}
+      {Lecturer}{05/2024 -- Current}
+      \resumeItemListStart
+        \resumeItem{Taught the following classes: Data Visualization, Methods of Data Collection and Production, Knowledge Mining, Introduction to Quantitative Methods, and State and Local Government.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {University of Texas at Dallas}{Richardson, Texas, US}
+      {Research Assistant}{05/2024 -- Current}
+      \resumeItemListStart
+        \resumeItem{Built custom attention-based synthetic control algorithm from scratch using PyTorch.}
+        \resumeItem{Fine-tuned BERT and transformer models for political text classification on GPU cluster.}
+        \resumeItem{Developed AI agent pipeline for event extraction from large-scale unstructured text data.}
+        \resumeItem{Implemented end-to-end NLP system processing 500K+ social media posts using HuggingFace Transformers.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {University of Texas at Dallas}{Richardson, Texas, US}
+      {Teaching Assistant}{08/2022 -- Current}
+      \resumeItemListStart
+        \resumeItem{Conducted workshops on data analysis for the Transfer Research Initiative.}
+        \resumeItem{Led coding sessions at the Math and Coding Camp.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Beijing Bytedance Technology Co. Ltd.}{Haidian, Beijing, China}
+      {Public Affairs Specialist}{}
+      \resumeItemListStart
+        \resumeItem{Analyzing local policy trends and related data.}
+        \resumeItem{Maintaining relationships with agencies.}
+        \resumeItem{Leading and managing a group of interns.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% Education
+\section{Education}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {University of Texas at Dallas}{Richardson, TX}
+      {Ph.D. in Political Science}{Expected 04/2026}
+    
+    \resumeSubheading
+      {University of Texas at Dallas}{Richardson, TX}
+      {Master of Science in Social Data Analytics and Research}{Expected 04/2026}
+\resumeSubHeadingListEnd
+
+% Technical Projects
+\section{Technical Projects}
+\resumeSubHeadingListStart
+
+    \resumeProjectHeading
+      {\textbf{AI Agent for Event Extraction from Unstructured Text} $|$ \emph{Independent Project}}{}
+      \resumeItemListStart
+        \resumeItem{Independently built an AI agent system to extract structured events from messy, unstructured text data.}
+        \resumeItem{Designed multi-step reasoning pipeline with LLM orchestration for robust information extraction.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Event Argument Extraction \& Multi-Sentence Argument Linking} $|$ \emph{Independent Project}}{}
+      \resumeItemListStart
+        \resumeItem{Independently developed NLP system for extracting event arguments and linking arguments across multiple sentences.}
+        \resumeItem{Implemented transformer-based architecture for cross-sentence semantic reasoning.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Attention-Based Synthetic Control Method} $|$ \emph{MPSA Conference}}{}
+      \resumeItemListStart
+        \resumeItem{Independently designed and implemented a novel causal inference algorithm integrating multi-head attention mechanism into synthetic control methods using PyTorch.}
+        \resumeItem{Built custom attention layers to refine donor unit weighting, improving pretreatment alignment.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Large-Scale Political Text Analysis Pipeline} $|$ \emph{MPSA Conference}}{}
+      \resumeItemListStart
+        \resumeItem{Independently built end-to-end NLP pipeline for analyzing political polarization patterns from 500K+ social media posts.}
+        \resumeItem{Implemented BERT-based text classification and topic modeling for stance detection.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{GPU Export Policy Impact Analysis} $|$ \emph{Working in Progress}}{}
+      \resumeItemListStart
+        \resumeItem{Independently designed empirical framework analyzing BIS GPU regulations' effect on US-China AI development trajectories.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+% Certifications
+\section{Certifications}
+\resumeSubHeadingListStart
+    \resumeItem{Computing in Python IV: Objects \& Algorithms from Georgia Tech GTX}
+    \resumeItem{Statistical Learning from Stanford Online}
+\resumeSubHeadingListEnd
+
+\end{document}
