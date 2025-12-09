@@ -326,7 +326,7 @@ async def process_dataframe_async(
     }
     
     # Instantiate Async processor
-    a = AsyncMessyTextProcessor(vllm_client, config, taxonomy, logger)
+    processor = AsyncMessyTextProcessor(vllm_client, config, taxonomy, logger)
     
     all_keys = list(code_to_desc_map.keys())
     keys_to_classify = all_keys[:inner_loop_break] if inner_loop_break else all_keys
@@ -392,7 +392,7 @@ def main():
     logger = setup_logger(log_file=settings['logging']['file'])
     
     # Step 2: Load data
-    df_text = pd.read_csv('df_text.csv', encoding='utf-8')
+    df_text = pd.read_csv(settings['input']['path'], encoding='utf-8')
     
     with open('config/taxonomy.json', 'r', encoding='utf-8') as f:
         taxonomy = json.load(f)

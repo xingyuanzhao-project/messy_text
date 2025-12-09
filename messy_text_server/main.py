@@ -384,7 +384,7 @@ def main():
     logger = setup_logger(log_file=settings['logging']['file'])
     
     # Step 2: Load data
-    df_text = pd.read_csv('df_text.csv', encoding='utf-8')
+    df_text = pd.read_csv(settings['input']['path'], encoding='utf-8')
     
     with open('config/taxonomy.json', 'r', encoding='utf-8') as f:
         taxonomy = json.load(f)

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>apsa_proposal</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="apsa_proposal_files/libs/clipboard/clipboard.min.js"></script>
+<script src="apsa_proposal_files/libs/quarto-html/quarto.js"></script>
+<script src="apsa_proposal_files/libs/quarto-html/popper.min.js"></script>
+<script src="apsa_proposal_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="apsa_proposal_files/libs/quarto-html/anchor.min.js"></script>
+<link href="apsa_proposal_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="apsa_proposal_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="apsa_proposal_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="apsa_proposal_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="apsa_proposal_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="extracting-information-from-low-quality-text-a-stacked-llm-approach-for-political-science-research" class="level1">
+<h1>Extracting Information from Low-Quality Text: A Stacked LLM Approach for Political Science Research</h1>
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>Political scientists increasingly rely on text data to study phenomena ranging from legislative behavior to human rights violations. However, much of the text that researchers need—web-scraped news archives, digitized historical documents, social media posts—is “messy”: riddled with navigation menus, error pages, advertising copy, and formatting artifacts that traditional natural language processing methods cannot handle. The standard solution—hiring research assistants to manually clean and code such texts—is costly and does not scale. This paper introduces a two-stage “stacked LLM” pipeline that addresses this challenge. In the first stage, a large language model performs <em>extractive</em> summarization, filtering noise while preserving the original language of relevant passages. In the second stage, a constrained classification module assigns the cleaned summary to categories from a predefined taxonomy. We validate this approach against human annotations on a corpus of approximately 15,000 Spanish-language news articles documenting forced disappearances in Mexico, classified across 15 categories based on the HURIDOCS human rights documentation standard. We evaluate performance using accuracy, Cohen’s Kappa, hallucination rates, and cross-document consistency metrics. Our results demonstrate that the stacked architecture substantially outperforms direct classification on raw text, achieving agreement with human coders comparable to inter-coder reliability benchmarks. This work contributes a reproducible methodology for extracting structured information from low-quality text, reducing a key barrier to text-as-data research in political science.</p>
+<hr>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">1. Introduction</h2>
+<p>The “text as data” revolution has transformed empirical political science. Scholars now routinely analyze legislative speeches, party manifestos, judicial opinions, and news coverage to measure concepts that were previously observable only through surveys or expert coding (Grimmer and Stewart 2013). Yet this methodological advance rests on an often-unstated assumption: that the text corpus is <em>clean</em>. Topic models, sentiment classifiers, and word embedding methods assume that input documents contain substantive content in a consistent format. When this assumption holds—as with curated corpora of parliamentary debates or press releases—these methods perform well.</p>
+<p>In practice, however, many text sources that political scientists need are far from clean. Web-scraped news archives contain 404 error pages, cookie consent notices, navigation menus, and social media sharing buttons interspersed with article content. Digitized historical documents suffer from OCR errors. Social media posts mix substantive content with hashtags, mentions, and platform-specific formatting. We call such corpora “messy text.”</p>
+<p>The conventional approach to messy text is labor-intensive human preprocessing. Research assistants read each document, discard irrelevant pages, extract substantive passages, and code them according to a scheme. This approach is expensive, slow, and creates a barrier to entry for researchers without large RA budgets. A single study may require thousands of person-hours of annotation work.</p>
+<p>This paper asks: <strong>Can large language models automate the extraction of structured information from low-quality political text, with accuracy comparable to human annotation?</strong></p>
+<p>We answer this question by developing and validating a “stacked LLM” pipeline—a two-stage architecture where the first stage filters noise through extractive summarization and the second stage classifies the cleaned text into a domain-specific taxonomy. We apply this pipeline to a substantively important case: documenting forced disappearances in Mexico, a human rights crisis that has claimed over 100,000 victims since 2006. Our corpus comprises approximately 15,000 web-scraped Spanish-language news articles, many of which contain substantial noise. We benchmark our pipeline against human annotations produced by trained coders following the HURIDOCS (Human Rights Information and Documentation Systems) classification standard.</p>
+<hr>
+</section>
+<section id="background-and-related-work" class="level2">
+<h2 class="anchored" data-anchor-id="background-and-related-work">2. Background and Related Work</h2>
+<section id="text-as-data-in-political-science" class="level3">
+<h3 class="anchored" data-anchor-id="text-as-data-in-political-science">2.1 Text as Data in Political Science</h3>
+<p>The past two decades have seen an explosion of text analysis methods in political science. Scholars have used topic models to measure policy agendas (Quinn et al.&nbsp;2010), sentiment analysis to study media tone (Young and Soroka 2012), and word embeddings to trace ideological shifts (Rodman 2020). These methods share a common workflow: collect a corpus, preprocess it (tokenization, stemming, stopword removal), and apply a statistical or machine learning model.</p>
+<p>Critically, this workflow assumes that preprocessing is straightforward—that documents can be tokenized into meaningful units without first determining <em>which parts</em> of a document are substantively relevant. For curated corpora (congressional speeches, party platforms), this assumption is reasonable. For web-scraped or archival corpora, it is not.</p>
+</section>
+<section id="human-rights-documentation" class="level3">
+<h3 class="anchored" data-anchor-id="human-rights-documentation">2.2 Human Rights Documentation</h3>
+<p>Documenting human rights violations is a data-intensive enterprise. Organizations like Amnesty International, Human Rights Watch, and the UN Office of the High Commissioner for Human Rights maintain databases of incidents coded according to standardized schemes. The HURIDOCS micro-thesauri provide a widely-used taxonomy covering victim characteristics, perpetrator types, methods of capture, treatment in captivity, and case outcomes.</p>
+<p>Applying such schemes at scale requires substantial human labor. In our case study, trained coders read news articles about forced disappearances in Mexico and assigned each article to categories including: victim’s social group (student, journalist, activist, etc.), method of capture (kidnapping, detention, “levantón”), perpetrator type (state police, military, organized crime cartel), and case outcome (still disappeared, found dead, liberated). This coding process—essential for systematic analysis—took hundreds of hours.</p>
+</section>
+<section id="large-language-models-for-annotation" class="level3">
+<h3 class="anchored" data-anchor-id="large-language-models-for-annotation">2.3 Large Language Models for Annotation</h3>
+<p>Recent work has explored using LLMs to automate text annotation tasks. Gilardi et al.&nbsp;(2023) show that ChatGPT can match or exceed crowd-workers on several annotation tasks. Ziems et al.&nbsp;(2024) provide a comprehensive survey of LLMs for computational social science. Törnberg (2023) demonstrates LLM classification of political content.</p>
+<p>However, this literature has largely focused on <em>clean</em> text: tweets, news headlines, survey responses. The question of whether LLMs can handle genuinely messy text—documents where the first task is identifying <em>which parts</em> are substantively relevant—remains underexplored. Our paper addresses this gap.</p>
+<hr>
+</section>
+</section>
+<section id="research-design" class="level2">
+<h2 class="anchored" data-anchor-id="research-design">3. Research Design</h2>
+<section id="the-challenge-of-direct-classification" class="level3">
+<h3 class="anchored" data-anchor-id="the-challenge-of-direct-classification">3.1 The Challenge of Direct Classification</h3>
+<p>Why not simply prompt an LLM to classify raw messy text directly? We initially attempted this approach and encountered two problems:</p>
+<ol type="1">
+<li><p><strong>Noise propagation</strong>: When input contains navigation menus, error messages, and advertising copy alongside substantive content, the model struggles to distinguish signal from noise. Classifications become unreliable.</p></li>
+<li><p><strong>Output failures</strong>: Messy input frequently causes the model to produce malformed output—incomplete JSON, hallucinated categories, or refusals to classify.</p></li>
+</ol>
+<p>These problems motivated our two-stage architecture.</p>
+</section>
+<section id="the-stacked-llm-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="the-stacked-llm-pipeline">3.2 The Stacked LLM Pipeline</h3>
+<p>Our pipeline consists of two stages:</p>
+<p><strong>Stage 1: Extractive Summarization</strong></p>
+<p>The first stage takes raw messy text as input and produces a cleaned summary as output. Crucially, we instruct the model to perform <em>extractive</em> rather than abstractive summarization: it must copy verbatim spans from the original text rather than paraphrasing. This design choice preserves the original language—important for legal and journalistic texts where exact phrasing carries meaning (e.g., distinguishing “desaparición” from “secuestro” from “levantón” in Mexican press coverage).</p>
+<p>The summarization prompt explicitly instructs the model to: - Ignore navigation elements, cookie notices, WordPress footers, and other site chrome - Detect and discard error pages (“Página no encontrada,” “404”) - Extract only passages relevant to the documentation categories - Preserve original Spanish phrasing without paraphrase</p>
+<p><strong>Stage 2: Constrained Classification</strong></p>
+<p>The second stage takes the cleaned summary and classifies it across 15 HURIDOCS-based categories. We use <em>constrained decoding</em> (also called “guided generation”) to force the model to produce valid JSON containing only labels from the predefined taxonomy. This eliminates parsing failures and restricts hallucination to selecting incorrect—but syntactically valid—categories.</p>
+<p>For each category, the model outputs both a classification and an evidence field containing the text span that supports the classification. This audit trail enables human review of edge cases.</p>
+</section>
+<section id="why-stacking-works" class="level3">
+<h3 class="anchored" data-anchor-id="why-stacking-works">3.3 Why Stacking Works</h3>
+<p>The two-stage architecture offers several advantages:</p>
+<ol type="1">
+<li><p><strong>Noise isolation</strong>: Summarization filters noise <em>before</em> it can affect classification. The classification stage operates on cleaned text.</p></li>
+<li><p><strong>Consistency</strong>: All 15 classifications are performed on the <em>same</em> summary, ensuring that evidence is interpreted consistently across categories.</p></li>
+<li><p><strong>Modularity</strong>: Each stage can be evaluated and improved independently. The summarization stage can be assessed for noise filtering; the classification stage can be assessed against the taxonomy.</p></li>
+<li><p><strong>Scalability</strong>: Both stages can be parallelized. We implement asynchronous processing with up to 100 concurrent documents.</p></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="data-and-validation" class="level2">
+<h2 class="anchored" data-anchor-id="data-and-validation">4. Data and Validation</h2>
+<section id="corpus" class="level3">
+<h3 class="anchored" data-anchor-id="corpus">4.1 Corpus</h3>
+<p>Our corpus comprises approximately 15,000 Spanish-language news articles related to forced disappearances in Mexico, collected via web scraping from regional and national news outlets. The corpus exhibits the full range of “messy text” challenges:</p>
+<ul>
+<li>404 error pages and “article not found” notices</li>
+<li>Navigation menus, category listings, and related article links</li>
+<li>Cookie consent banners and privacy notices</li>
+<li>Social media sharing buttons and comment sections</li>
+<li>WordPress and CMS metadata</li>
+<li>Inconsistent formatting across outlets</li>
+</ul>
+<p>Articles are linked to approximately 2,000 unique victim cases, with multiple articles per victim enabling cross-document consistency analysis.</p>
+</section>
+<section id="human-annotations" class="level3">
+<h3 class="anchored" data-anchor-id="human-annotations">4.2 Human Annotations</h3>
+<p>Ground truth annotations were produced by trained research assistants following the HURIDOCS coding manual (translated to Spanish). Coders assigned each article to categories including:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 33%">
+<col style="width: 41%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>vic_grupo_social</td>
+<td>Victim’s social group</td>
+<td>Student, Journalist, Activist, Taxi driver</td>
+</tr>
+<tr class="even">
+<td>captura_metodo</td>
+<td>Method of capture</td>
+<td>Disappearance, Kidnapping, Detention, Levantón</td>
+</tr>
+<tr class="odd">
+<td>perp_tipo1</td>
+<td>Perpetrator type</td>
+<td>Municipal police, Army, Cartel de Sinaloa, CJNG</td>
+</tr>
+<tr class="even">
+<td>desenlace</td>
+<td>Case outcome</td>
+<td>Still disappeared, Found dead, Liberated</td>
+</tr>
+</tbody>
+</table>
+<p>Fifteen categories in total, each with 5-22 possible values plus “No information.”</p>
+</section>
+<section id="evaluation-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="evaluation-metrics">4.3 Evaluation Metrics</h3>
+<p>We evaluate the pipeline using metrics appropriate for multi-class classification against human annotation:</p>
+<p><strong>Agreement Metrics</strong> - <strong>Accuracy</strong>: Proportion of exact matches with human coding - <strong>Macro F1</strong>: Average F1 across categories, weighting rare categories equally - <strong>Cohen’s Kappa</strong>: Agreement corrected for chance, standard for inter-coder reliability</p>
+<p><strong>Error Metrics</strong> - <strong>Extrinsic Hallucination Rate</strong>: LLM asserts information not present in source text (1 - Precision on binary “information present” task) - <strong>Intrinsic Hallucination Rate</strong>: Among cases where both human and LLM find information, rate of contradictory classifications - <strong>Omission Rate</strong>: LLM misses information that human coders found (1 - Recall on binary task)</p>
+<p><strong>Consistency Metrics</strong> - <strong>Cross-Document Consistency</strong>: For victims with multiple articles, Shannon entropy of LLM classifications. Lower entropy indicates the model assigns consistent labels across documents about the same case.</p>
+</section>
+<section id="aggregation-methods" class="level3">
+<h3 class="anchored" data-anchor-id="aggregation-methods">4.4 Aggregation Methods</h3>
+<p>Because victims may appear in multiple news articles, we implement three aggregation methods for victim-level analysis:</p>
+<ol type="1">
+<li><strong>Consensus (Mode)</strong>: Most frequent classification across articles</li>
+<li><strong>Sigmoid-Weighted</strong>: Weight by article length (longer articles = more information)</li>
+<li><strong>Log-Weighted</strong>: Log-transformed article length to reduce outlier influence</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="expected-findings" class="level2">
+<h2 class="anchored" data-anchor-id="expected-findings">5. Expected Findings</h2>
+<p>We anticipate the following results:</p>
+<ol type="1">
+<li><p><strong>Stacking outperforms direct classification</strong>: The two-stage pipeline will achieve substantially higher accuracy than single-stage classification on raw text, validating the architectural innovation.</p></li>
+<li><p><strong>Performance comparable to inter-coder reliability</strong>: Agreement metrics (Kappa, F1) will approach typical inter-coder reliability benchmarks for human annotation tasks (Kappa &gt; 0.6).</p></li>
+<li><p><strong>Low hallucination, moderate omission</strong>: We expect extrinsic hallucination rates below 15% (the model rarely fabricates information) but omission rates of 20-30% (the model misses some information that human coders found—a conservative error mode).</p></li>
+<li><p><strong>High cross-document consistency</strong>: For victims appearing in multiple articles, the model will assign consistent classifications, indicating robustness to variation in source text.</p></li>
+</ol>
+<hr>
+</section>
+<section id="contributions-and-implications" class="level2">
+<h2 class="anchored" data-anchor-id="contributions-and-implications">6. Contributions and Implications</h2>
+<section id="methodological-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="methodological-contribution">6.1 Methodological Contribution</h3>
+<p>This paper contributes a validated, reproducible methodology for extracting structured information from low-quality text. The key insight is architectural: decomposing the task into noise filtering (summarization) and classification enables LLMs to handle text that would defeat single-stage approaches. We provide open-source code, prompts, and evaluation scripts to enable replication and adaptation.</p>
+</section>
+<section id="substantive-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="substantive-contribution">6.2 Substantive Contribution</h3>
+<p>By automating the annotation process, we enable systematic analysis of human rights documentation at a scale previously infeasible. Our case study on forced disappearances in Mexico demonstrates the pipeline’s application to a substantively important research agenda.</p>
+</section>
+<section id="broader-implications" class="level3">
+<h3 class="anchored" data-anchor-id="broader-implications">6.3 Broader Implications</h3>
+<p>The stacked LLM approach generalizes beyond our specific case:</p>
+<ul>
+<li><strong>Historical research</strong>: Digitized newspaper archives with OCR errors and layout artifacts</li>
+<li><strong>Media studies</strong>: Web-scraped news coverage with CMS noise</li>
+<li><strong>Comparative politics</strong>: Multilingual corpora with inconsistent formatting</li>
+<li><strong>Conflict research</strong>: Reports from conflict zones with fragmentary information</li>
+</ul>
+<p>By reducing the labor cost of processing messy text, this methodology lowers barriers to entry for text-as-data research, enabling scholars without large RA budgets to analyze corpora that were previously inaccessible.</p>
+<hr>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>Gilardi, F., Alizadeh, M., &amp; Kubli, M. (2023). ChatGPT outperforms crowd-workers for text-annotation tasks. <em>Proceedings of the National Academy of Sciences</em>, 120(30).</p>
+<p>Grimmer, J., &amp; Stewart, B. M. (2013). Text as data: The promise and pitfalls of automatic content analysis methods for political texts. <em>Political Analysis</em>, 21(3), 267-297.</p>
+<p>Quinn, K. M., Monroe, B. L., Colaresi, M., Crespin, M. H., &amp; Radev, D. R. (2010). How to analyze political attention with minimal assumptions and costs. <em>American Journal of Political Science</em>, 54(1), 209-228.</p>
+<p>Rodman, E. (2020). A timely intervention: Tracking the changing meanings of political concepts with word vectors. <em>Political Analysis</em>, 28(1), 87-111.</p>
+<p>Törnberg, P. (2023). ChatGPT-4 outperforms experts and crowd workers in annotating political Twitter messages with zero-shot learning. <em>arXiv preprint arXiv:2304.06588</em>.</p>
+<p>Young, L., &amp; Soroka, S. (2012). Affective news: The automated coding of sentiment in political texts. <em>Political Communication</em>, 29(2), 205-231.</p>
+<p>Ziems, C., Held, W., Shaber, O., Lu, J., Levy, M., &amp; Yang, D. (2024). Can large language models transform computational social science? <em>Computational Linguistics</em>, 50(1), 237-291.</p>
+<hr>
+<p><em>Word Count: approximately 2,200 words</em></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
