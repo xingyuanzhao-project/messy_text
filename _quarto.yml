@@ -1,0 +1,34 @@
+project:
+  type: default
+  output-dir: _output
+
+# Default format options
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-tools: true
+  
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    transition: fade
+    preview-links: auto
+    chalkboard: false
+
+# Execute options for notebooks/code
+execute:
+  freeze: auto
+  cache: true
+
+# Jupyter configuration
+jupyter: python3
+
+# Rendering options
+knitr:
+  opts_chunk:
+    echo: true
+    warning: false
+    message: false
+

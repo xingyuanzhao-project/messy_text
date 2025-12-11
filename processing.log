@@ -1538,3 +1538,963 @@
 2025-12-04 10:28:34,503 - INFO - Processing complete. Processed 20 rows.
 2025-12-04 10:28:34,807 - INFO - Output saved to df_text_clas_server.csv
 2025-12-04 10:28:34,807 - INFO - Output saved to df_text_clas_server.csv
+2025-12-10 11:24:01,256 - INFO - ==================================================
+2025-12-10 11:24:01,256 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 11:24:01,256 - INFO - ==================================================
+2025-12-10 11:24:01,256 - INFO - Loading data from: df_text_clas_server.csv
+2025-12-10 11:24:01,352 - INFO - Loaded 2229 rows
+2025-12-10 11:24:01,358 - INFO - Evaluating 5 rows with valid summaries
+2025-12-10 11:24:01,573 - INFO - GEvalEvaluator initialized with model: Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (Local Model)
+2025-12-10 11:24:01,574 - INFO - --- Evaluating row 1 ---
+2025-12-10 11:24:01,574 - INFO - Source length: 5511 chars
+2025-12-10 11:24:01,574 - INFO - Summary length: 1586 chars
+2025-12-10 11:24:02,731 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:24:02,731 - INFO - Row 1 score: 0.000
+2025-12-10 11:24:02,731 - INFO - --- Evaluating row 2 ---
+2025-12-10 11:24:02,731 - INFO - Source length: 5071 chars
+2025-12-10 11:24:02,731 - INFO - Summary length: 683 chars
+2025-12-10 11:24:03,439 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:24:03,439 - INFO - Row 2 score: 0.000
+2025-12-10 11:24:03,439 - INFO - --- Evaluating row 3 ---
+2025-12-10 11:24:03,439 - INFO - Source length: 15789 chars
+2025-12-10 11:24:03,439 - INFO - Summary length: 597 chars
+2025-12-10 11:24:04,131 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:24:04,131 - INFO - Row 3 score: 0.000
+2025-12-10 11:24:04,139 - INFO - --- Evaluating row 4 ---
+2025-12-10 11:24:04,139 - INFO - Source length: 7637 chars
+2025-12-10 11:24:04,139 - INFO - Summary length: 806 chars
+2025-12-10 11:24:04,875 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:24:04,875 - INFO - Row 4 score: 0.000
+2025-12-10 11:24:04,875 - INFO - --- Evaluating row 5 ---
+2025-12-10 11:24:04,875 - INFO - Source length: 3442 chars
+2025-12-10 11:24:04,875 - INFO - Summary length: 1406 chars
+2025-12-10 11:24:05,564 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:24:05,564 - INFO - Row 5 score: 0.000
+2025-12-10 11:24:05,564 - INFO - ==================================================
+2025-12-10 11:24:05,564 - INFO - EVALUATION RESULTS
+2025-12-10 11:24:05,564 - INFO - ==================================================
+2025-12-10 11:24:05,564 - INFO - Rows evaluated: 5
+2025-12-10 11:24:05,564 - INFO - Average summarization score: 0.000
+2025-12-10 11:24:05,564 - INFO - Min score: 0.000
+2025-12-10 11:24:05,564 - INFO - Max score: 0.000
+2025-12-10 11:24:05,564 - INFO - Evaluation complete.
+2025-12-10 11:26:52,746 - INFO - ==================================================
+2025-12-10 11:26:52,748 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 11:26:52,748 - INFO - ==================================================
+2025-12-10 11:26:52,748 - INFO - Loading data from: df_text_clas_server.csv
+2025-12-10 11:26:52,855 - INFO - Loaded 2229 rows
+2025-12-10 11:26:52,857 - INFO - Evaluating 5 rows with valid summaries
+2025-12-10 11:26:53,097 - INFO - GEvalEvaluator initialized with model: Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (Local Model)
+2025-12-10 11:26:53,098 - INFO - --- Evaluating row 1 ---
+2025-12-10 11:26:53,098 - INFO - Source length: 5511 chars
+2025-12-10 11:26:53,098 - INFO - Summary length: 1586 chars
+2025-12-10 11:26:54,158 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:26:54,158 - INFO - Row 1 score: 0.000
+2025-12-10 11:26:54,158 - INFO - --- Evaluating row 2 ---
+2025-12-10 11:26:54,159 - INFO - Source length: 5071 chars
+2025-12-10 11:26:54,159 - INFO - Summary length: 683 chars
+2025-12-10 11:26:54,937 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:26:54,938 - INFO - Row 2 score: 0.000
+2025-12-10 11:26:54,938 - INFO - --- Evaluating row 3 ---
+2025-12-10 11:26:54,938 - INFO - Source length: 15789 chars
+2025-12-10 11:26:54,938 - INFO - Summary length: 597 chars
+2025-12-10 11:26:55,691 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:26:55,691 - INFO - Row 3 score: 0.000
+2025-12-10 11:26:55,692 - INFO - --- Evaluating row 4 ---
+2025-12-10 11:26:55,692 - INFO - Source length: 7637 chars
+2025-12-10 11:26:55,692 - INFO - Summary length: 806 chars
+2025-12-10 11:26:56,465 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:26:56,466 - INFO - Row 4 score: 0.000
+2025-12-10 11:26:56,467 - INFO - --- Evaluating row 5 ---
+2025-12-10 11:26:56,467 - INFO - Source length: 3442 chars
+2025-12-10 11:26:56,467 - INFO - Summary length: 1406 chars
+2025-12-10 11:26:57,330 - ERROR - Summarization evaluation failed: Error code: 404 - {'error': {'message': 'The model `Meta-Llama-3.1-8B-Instruct-AWQ-INT4` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+2025-12-10 11:26:57,330 - INFO - Row 5 score: 0.000
+2025-12-10 11:26:57,334 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 11:26:57,338 - INFO - ==================================================
+2025-12-10 11:26:57,338 - INFO - EVALUATION RESULTS
+2025-12-10 11:26:57,338 - INFO - ==================================================
+2025-12-10 11:26:57,339 - INFO - Rows evaluated: 5
+2025-12-10 11:26:57,339 - INFO - Average summarization score: 0.000
+2025-12-10 11:26:57,339 - INFO - Min score: 0.000
+2025-12-10 11:26:57,340 - INFO - Max score: 0.000
+2025-12-10 11:26:57,340 - INFO - Evaluation complete.
+2025-12-10 11:35:17,004 - INFO - ==================================================
+2025-12-10 11:35:17,004 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 11:35:17,004 - INFO - ==================================================
+2025-12-10 11:35:17,004 - INFO - Loading data from: df_text_clas_server.csv
+2025-12-10 11:35:17,122 - INFO - Loaded 2229 rows
+2025-12-10 11:35:17,126 - INFO - Evaluating 5 rows with valid summaries
+2025-12-10 11:35:17,367 - INFO - GEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 11:35:17,368 - INFO - --- Evaluating row 1 ---
+2025-12-10 11:35:17,368 - INFO - Source length: 5511 chars
+2025-12-10 11:35:17,368 - INFO - Summary length: 1586 chars
+2025-12-10 12:06:27,513 - INFO - ==================================================
+2025-12-10 12:06:27,513 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 12:06:27,513 - INFO - ==================================================
+2025-12-10 12:06:27,513 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 12:06:27,743 - INFO - GEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 12:06:27,752 - INFO - --- Evaluating row 1 ---
+2025-12-10 12:06:27,752 - INFO - Source length: 5511 chars
+2025-12-10 12:06:27,752 - INFO - Summary length: 1586 chars
+2025-12-10 12:22:59,330 - INFO - ==================================================
+2025-12-10 12:22:59,331 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 12:22:59,331 - INFO - ==================================================
+2025-12-10 12:22:59,331 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 12:22:59,540 - INFO - GEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 12:22:59,558 - INFO - --- Evaluating row 1 ---
+2025-12-10 12:22:59,559 - INFO - Source length: 5511 chars
+2025-12-10 12:22:59,559 - INFO - Summary length: 1586 chars
+2025-12-10 13:01:53,796 - INFO - ==================================================
+2025-12-10 13:01:53,796 - INFO - SUMMARIZATION EVALUATION
+2025-12-10 13:01:53,796 - INFO - ==================================================
+2025-12-10 13:01:53,803 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 13:01:53,803 - INFO - Mode: async
+2025-12-10 13:01:54,024 - INFO - AsyncGEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 13:01:54,030 - INFO - --- Evaluating row 1 ---
+2025-12-10 13:01:54,030 - INFO - Source length: 5511 chars
+2025-12-10 13:01:54,030 - INFO - Summary length: 1586 chars
+2025-12-10 13:02:36,471 - ERROR - Summarization evaluation failed: 'tuple' object has no attribute 'claims'
+2025-12-10 13:02:36,471 - INFO - Row 1 score: 0.000
+2025-12-10 13:02:36,471 - INFO - --- Evaluating row 2 ---
+2025-12-10 13:02:36,471 - INFO - Source length: 5071 chars
+2025-12-10 13:02:36,471 - INFO - Summary length: 683 chars
+2025-12-10 13:02:55,440 - ERROR - Summarization evaluation failed: 'tuple' object has no attribute 'claims'
+2025-12-10 13:02:55,440 - INFO - Row 2 score: 0.000
+2025-12-10 13:02:55,440 - INFO - ==================================================
+2025-12-10 13:02:55,440 - INFO - EVALUATION RESULTS
+2025-12-10 13:02:55,440 - INFO - ==================================================
+2025-12-10 13:02:55,440 - INFO - Rows evaluated: 2
+2025-12-10 13:02:55,450 - INFO - Total time: 61.4s
+2025-12-10 13:02:55,450 - INFO - Average summarization score: 0.000
+2025-12-10 13:02:55,450 - INFO - Min score: 0.000
+2025-12-10 13:02:55,450 - INFO - Max score: 0.000
+2025-12-10 13:02:55,458 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 13:02:55,458 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 13:02:55,458 - INFO - Evaluation complete.
+2025-12-10 13:02:55,458 - INFO - Evaluation complete.
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - EVALUATION BENCHMARKS
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - geval_summarization: disabled
+2025-12-10 17:19:43,945 - INFO - geval_hallucination: disabled
+2025-12-10 17:19:43,945 - INFO - summac_zs: disabled
+2025-12-10 17:19:43,945 - INFO - summac_conv: enabled, running...
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 17:19:43,945 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - ==================================================
+2025-12-10 17:19:43,945 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 17:19:43,945 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 17:21:49,185 - INFO - ==================================================
+2025-12-10 17:21:49,187 - INFO - EVALUATION BENCHMARKS
+2025-12-10 17:21:49,187 - INFO - ==================================================
+2025-12-10 17:21:49,187 - INFO - geval_summarization: disabled
+2025-12-10 17:21:49,187 - INFO - geval_hallucination: disabled
+2025-12-10 17:21:49,187 - INFO - summac_zs: disabled
+2025-12-10 17:21:49,187 - INFO - summac_conv: enabled, running...
+2025-12-10 17:21:49,187 - INFO - ==================================================
+2025-12-10 17:21:49,187 - INFO - ==================================================
+2025-12-10 17:21:49,189 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 17:21:49,189 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 17:21:49,189 - INFO - ==================================================
+2025-12-10 17:21:49,189 - INFO - ==================================================
+2025-12-10 17:21:49,190 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 17:21:49,190 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 17:21:55,060 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 17:21:55,060 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 17:21:55,061 - INFO - SummaCZS model loaded successfully
+2025-12-10 17:21:55,061 - INFO - SummaCZS model loaded successfully
+2025-12-10 17:21:55,074 - ERROR - Failed to load SummaCConv: Torch not compiled with CUDA enabled
+2025-12-10 17:21:55,074 - ERROR - Failed to load SummaCConv: Torch not compiled with CUDA enabled
+2025-12-10 18:14:49,537 - INFO - ==================================================
+2025-12-10 18:14:49,538 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:14:49,538 - INFO - ==================================================
+2025-12-10 18:14:49,538 - INFO - geval_summarization: disabled
+2025-12-10 18:14:49,539 - INFO - geval_hallucination: disabled
+2025-12-10 18:14:49,539 - INFO - summac_zs: disabled
+2025-12-10 18:14:49,539 - INFO - summac_conv: enabled, running...
+2025-12-10 18:14:49,540 - INFO - ==================================================
+2025-12-10 18:14:49,540 - INFO - ==================================================
+2025-12-10 18:14:49,540 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:14:49,540 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:14:49,541 - INFO - ==================================================
+2025-12-10 18:14:49,541 - INFO - ==================================================
+2025-12-10 18:14:49,542 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:14:49,542 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:14:57,245 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:14:57,245 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:14:57,245 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:14:57,245 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:14:57,262 - ERROR - Failed to load SummaCConv: Torch not compiled with CUDA enabled
+2025-12-10 18:14:57,262 - ERROR - Failed to load SummaCConv: Torch not compiled with CUDA enabled
+2025-12-10 18:28:34,836 - INFO - ==================================================
+2025-12-10 18:28:34,836 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:28:34,836 - INFO - ==================================================
+2025-12-10 18:28:34,836 - INFO - geval_summarization: disabled
+2025-12-10 18:28:34,836 - INFO - geval_hallucination: disabled
+2025-12-10 18:28:34,840 - INFO - summac_zs: disabled
+2025-12-10 18:28:34,840 - INFO - summac_conv: enabled, running...
+2025-12-10 18:28:34,840 - INFO - ==================================================
+2025-12-10 18:28:34,840 - INFO - ==================================================
+2025-12-10 18:28:34,840 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:28:34,840 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:28:34,840 - INFO - ==================================================
+2025-12-10 18:28:34,840 - INFO - ==================================================
+2025-12-10 18:28:34,845 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:28:34,845 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:28:43,709 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:28:43,709 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:28:43,710 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:28:43,710 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:28:44,107 - ERROR - Failed to load SummaCConv: [Errno 2] No such file or directory: 'summac_conv_vitc_sent_perc_e.bin'
+2025-12-10 18:28:44,107 - ERROR - Failed to load SummaCConv: [Errno 2] No such file or directory: 'summac_conv_vitc_sent_perc_e.bin'
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - geval_summarization: disabled
+2025-12-10 18:53:04,020 - INFO - geval_hallucination: disabled
+2025-12-10 18:53:04,020 - INFO - summac_zs: disabled
+2025-12-10 18:53:04,020 - INFO - summac_conv: enabled, running...
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:53:04,020 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - ==================================================
+2025-12-10 18:53:04,020 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:53:04,020 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:53:06,836 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:53:06,836 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:53:06,836 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:53:06,836 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:53:07,087 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:53:07,087 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:53:07,087 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:53:07,087 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:53:07,087 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:53:07,087 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:53:07,087 - INFO - Source length: 5511 chars
+2025-12-10 18:53:07,087 - INFO - Source length: 5511 chars
+2025-12-10 18:53:07,087 - INFO - Summary length: 1586 chars
+2025-12-10 18:53:07,087 - INFO - Summary length: 1586 chars
+2025-12-10 18:53:07,087 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:53:07,087 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:53:07,102 - INFO - Row 1 score: 0.000
+2025-12-10 18:53:07,102 - INFO - Row 1 score: 0.000
+2025-12-10 18:53:07,103 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:53:07,103 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:53:07,103 - INFO - Source length: 5071 chars
+2025-12-10 18:53:07,103 - INFO - Source length: 5071 chars
+2025-12-10 18:53:07,103 - INFO - Summary length: 683 chars
+2025-12-10 18:53:07,103 - INFO - Summary length: 683 chars
+2025-12-10 18:53:07,105 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:53:07,105 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:53:07,106 - INFO - Row 2 score: 0.000
+2025-12-10 18:53:07,106 - INFO - Row 2 score: 0.000
+2025-12-10 18:53:07,109 - INFO - ==================================================
+2025-12-10 18:53:07,109 - INFO - ==================================================
+2025-12-10 18:53:07,109 - INFO - SUMMAC CONVOLUTIONAL RESULTS
+2025-12-10 18:53:07,109 - INFO - SUMMAC CONVOLUTIONAL RESULTS
+2025-12-10 18:53:07,109 - INFO - ==================================================
+2025-12-10 18:53:07,109 - INFO - ==================================================
+2025-12-10 18:53:07,109 - INFO - Rows evaluated: 2
+2025-12-10 18:53:07,109 - INFO - Rows evaluated: 2
+2025-12-10 18:53:07,110 - INFO - Total time: 0.0s
+2025-12-10 18:53:07,110 - INFO - Total time: 0.0s
+2025-12-10 18:53:07,110 - INFO - Average score: 0.000
+2025-12-10 18:53:07,110 - INFO - Average score: 0.000
+2025-12-10 18:53:07,110 - INFO - Min score: 0.000
+2025-12-10 18:53:07,110 - INFO - Min score: 0.000
+2025-12-10 18:53:07,110 - INFO - Max score: 0.000
+2025-12-10 18:53:07,110 - INFO - Max score: 0.000
+2025-12-10 18:53:07,115 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:53:07,115 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:53:07,115 - INFO - Evaluation complete.
+2025-12-10 18:53:07,115 - INFO - Evaluation complete.
+2025-12-10 18:54:09,603 - INFO - ==================================================
+2025-12-10 18:54:09,604 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:54:09,604 - INFO - ==================================================
+2025-12-10 18:54:09,604 - INFO - geval_summarization: disabled
+2025-12-10 18:54:09,604 - INFO - geval_hallucination: disabled
+2025-12-10 18:54:09,604 - INFO - summac_zs: enabled, running...
+2025-12-10 18:54:09,604 - INFO - ==================================================
+2025-12-10 18:54:09,604 - INFO - ==================================================
+2025-12-10 18:54:09,606 - INFO - SUMMAC ZERO-SHOT EVALUATION
+2025-12-10 18:54:09,606 - INFO - SUMMAC ZERO-SHOT EVALUATION
+2025-12-10 18:54:09,606 - INFO - ==================================================
+2025-12-10 18:54:09,606 - INFO - ==================================================
+2025-12-10 18:54:09,608 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:09,608 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:13,771 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:13,771 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:13,772 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:13,772 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:13,956 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:13,956 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:13,957 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:13,957 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:13,960 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:13,960 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:13,960 - INFO - Source length: 5511 chars
+2025-12-10 18:54:13,960 - INFO - Source length: 5511 chars
+2025-12-10 18:54:13,960 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:13,960 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:13,962 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:13,962 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:13,964 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:13,964 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:13,965 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:13,965 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:13,965 - INFO - Source length: 5071 chars
+2025-12-10 18:54:13,965 - INFO - Source length: 5071 chars
+2025-12-10 18:54:13,965 - INFO - Summary length: 683 chars
+2025-12-10 18:54:13,965 - INFO - Summary length: 683 chars
+2025-12-10 18:54:13,967 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:13,967 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:13,967 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:13,967 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:13,967 - INFO - ==================================================
+2025-12-10 18:54:13,967 - INFO - ==================================================
+2025-12-10 18:54:13,967 - INFO - SUMMAC ZERO-SHOT RESULTS
+2025-12-10 18:54:13,967 - INFO - SUMMAC ZERO-SHOT RESULTS
+2025-12-10 18:54:13,967 - INFO - ==================================================
+2025-12-10 18:54:13,967 - INFO - ==================================================
+2025-12-10 18:54:13,967 - INFO - Rows evaluated: 2
+2025-12-10 18:54:13,967 - INFO - Rows evaluated: 2
+2025-12-10 18:54:13,967 - INFO - Total time: 0.0s
+2025-12-10 18:54:13,967 - INFO - Total time: 0.0s
+2025-12-10 18:54:13,967 - INFO - Average score: 0.000
+2025-12-10 18:54:13,967 - INFO - Average score: 0.000
+2025-12-10 18:54:13,967 - INFO - Min score: 0.000
+2025-12-10 18:54:13,967 - INFO - Min score: 0.000
+2025-12-10 18:54:13,967 - INFO - Max score: 0.000
+2025-12-10 18:54:13,967 - INFO - Max score: 0.000
+2025-12-10 18:54:13,967 - INFO - summac_conv: disabled
+2025-12-10 18:54:13,967 - INFO - summac_conv: disabled
+2025-12-10 18:54:13,975 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:54:13,975 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:54:13,975 - INFO - Evaluation complete.
+2025-12-10 18:54:13,975 - INFO - Evaluation complete.
+2025-12-10 18:54:43,394 - INFO - ==================================================
+2025-12-10 18:54:43,395 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:54:43,395 - INFO - ==================================================
+2025-12-10 18:54:43,395 - INFO - geval_summarization: disabled
+2025-12-10 18:54:43,395 - INFO - geval_hallucination: disabled
+2025-12-10 18:54:43,396 - INFO - summac_zs: enabled, running...
+2025-12-10 18:54:43,396 - INFO - ==================================================
+2025-12-10 18:54:43,396 - INFO - ==================================================
+2025-12-10 18:54:43,396 - INFO - SUMMAC ZERO-SHOT EVALUATION
+2025-12-10 18:54:43,396 - INFO - SUMMAC ZERO-SHOT EVALUATION
+2025-12-10 18:54:43,396 - INFO - ==================================================
+2025-12-10 18:54:43,396 - INFO - ==================================================
+2025-12-10 18:54:43,398 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:43,398 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:46,074 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:46,074 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:46,074 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:46,074 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:46,244 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:46,244 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:46,244 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:46,244 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:46,244 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:46,244 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:46,244 - INFO - Source length: 5511 chars
+2025-12-10 18:54:46,244 - INFO - Source length: 5511 chars
+2025-12-10 18:54:46,244 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:46,244 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:46,244 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,244 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,249 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:46,249 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:46,250 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:46,250 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:46,250 - INFO - Source length: 5071 chars
+2025-12-10 18:54:46,250 - INFO - Source length: 5071 chars
+2025-12-10 18:54:46,250 - INFO - Summary length: 683 chars
+2025-12-10 18:54:46,250 - INFO - Summary length: 683 chars
+2025-12-10 18:54:46,252 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,252 - ERROR - SummaCZS evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,253 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:46,253 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:46,254 - INFO - ==================================================
+2025-12-10 18:54:46,254 - INFO - ==================================================
+2025-12-10 18:54:46,254 - INFO - SUMMAC ZERO-SHOT RESULTS
+2025-12-10 18:54:46,254 - INFO - SUMMAC ZERO-SHOT RESULTS
+2025-12-10 18:54:46,254 - INFO - ==================================================
+2025-12-10 18:54:46,254 - INFO - ==================================================
+2025-12-10 18:54:46,254 - INFO - Rows evaluated: 2
+2025-12-10 18:54:46,254 - INFO - Rows evaluated: 2
+2025-12-10 18:54:46,254 - INFO - Total time: 0.0s
+2025-12-10 18:54:46,254 - INFO - Total time: 0.0s
+2025-12-10 18:54:46,254 - INFO - Average score: 0.000
+2025-12-10 18:54:46,254 - INFO - Average score: 0.000
+2025-12-10 18:54:46,254 - INFO - Min score: 0.000
+2025-12-10 18:54:46,254 - INFO - Min score: 0.000
+2025-12-10 18:54:46,256 - INFO - Max score: 0.000
+2025-12-10 18:54:46,256 - INFO - Max score: 0.000
+2025-12-10 18:54:46,256 - INFO - summac_conv: enabled, running...
+2025-12-10 18:54:46,256 - INFO - summac_conv: enabled, running...
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,256 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:54:46,256 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:54:46,256 - INFO - SUMMAC CONVOLUTIONAL EVALUATION
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,256 - INFO - ==================================================
+2025-12-10 18:54:46,258 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:46,258 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:46,258 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:54:46,259 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:46,259 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:46,259 - INFO - Initializing SummaCEvaluator: device=cuda, granularity=sentence, model=vitc
+2025-12-10 18:54:46,259 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:46,259 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:46,259 - INFO - SummaCZS model loaded successfully
+2025-12-10 18:54:46,261 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:46,261 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:46,261 - INFO - SummaCConv model loaded successfully
+2025-12-10 18:54:46,261 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:46,261 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:46,261 - INFO - SummaCEvaluator initialized with both ZS and Conv models
+2025-12-10 18:54:46,261 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:46,261 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:46,261 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:54:46,263 - INFO - Source length: 5511 chars
+2025-12-10 18:54:46,263 - INFO - Source length: 5511 chars
+2025-12-10 18:54:46,263 - INFO - Source length: 5511 chars
+2025-12-10 18:54:46,263 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:46,263 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:46,263 - INFO - Summary length: 1586 chars
+2025-12-10 18:54:46,265 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,265 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,265 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,267 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:46,267 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:46,267 - INFO - Row 1 score: 0.000
+2025-12-10 18:54:46,267 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:46,267 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:46,267 - INFO - --- Evaluating row 2 ---
+2025-12-10 18:54:46,268 - INFO - Source length: 5071 chars
+2025-12-10 18:54:46,268 - INFO - Source length: 5071 chars
+2025-12-10 18:54:46,268 - INFO - Source length: 5071 chars
+2025-12-10 18:54:46,268 - INFO - Summary length: 683 chars
+2025-12-10 18:54:46,268 - INFO - Summary length: 683 chars
+2025-12-10 18:54:46,268 - INFO - Summary length: 683 chars
+2025-12-10 18:54:46,270 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,270 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,270 - ERROR - SummaCConv evaluation failed: 
+**********************************************************************
+  Resource [93mpunkt_tab[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('punkt_tab')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtokenizers/punkt_tab/english/[0m
+
+  Searched in:
+    - 'C:\\Users\\meier/nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\share\\nltk_data'
+    - 'C:\\Users\\meier\\OneDrive\\Documents\\messy_text\\.venv\\lib\\nltk_data'
+    - 'C:\\Users\\meier\\AppData\\Roaming\\nltk_data'
+    - 'C:\\nltk_data'
+    - 'D:\\nltk_data'
+    - 'E:\\nltk_data'
+**********************************************************************
+
+2025-12-10 18:54:46,271 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:46,271 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:46,271 - INFO - Row 2 score: 0.000
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - SUMMAC CONVOLUTIONAL RESULTS
+2025-12-10 18:54:46,273 - INFO - SUMMAC CONVOLUTIONAL RESULTS
+2025-12-10 18:54:46,273 - INFO - SUMMAC CONVOLUTIONAL RESULTS
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - ==================================================
+2025-12-10 18:54:46,273 - INFO - Rows evaluated: 2
+2025-12-10 18:54:46,273 - INFO - Rows evaluated: 2
+2025-12-10 18:54:46,273 - INFO - Rows evaluated: 2
+2025-12-10 18:54:46,274 - INFO - Total time: 0.0s
+2025-12-10 18:54:46,274 - INFO - Total time: 0.0s
+2025-12-10 18:54:46,274 - INFO - Total time: 0.0s
+2025-12-10 18:54:46,274 - INFO - Average score: 0.000
+2025-12-10 18:54:46,274 - INFO - Average score: 0.000
+2025-12-10 18:54:46,274 - INFO - Average score: 0.000
+2025-12-10 18:54:46,274 - INFO - Min score: 0.000
+2025-12-10 18:54:46,274 - INFO - Min score: 0.000
+2025-12-10 18:54:46,274 - INFO - Min score: 0.000
+2025-12-10 18:54:46,274 - INFO - Max score: 0.000
+2025-12-10 18:54:46,274 - INFO - Max score: 0.000
+2025-12-10 18:54:46,274 - INFO - Max score: 0.000
+2025-12-10 18:54:46,278 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:54:46,278 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:54:46,278 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 18:54:46,279 - INFO - Evaluation complete.
+2025-12-10 18:54:46,279 - INFO - Evaluation complete.
+2025-12-10 18:54:46,279 - INFO - Evaluation complete.
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - EVALUATION BENCHMARKS
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - geval_summarization: enabled, running...
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - G-EVAL SUMMARIZATION EVALUATION
+2025-12-10 18:55:21,248 - INFO - G-EVAL SUMMARIZATION EVALUATION
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - ==================================================
+2025-12-10 18:55:21,248 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:55:21,248 - INFO - Evaluating 2 rows with valid summaries
+2025-12-10 18:55:21,461 - INFO - GEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 18:55:21,461 - INFO - GEvalEvaluator initialized with model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 (vLLM)
+2025-12-10 18:55:21,465 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:55:21,465 - INFO - --- Evaluating row 1 ---
+2025-12-10 18:55:21,465 - INFO - Source length: 5511 chars
+2025-12-10 18:55:21,465 - INFO - Source length: 5511 chars
+2025-12-10 18:55:21,465 - INFO - Summary length: 1586 chars
+2025-12-10 18:55:21,465 - INFO - Summary length: 1586 chars
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - EVALUATION BENCHMARKS
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - geval_summarization: disabled
+2025-12-10 19:25:42,275 - INFO - geval_hallucination: disabled
+2025-12-10 19:25:42,275 - INFO - summac_zs: disabled
+2025-12-10 19:25:42,275 - INFO - summac_conv: disabled
+2025-12-10 19:25:42,275 - INFO - default_metrics: enabled, running...
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - DEFAULT METRICS EVALUATION
+2025-12-10 19:25:42,275 - INFO - DEFAULT METRICS EVALUATION
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - ==================================================
+2025-12-10 19:25:42,275 - INFO - DefaultMetricsEvaluator initialized with 15 fields
+2025-12-10 19:25:42,275 - INFO - DefaultMetricsEvaluator initialized with 15 fields
+2025-12-10 19:25:42,275 - INFO - Evaluating 15 fields from taxonomy
+2025-12-10 19:25:42,275 - INFO - Evaluating 15 fields from taxonomy
+2025-12-10 19:25:42,291 - INFO - Rows to evaluate: 2
+2025-12-10 19:25:42,291 - INFO - Rows to evaluate: 2
+2025-12-10 19:25:42,292 - INFO - vic_grupo_social: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,292 - INFO - vic_grupo_social: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,297 - INFO - amenaza_quien: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,297 - INFO - amenaza_quien: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,299 - INFO - captura_metodo: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,299 - INFO - captura_metodo: Accuracy=0.500 | F1=0.333 | Kappa=0.000
+2025-12-10 19:25:42,301 - INFO - captura_tipo: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,301 - INFO - captura_tipo: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,305 - INFO - cautiverio_trato: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,305 - INFO - cautiverio_trato: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,309 - INFO - desenlace: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,309 - INFO - desenlace: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,311 - INFO - desenlace_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,311 - INFO - desenlace_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,317 - INFO - perp_tipo1: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,317 - INFO - perp_tipo1: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,319 - INFO - perp_tipo2: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,319 - INFO - perp_tipo2: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,325 - INFO - proced_contacto1: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,325 - INFO - proced_contacto1: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,329 - INFO - proced_contacto2: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,329 - INFO - proced_contacto2: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,330 - INFO - proced_contactado: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,330 - INFO - proced_contactado: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,339 - INFO - Tribunal_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,339 - INFO - Tribunal_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,344 - INFO - proced_sent_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,344 - INFO - proced_sent_tipo: Accuracy=1.000 | F1=1.000 | Kappa=nan
+2025-12-10 19:25:42,347 - INFO - soc_civil: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,347 - INFO - soc_civil: Accuracy=0.000 | F1=0.000 | Kappa=0.000
+2025-12-10 19:25:42,348 - INFO - ==================================================
+2025-12-10 19:25:42,348 - INFO - ==================================================
+2025-12-10 19:25:42,348 - INFO - DEFAULT METRICS COMPLETE
+2025-12-10 19:25:42,348 - INFO - DEFAULT METRICS COMPLETE
+2025-12-10 19:25:42,349 - INFO - ==================================================
+2025-12-10 19:25:42,349 - INFO - ==================================================
+2025-12-10 19:25:42,353 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 19:25:42,353 - INFO - Saved evaluation results to: df_text_eval.csv
+2025-12-10 19:25:42,354 - INFO - Evaluation complete.
+2025-12-10 19:25:42,354 - INFO - Evaluation complete.

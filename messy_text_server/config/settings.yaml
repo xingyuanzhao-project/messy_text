@@ -3,27 +3,46 @@ model:
   api_base: "http://localhost:8000/v1"
   api_key: "dummy"
 
-input:
-  path: "df_text.csv"
+paths:
+  input: "df_text.csv"
+  output: "df_text_clas_server.csv"
+  eval_output: "df_text_eval.csv"
+  taxonomy: "config/taxonomy.json"
+
+async:
+  enabled: True
+  max_retries: 5
+  max_concurrent_rows: 50
 
 processing:
   temperature: 0.0
-  max_tokens_summary: 8192
-  max_tokens_classification: 8192
+  max_tokens_summary: 1024
+  max_tokens_classification: 256
   start_index: 0
   early_break: null
   inner_loop_break: null
+
+evaluation:
+  rows_eval_break: null
+  benchmarks:
+    enable_geval_summarization: True
+    enable_geval_hallucination: True
+    enable_summac_zs: True
+    enable_summac_conv: True
+    enable_default_metrics: True
+
+    summac_settings:
+      device: "cuda"
+      granularity: "sentence"
+      model_name: "vitc"
+
+
+display:
+  use_progress_bar: True
+
+logging:
   log_resources: false
   log_prompts: false
   log_response: false
   log_progress: True
-  use_progress_bar: True
-  async_processing: True
-  max_retries: 5
-  max_concurrent_rows: 100
-
-output:
-  path: "df_text_clas_server.csv"
-
-logging:
   file: "processing.log"

@@ -20,9 +20,13 @@ yes. just summ now.
 dealing with real problem in polisci world. this is not about running model on a perfectly cleaned dataset, that is balanced, cleaned, etc. real world polisci deal with a lot of messy text.
 
 brandt:
-anotehr strength: one iter job takes 1hr, so we can market it like:
+another strength: one iter job takes 1hr, so we can market it like:
 human might take a month to do it, takes many ppl. even machine isnt doing perfect job, but 1hr total work, we can easily adjust what we have, and get better result faster
 
 Conflict Forecast used 20 days (6 days), using lda and stm to create summary, so we can do it with llm, and it will be faster. they have 60 days lag, we can def do it faster.
 
 they aslo cant do follow ups, or sgoing back to the thing. we can do it.
+
+todo:
+try different prompt stacking and victim source handling
+understand the cost

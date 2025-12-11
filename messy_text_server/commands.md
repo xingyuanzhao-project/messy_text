@@ -70,6 +70,8 @@ module purge
 module load cray-python/3.11.5
 source venv/bin/activate
 python main.py
+python scripts/run_processing.py
+python scripts/run_evaluation.py
 ```
 
 ### Check Status
@@ -95,4 +97,6 @@ vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq
 ```bash
 .\.venv\Scripts\Activate.ps1
 python main.py
+python scripts/run_processing.py
+python scripts/run_evaluation.py
 ```

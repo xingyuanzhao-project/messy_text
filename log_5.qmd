@@ -1,0 +1,132 @@
+---
+title: "Extracting Information from Messy Text"
+subtitle: "Evaluation Steps"
+author: ""
+date: today
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    transition: fade
+    slide-number: true
+    chalkboard: false
+    preview-links: auto
+    footer: ""
+    logo: ""
+    width: 1600
+    height: 900
+    margin: 0.1
+    highlight-style: github-dark
+    code-line-numbers: true
+    incremental: false
+---
+
+## Stage 1: Extractive Summarization
+
+**Input**: Raw messy text with navigation, ads, error pages
+
+```json
+{
+  "input_text": "Menu | Home... Abel soñaba ser ingeniero...",
+  "related_context": {"vic_grupo_social": "Is the victim...", ...},
+  "output_format": {"info_found": "", "relevant_context": [], "summary": ""},
+  "instructions": ["Extractive in Spanish, DO NOT paraphrase", 
+    "If error page (404), return empty", "Ignore navigation", ...]
+}
+```
+
+**Output**:
+
+```json
+{
+  "info_found": "TRUE",
+  "relevant_context": ["vic_grupo_social", "captura_metodo"],
+  "summary": "Abel soñaba ser ingeniero. Fue detenido por policías."
+}
+```
+
+---
+
+## Stage 2: Constrained Classification
+
+**Input**: Clean summary + taxonomy question
+
+```json
+{
+  "input_text": "Abel soñaba ser ingeniero... detenido por policías",
+  "question": "Is the victim a member of a distinct social group?",
+  "possible_values": ["Students", "Professionals", "Activists", ...],
+  "instructions": ["Return evidence AND result", "result MUST be one of possible_values", ...]
+}
+```
+
+**Output**:
+
+```json
+{
+  "evidence": "estudiante de la preparatoria",
+  "result": "Students"
+}
+```
+
+---
+
+## Classification Metrics (Source-Level)
+
+Accuracy, Macro F1, and Cohen's Kappa for each classification label
+
+![](plots/metrics_per_label_source.png){width="90%"}
+
+---
+
+## Aggregating to Victim-Level
+
+Aggregate multiple news sources per victim using consensus (mode)
+
+![](plots/metrics_per_label_victim.png){width="90%"}
+
+---
+
+## Performance Change (Victim − Source)
+
+Performance gains from aggregation are inconsistent across labels
+
+![](plots/metrics_per_label_diff.png){width="90%"}
+
+---
+
+## LLM-Based Summarization Metrics
+
+COMET, BLEU, ROUGE require reference summaries. We have none.
+
+We use **reference-free** metrics instead:
+
+- **[G-Eval](https://arxiv.org/abs/2303.16634)**: Prompt-based evaluator. Inputs source and summary, and tasks in stacked promtps to output scores.
+
+- **[SummaC](https://arxiv.org/abs/2111.09525)**: Segments source and summary into sentences, use pretrained NLI models to compute scores.
+
+---
+
+## LLM Metrics: Aggregated Scores
+
+![](plots/metrics_llm_summarization.png){width="70%"}
+
+---
+
+## LLM Metrics: Score Distributions
+
+![](plots/metrics_llm_summarization_dist.png){width="80%"}
+
+---
+
+## LLM Metrics: Limitations
+
+These metrics underperform for our use case:
+
+- **Language mismatch**: NLI models used in SummaC are trained on English; does not perform well on Spanish.
+
+- **Noisy source**: Models compare messy source vs clean summary, inflating inconsistency
+
+- **Model mismatch**: G-Eval designed for GPT-4; we used Llama 3.1 8B
+
+---
+
