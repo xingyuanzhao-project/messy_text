@@ -49,9 +49,7 @@ pip freeze
 ls ~/.cache/huggingface/hub/
 ```
 
-### Download model
-```bash
-pip install huggingface_hub
+huggingface-cli login
 huggingface-cli download hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
 ```
 
