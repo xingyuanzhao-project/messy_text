@@ -33,7 +33,7 @@ from tqdm.asyncio import tqdm as tqdm_async
 from tqdm.auto import tqdm
 
 from src.processors import MessyTextProcessor, AsyncMessyTextProcessor
-from src.utils import setup_logger, log_memory_usage, check_gpu_info, check_vllm_server
+from src.utils import setup_logger, log_memory_usage, check_gpu_info, check_vllm_server, check_local_models
 
 
 # =============================================================================
@@ -417,6 +417,9 @@ def main():
     if gpu_info is None:
         logger.error("No GPU available. Exiting.")
         sys.exit(1)
+    
+    # Local model check
+    check_local_models(settings['model']['name'], logger)
     
     # vLLM server check
     vllm_ok, available_models, test_result = check_vllm_server(

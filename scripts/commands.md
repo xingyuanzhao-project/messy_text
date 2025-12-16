@@ -51,8 +51,19 @@ ls ~/.cache/huggingface/hub/
 
 ### Download model
 ```bash
+cd /scratch/bbov/xzhao16/messy_text_server/
 pip install huggingface_hub
+ls ~/.cache/huggingface/hub/
+
+huggingface-cli login
+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
+
 huggingface-cli download hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+
+huggingface-cli download hugging-quants/gemma-2-9b-it-AWQ-INT4
+huggingface-cli download solidrust/Mistral-7B-Instruct-v0.3-AWQ
+huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ
+huggingface-cli download openai/gpt-oss-20b
 ```
 
 
@@ -70,6 +81,8 @@ module purge
 module load cray-python/3.11.5
 source venv/bin/activate
 python main.py
+python scripts/run_processing.py
+python scripts/run_evaluation.py
 ```
 
 ### Check Status
@@ -94,7 +107,6 @@ vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq
 
 ```bash
 .\.venv\Scripts\Activate.ps1
-# python main.py
 python scripts/run_processing.py
 python scripts/run_evaluation.py
 ```

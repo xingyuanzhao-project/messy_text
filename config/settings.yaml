@@ -5,31 +5,33 @@ model:
 
 paths:
   input: "df_text.csv"
-  output: "df_text_clas_server.csv"
-  eval_output: "df_text_eval.csv"
+  output:
+    file: "df_text_clas_multi_server.csv"
+    extend: False
+  eval_output: "df_text_multi_eval.csv"
   taxonomy: "config/taxonomy.json"
 
 async:
   enabled: False
   max_retries: 5
-  max_concurrent_rows: 2
+  max_concurrent_rows: 50
 
 processing:
   temperature: 0.0
   max_tokens_summary: 1024
   max_tokens_classification: 256
   start_index: 0
-  early_break: 20
-  inner_loop_break: 5
+  early_break: 3
+  inner_loop_break: 3
 
 evaluation:
-  rows_eval_break: 2
+  rows_eval_break: 3
   benchmarks:
-    enable_geval_summarization: false
-    enable_geval_hallucination: false
-    enable_summac_zs: false
-    enable_summac_conv: false
-    enable_default_metrics: true
+    enable_geval_summarization: True
+    enable_geval_hallucination: True
+    enable_summac_zs: True
+    enable_summac_conv: True
+    enable_default_metrics: True
 
     summac_settings:
       device: "cuda"

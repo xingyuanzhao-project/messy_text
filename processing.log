@@ -2498,3 +2498,228 @@
 2025-12-10 19:25:42,353 - INFO - Saved evaluation results to: df_text_eval.csv
 2025-12-10 19:25:42,354 - INFO - Evaluation complete.
 2025-12-10 19:25:42,354 - INFO - Evaluation complete.
+2025-12-15 00:32:42,724 - INFO - ==================================================
+2025-12-15 00:32:42,724 - INFO - PRE-FLIGHT CHECKS
+2025-12-15 00:32:42,724 - INFO - ==================================================
+2025-12-15 00:32:42,724 - INFO - Requested models: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4', 'hugging-quants/gemma-2-9b-it-AWQ-INT4', 'solidrust/Mistral-7B-Instruct-v0.3-AWQ', 'Qwen/Qwen2.5-7B-Instruct-AWQ']
+2025-12-15 00:32:42,724 - INFO - vLLM auto-management ENABLED: will start/stop vLLM per model
+2025-12-15 00:32:42,772 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15995/16376 MB used | Utilization: 0%
+2025-12-15 00:32:42,772 - INFO - Will process 4 model(s) with auto vLLM management
+2025-12-15 00:32:42,772 - INFO - ==================================================
+2025-12-15 00:32:42,772 - INFO - ==================================================
+2025-12-15 00:32:42,772 - INFO - PROCESSING MODEL 1/4: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:32:42,773 - INFO - ==================================================
+2025-12-15 00:32:42,773 - INFO - Starting vLLM server: vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:32:42,848 - INFO - vLLM server started with PID: 82092
+2025-12-15 00:32:42,848 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:32:44,875 - INFO - vLLM server ready after 2.0s
+2025-12-15 00:32:47,548 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:32:49,203 - INFO - Model 'hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4' test passed: 1+1 = 2
+2025-12-15 00:32:49,203 - INFO - Valid models for processing: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:32:49,203 - INFO - Using SYNC processing mode (Legacy).
+2025-12-15 00:32:49,213 - INFO - Processing row 0
+2025-12-15 00:32:49,213 - INFO - Processing row 0
+2025-12-15 00:32:51,746 - INFO - Processing row 1
+2025-12-15 00:32:51,746 - INFO - Processing row 1
+2025-12-15 00:33:21,214 - INFO - Processing complete. Processed 2 rows.
+2025-12-15 00:33:21,214 - INFO - Processing complete. Processed 2 rows.
+2025-12-15 00:33:21,420 - INFO - Model 'hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4' results appended to df_text_clas_multi_server.csv
+2025-12-15 00:33:21,420 - INFO - Model 'hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4' results appended to df_text_clas_multi_server.csv
+2025-12-15 00:33:21,460 - INFO - ==================================================
+2025-12-15 00:33:21,460 - INFO - ==================================================
+2025-12-15 00:33:21,460 - INFO - PROCESSING MODEL 2/4: hugging-quants/gemma-2-9b-it-AWQ-INT4
+2025-12-15 00:33:21,460 - INFO - PROCESSING MODEL 2/4: hugging-quants/gemma-2-9b-it-AWQ-INT4
+2025-12-15 00:33:21,461 - INFO - ==================================================
+2025-12-15 00:33:21,461 - INFO - ==================================================
+2025-12-15 00:33:21,462 - INFO - Stopping vLLM server (PID: 82092)...
+2025-12-15 00:33:21,462 - INFO - Stopping vLLM server (PID: 82092)...
+2025-12-15 00:33:21,462 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:21,462 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:21,462 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:21,462 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:26,465 - INFO - Starting vLLM server: vllm serve hugging-quants/gemma-2-9b-it-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:26,465 - INFO - Starting vLLM server: vllm serve hugging-quants/gemma-2-9b-it-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:26,465 - INFO - vLLM server started with PID: 65308
+2025-12-15 00:33:26,465 - INFO - vLLM server started with PID: 65308
+2025-12-15 00:33:26,465 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:26,465 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:28,517 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:28,517 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:30,778 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:30,778 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:30,779 - WARNING - Model 'hugging-quants/gemma-2-9b-it-AWQ-INT4' not available on server - SKIPPING
+2025-12-15 00:33:30,779 - WARNING - Model 'hugging-quants/gemma-2-9b-it-AWQ-INT4' not available on server - SKIPPING
+2025-12-15 00:33:30,779 - ERROR - ALL models failed validation. Requested: ['hugging-quants/gemma-2-9b-it-AWQ-INT4'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:30,779 - ERROR - ALL models failed validation. Requested: ['hugging-quants/gemma-2-9b-it-AWQ-INT4'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:30,781 - ERROR - Model hugging-quants/gemma-2-9b-it-AWQ-INT4 not responding after vLLM start - SKIPPING
+2025-12-15 00:33:30,781 - ERROR - Model hugging-quants/gemma-2-9b-it-AWQ-INT4 not responding after vLLM start - SKIPPING
+2025-12-15 00:33:30,781 - INFO - Stopping vLLM server (PID: 65308)...
+2025-12-15 00:33:30,781 - INFO - Stopping vLLM server (PID: 65308)...
+2025-12-15 00:33:30,782 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:30,782 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:30,782 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:30,782 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:35,783 - INFO - ==================================================
+2025-12-15 00:33:35,783 - INFO - ==================================================
+2025-12-15 00:33:35,783 - INFO - PROCESSING MODEL 3/4: solidrust/Mistral-7B-Instruct-v0.3-AWQ
+2025-12-15 00:33:35,783 - INFO - PROCESSING MODEL 3/4: solidrust/Mistral-7B-Instruct-v0.3-AWQ
+2025-12-15 00:33:35,783 - INFO - ==================================================
+2025-12-15 00:33:35,783 - INFO - ==================================================
+2025-12-15 00:33:35,783 - INFO - Starting vLLM server: vllm serve solidrust/Mistral-7B-Instruct-v0.3-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:35,783 - INFO - Starting vLLM server: vllm serve solidrust/Mistral-7B-Instruct-v0.3-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:35,785 - INFO - vLLM server started with PID: 99772
+2025-12-15 00:33:35,785 - INFO - vLLM server started with PID: 99772
+2025-12-15 00:33:35,785 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:35,785 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:37,843 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:37,843 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:40,089 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:40,089 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:40,089 - WARNING - Model 'solidrust/Mistral-7B-Instruct-v0.3-AWQ' not available on server - SKIPPING
+2025-12-15 00:33:40,089 - WARNING - Model 'solidrust/Mistral-7B-Instruct-v0.3-AWQ' not available on server - SKIPPING
+2025-12-15 00:33:40,089 - ERROR - ALL models failed validation. Requested: ['solidrust/Mistral-7B-Instruct-v0.3-AWQ'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:40,089 - ERROR - ALL models failed validation. Requested: ['solidrust/Mistral-7B-Instruct-v0.3-AWQ'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:40,089 - ERROR - Model solidrust/Mistral-7B-Instruct-v0.3-AWQ not responding after vLLM start - SKIPPING
+2025-12-15 00:33:40,089 - ERROR - Model solidrust/Mistral-7B-Instruct-v0.3-AWQ not responding after vLLM start - SKIPPING
+2025-12-15 00:33:40,089 - INFO - Stopping vLLM server (PID: 99772)...
+2025-12-15 00:33:40,089 - INFO - Stopping vLLM server (PID: 99772)...
+2025-12-15 00:33:40,089 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:40,089 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:40,089 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:40,089 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:45,095 - INFO - ==================================================
+2025-12-15 00:33:45,095 - INFO - ==================================================
+2025-12-15 00:33:45,095 - INFO - PROCESSING MODEL 4/4: Qwen/Qwen2.5-7B-Instruct-AWQ
+2025-12-15 00:33:45,095 - INFO - PROCESSING MODEL 4/4: Qwen/Qwen2.5-7B-Instruct-AWQ
+2025-12-15 00:33:45,095 - INFO - ==================================================
+2025-12-15 00:33:45,095 - INFO - ==================================================
+2025-12-15 00:33:45,095 - INFO - Starting vLLM server: vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:45,095 - INFO - Starting vLLM server: vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:33:45,095 - INFO - vLLM server started with PID: 99892
+2025-12-15 00:33:45,095 - INFO - vLLM server started with PID: 99892
+2025-12-15 00:33:45,095 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:45,095 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:33:47,178 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:47,178 - INFO - vLLM server ready after 2.1s
+2025-12-15 00:33:49,410 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:49,410 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:33:49,411 - WARNING - Model 'Qwen/Qwen2.5-7B-Instruct-AWQ' not available on server - SKIPPING
+2025-12-15 00:33:49,411 - WARNING - Model 'Qwen/Qwen2.5-7B-Instruct-AWQ' not available on server - SKIPPING
+2025-12-15 00:33:49,411 - ERROR - ALL models failed validation. Requested: ['Qwen/Qwen2.5-7B-Instruct-AWQ'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:49,411 - ERROR - ALL models failed validation. Requested: ['Qwen/Qwen2.5-7B-Instruct-AWQ'], Available: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4']
+2025-12-15 00:33:49,412 - ERROR - Model Qwen/Qwen2.5-7B-Instruct-AWQ not responding after vLLM start - SKIPPING
+2025-12-15 00:33:49,412 - ERROR - Model Qwen/Qwen2.5-7B-Instruct-AWQ not responding after vLLM start - SKIPPING
+2025-12-15 00:33:49,412 - INFO - Stopping vLLM server (PID: 99892)...
+2025-12-15 00:33:49,412 - INFO - Stopping vLLM server (PID: 99892)...
+2025-12-15 00:33:49,413 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:49,413 - INFO - vLLM server terminated gracefully
+2025-12-15 00:33:49,413 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:49,413 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:33:54,427 - INFO - ==================================================
+2025-12-15 00:33:54,427 - INFO - ==================================================
+2025-12-15 00:33:54,427 - INFO - ALL PROCESSING COMPLETE. 1/4 models succeeded.
+2025-12-15 00:33:54,427 - INFO - ALL PROCESSING COMPLETE. 1/4 models succeeded.
+2025-12-15 00:33:54,427 - INFO - Output saved to df_text_clas_multi_server.csv
+2025-12-15 00:33:54,427 - INFO - Output saved to df_text_clas_multi_server.csv
+2025-12-15 00:33:54,427 - INFO - ==================================================
+2025-12-15 00:33:54,427 - INFO - ==================================================
+2025-12-15 00:41:10,357 - INFO - ==================================================
+2025-12-15 00:41:10,357 - INFO - PRE-FLIGHT CHECKS
+2025-12-15 00:41:10,357 - INFO - ==================================================
+2025-12-15 00:41:10,357 - INFO - Requested models: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4', 'hugging-quants/gemma-2-9b-it-AWQ-INT4', 'solidrust/Mistral-7B-Instruct-v0.3-AWQ', 'Qwen/Qwen2.5-7B-Instruct-AWQ']
+2025-12-15 00:41:10,357 - INFO - vLLM auto-management ENABLED: will start/stop vLLM per model
+2025-12-15 00:41:10,488 - INFO - Checking model availability on HuggingFace Hub...
+2025-12-15 00:41:10,844 - INFO -   ✓ hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4: EXISTS on Hub (NOT CACHED (will download))
+2025-12-15 00:41:10,913 - INFO -   ✓ hugging-quants/gemma-2-9b-it-AWQ-INT4: EXISTS on Hub (NOT CACHED (will download))
+2025-12-15 00:41:10,977 - INFO -   ✓ solidrust/Mistral-7B-Instruct-v0.3-AWQ: EXISTS on Hub (NOT CACHED (will download))
+2025-12-15 00:41:11,039 - INFO -   ✓ Qwen/Qwen2.5-7B-Instruct-AWQ: EXISTS on Hub (NOT CACHED (will download))
+2025-12-15 00:41:11,039 - INFO - Model availability: 4/4 confirmed available
+2025-12-15 00:41:11,082 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 84/16376 MB used | Utilization: 0%
+2025-12-15 00:41:11,083 - INFO - Will process 4 model(s) with auto vLLM management
+2025-12-15 00:41:11,084 - INFO - ==================================================
+2025-12-15 00:41:11,084 - INFO - ==================================================
+2025-12-15 00:41:11,084 - INFO - PROCESSING MODEL 1/4: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 00:41:11,084 - INFO - ==================================================
+2025-12-15 00:41:11,084 - INFO - Starting vLLM server: vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:41:11,088 - INFO - vLLM server started with PID: 109964
+2025-12-15 00:41:11,088 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:46:41,258 - INFO - Still waiting for vLLM... (330s / 600s)
+2025-12-15 00:48:11,884 - INFO - Still waiting for vLLM... (421s / 600s)
+2025-12-15 00:51:18,167 - ERROR - vLLM server did not become ready within 600s
+2025-12-15 00:51:18,167 - ERROR - vLLM not ready for hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 within 600s - SKIPPING
+2025-12-15 00:51:18,167 - INFO - Stopping vLLM server (PID: 109964)...
+2025-12-15 00:51:18,167 - INFO - vLLM server terminated gracefully
+2025-12-15 00:51:18,167 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 00:51:23,176 - INFO - ==================================================
+2025-12-15 00:51:23,176 - INFO - PROCESSING MODEL 2/4: hugging-quants/gemma-2-9b-it-AWQ-INT4
+2025-12-15 00:51:23,176 - INFO - ==================================================
+2025-12-15 00:51:23,176 - INFO - Starting vLLM server: vllm serve hugging-quants/gemma-2-9b-it-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 00:51:23,176 - INFO - vLLM server started with PID: 93128
+2025-12-15 00:51:23,176 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 00:56:53,282 - INFO - Still waiting for vLLM... (330s / 600s)
+2025-12-15 00:58:23,758 - INFO - Still waiting for vLLM... (421s / 600s)
+2025-12-15 01:01:29,840 - ERROR - vLLM server did not become ready within 600s
+2025-12-15 01:01:29,840 - ERROR - vLLM not ready for hugging-quants/gemma-2-9b-it-AWQ-INT4 within 600s - SKIPPING
+2025-12-15 01:01:29,840 - INFO - Stopping vLLM server (PID: 93128)...
+2025-12-15 01:01:29,840 - INFO - vLLM server terminated gracefully
+2025-12-15 01:01:29,842 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 01:01:34,847 - INFO - ==================================================
+2025-12-15 01:01:34,847 - INFO - PROCESSING MODEL 3/4: solidrust/Mistral-7B-Instruct-v0.3-AWQ
+2025-12-15 01:01:34,848 - INFO - ==================================================
+2025-12-15 01:01:34,848 - INFO - Starting vLLM server: vllm serve solidrust/Mistral-7B-Instruct-v0.3-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 01:01:34,851 - INFO - vLLM server started with PID: 38336
+2025-12-15 01:01:34,851 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 01:08:35,265 - INFO - Still waiting for vLLM... (420s / 600s)
+2025-12-15 01:10:05,833 - INFO - Still waiting for vLLM... (511s / 600s)
+2025-12-15 01:11:41,427 - ERROR - vLLM server did not become ready within 600s
+2025-12-15 01:11:41,427 - ERROR - vLLM not ready for solidrust/Mistral-7B-Instruct-v0.3-AWQ within 600s - SKIPPING
+2025-12-15 01:11:41,427 - INFO - Stopping vLLM server (PID: 38336)...
+2025-12-15 01:11:41,429 - INFO - vLLM server terminated gracefully
+2025-12-15 01:11:41,429 - INFO - Waiting 5s for GPU memory release...
+2025-12-15 01:11:46,445 - INFO - ==================================================
+2025-12-15 01:11:46,445 - INFO - PROCESSING MODEL 4/4: Qwen/Qwen2.5-7B-Instruct-AWQ
+2025-12-15 01:11:46,445 - INFO - ==================================================
+2025-12-15 01:11:46,445 - INFO - Starting vLLM server: vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 01:11:46,445 - INFO - vLLM server started with PID: 47464
+2025-12-15 01:11:46,445 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 01:17:16,971 - INFO - Still waiting for vLLM... (331s / 600s)
+2025-12-15 01:18:47,423 - INFO - Still waiting for vLLM... (421s / 600s)
+2025-12-15 01:19:50,504 - INFO - ==================================================
+2025-12-15 01:19:50,504 - INFO - PRE-FLIGHT CHECKS
+2025-12-15 01:19:50,504 - INFO - ==================================================
+2025-12-15 01:19:50,504 - INFO - Requested models: ['hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4', 'hugging-quants/gemma-2-9b-it-AWQ-INT4', 'solidrust/Mistral-7B-Instruct-v0.3-AWQ', 'Qwen/Qwen2.5-7B-Instruct-AWQ']
+2025-12-15 01:19:50,504 - INFO - vLLM auto-management ENABLED: will start/stop vLLM per model
+2025-12-15 01:19:50,543 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 84/16376 MB used | Utilization: 0%
+2025-12-15 01:19:50,543 - INFO - [NOT FOUND] hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 01:19:50,543 - INFO - [NOT FOUND] hugging-quants/gemma-2-9b-it-AWQ-INT4
+2025-12-15 01:19:50,544 - INFO - [NOT FOUND] solidrust/Mistral-7B-Instruct-v0.3-AWQ
+2025-12-15 01:19:50,544 - INFO - [NOT FOUND] Qwen/Qwen2.5-7B-Instruct-AWQ
+2025-12-15 01:19:50,544 - INFO - Will process 4 model(s) with auto vLLM management
+2025-12-15 01:19:50,545 - INFO - ==================================================
+2025-12-15 01:19:50,545 - INFO - ==================================================
+2025-12-15 01:19:50,545 - INFO - PROCESSING MODEL 1/4: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 01:19:50,545 - INFO - ==================================================
+2025-12-15 01:19:50,545 - INFO - Starting vLLM server: vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+2025-12-15 01:19:50,547 - INFO - vLLM server started with PID: 20336
+2025-12-15 01:19:50,549 - INFO - Waiting for vLLM server to be ready (timeout: 600s)...
+2025-12-15 01:25:20,585 - INFO - Still waiting for vLLM... (330s / 600s)
+2025-12-15 01:26:51,124 - INFO - Still waiting for vLLM... (421s / 600s)
+2025-12-15 09:57:50,850 - INFO - ==================================================
+2025-12-15 09:57:50,852 - INFO - PRE-FLIGHT CHECKS
+2025-12-15 09:57:50,852 - INFO - ==================================================
+2025-12-15 09:57:50,888 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 16021/16376 MB used | Utilization: 0%
+2025-12-15 09:57:53,251 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2025-12-15 09:57:54,717 - INFO - vLLM test request successful: 1+1 = 2
+2025-12-15 09:57:54,717 - INFO - Pre-flight checks PASSED
+2025-12-15 09:57:54,717 - INFO - ==================================================
+2025-12-15 09:57:54,717 - INFO - Using SYNC processing mode (Legacy).
+2025-12-15 09:57:54,734 - INFO - Processing row 0
+2025-12-15 09:57:54,734 - INFO - Processing row 0
+2025-12-15 09:57:57,180 - INFO - Processing row 1
+2025-12-15 09:57:57,180 - INFO - Processing row 1
+2025-12-15 09:58:33,309 - INFO - Processing row 2
+2025-12-15 09:58:33,309 - INFO - Processing row 2
+2025-12-15 09:59:16,030 - INFO - Processing complete. Processed 3 rows.
+2025-12-15 09:59:16,030 - INFO - Processing complete. Processed 3 rows.
+2025-12-15 09:59:16,280 - INFO - Output saved to df_text_clas_server.csv (2229 rows)
+2025-12-15 09:59:16,280 - INFO - Output saved to df_text_clas_server.csv (2229 rows)

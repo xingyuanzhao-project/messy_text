@@ -19,7 +19,7 @@ from openai import OpenAI, AsyncOpenAI
 from sklearn.metrics import f1_score, cohen_kappa_score
 
 from src.metrics import GEvalEvaluator, AsyncGEvalEvaluator, SummaCEvaluator, DefaultMetricsEvaluator
-from src.utils import setup_logger
+from src.utils import setup_logger, check_vllm_server
 
 
 # =============================================================================
@@ -249,12 +249,15 @@ def _evaluate_metric(
     logger.info("=" * 50)
     
     if scores:
-        avg_score = sum(scores) / len(scores)
         logger.info(f"Rows evaluated: {len(scores)}")
         logger.info(f"Total time: {elapsed_total:.1f}s")
-        logger.info(f"Average score: {avg_score:.3f}")
-        logger.info(f"Min score: {min(scores):.3f}")
-        logger.info(f"Max score: {max(scores):.3f}")
+        
+        # Log per-model stats
+        for model_name in df_eval['model'].unique():
+            model_scores = df_eval[df_eval['model'] == model_name][output_column].tolist()
+            if model_scores:
+                logger.info(f"[{model_name}] Avg={sum(model_scores)/len(model_scores):.3f} | "
+                           f"Min={min(model_scores):.3f} | Max={max(model_scores):.3f} | N={len(model_scores)}")
     else:
         logger.warning("No valid rows found for evaluation")
     
@@ -284,6 +287,13 @@ def evaluate_geval_summarization(
     """
     logger = setup_logger(log_file=log_file)
     model_config = config['model']
+    
+    # Fallback: openai/ model or vLLM client check, else skip
+    if not model_config.get('name', '').startswith('openai/'):
+        client = OpenAI(base_url=model_config['api_base'], api_key=model_config['api_key'])
+        vllm_ok, _, _ = check_vllm_server(client, model_config['name'], logger)
+        if not vllm_ok:
+            return df
     
     # Factory to create evaluator
     def evaluator_factory():
@@ -341,6 +351,13 @@ def evaluate_geval_hallucination(
     """
     logger = setup_logger(log_file=log_file)
     model_config = config['model']
+    
+    # Fallback: openai/ model or vLLM client check, else skip
+    if not model_config.get('name', '').startswith('openai/'):
+        client = OpenAI(base_url=model_config['api_base'], api_key=model_config['api_key'])
+        vllm_ok, _, _ = check_vllm_server(client, model_config['name'], logger)
+        if not vllm_ok:
+            return df
     
     # Factory to create evaluator
     def evaluator_factory():
@@ -551,14 +568,22 @@ def evaluate_default_metrics(
             output_column = f"{field_name}_match"
             df_eval[output_column] = scores
 
-            # Compute aggregate metrics
+            # Compute aggregate metrics per model
             if scores:
-                accuracy = sum(scores) / len(scores)
-                labels = list(set(y_true + y_pred))
-                f1 = f1_score(y_true, y_pred, average='macro', zero_division=0)
-                kappa = cohen_kappa_score(y_true, y_pred, labels=labels)
-
-                logger.info(f"{field_name}: Accuracy={accuracy:.3f} | F1={f1:.3f} | Kappa={kappa:.3f}")
+                for model_name in df_eval['model'].unique():
+                    model_mask = df_eval['model'] == model_name
+                    model_scores = df_eval.loc[model_mask, output_column].tolist()
+                    model_y_true = df_eval.loc[model_mask, annotation_col].apply(
+                        lambda x: str(x).strip() if x else '').tolist()
+                    model_y_pred = df_eval.loc[model_mask, classification_col].apply(
+                        lambda x: str(x).strip() if x else '').tolist()
+                    
+                    if model_scores:
+                        accuracy = sum(model_scores) / len(model_scores)
+                        labels = list(set(model_y_true + model_y_pred))
+                        f1 = f1_score(model_y_true, model_y_pred, average='macro', zero_division=0)
+                        kappa = cohen_kappa_score(model_y_true, model_y_pred, labels=labels)
+                        logger.info(f"[{model_name}] {field_name}: Accuracy={accuracy:.3f} | F1={f1:.3f} | Kappa={kappa:.3f}")
 
             pbar.update(1)
 
@@ -591,7 +616,7 @@ def main():
     logger = setup_logger(log_file=config['logging']['file'])
     
     # Step 2: Load data
-    input_path = config['paths']['output']
+    input_path = config['paths']['output']['file']
     df = pd.read_csv(input_path, encoding='utf-8')
     output_file = config['paths'].get('eval_output', 'df_text_eval.csv')
     

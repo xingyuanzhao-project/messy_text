@@ -30,3 +30,12 @@ they aslo cant do follow ups, or sgoing back to the thing. we can do it.
 todo:
 try different prompt stacking and victim source handling
 understand the cost
+
+
+pa paper? what is that
+
+agg problem. read the papers.
+
+ask sultan about the ways of agg.
+
+still need to agg on the victim level. find diff processors.
