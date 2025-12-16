@@ -56,7 +56,7 @@ pip install huggingface_hub
 ls ~/.cache/huggingface/hub/
 
 huggingface-cli login
-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
+
 
 huggingface-cli download hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
 
