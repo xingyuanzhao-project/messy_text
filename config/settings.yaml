@@ -4,33 +4,45 @@ model:
   api_key: "dummy"
 
 paths:
-  input: "df_text.csv"
-  output:
-    file: "df_text_clas_multi_server.csv"
-    extend: False
-  eval_output: "df_text_multi_eval.csv"
+  summary:
+    input: "df_text_by_report.csv"
+    output:
+      file: "df_text_by_report_conversation_summary.csv"
+      extend: False
+  classification:
+    input: "df_text_by_report_conversation_summary.csv"
+    output:
+      file: "df_text_by_report_conversation_classification.csv"
+      extend: False
+  eval:
+    input: "df_text_by_report_conversation_classification.csv"
+    output:
+      file: "df_text_by_report_conversation_evaluation.csv"
   taxonomy: "config/taxonomy.json"
+  prompts: "config/prompts.json"
 
 async:
-  enabled: False
+  enabled: True
   max_retries: 5
-  max_concurrent_rows: 50
+  max_concurrent_rows: 5
 
 processing:
   temperature: 0.0
   max_tokens_summary: 1024
   max_tokens_classification: 256
   start_index: 0
-  early_break: 3
-  inner_loop_break: 3
+  summary_row_limit: 1
+  classification_key_limit: 3
+  conversation:
+    enabled: True
 
 evaluation:
-  rows_eval_break: 3
+  rows_eval_limit: null
   benchmarks:
-    enable_geval_summarization: True
-    enable_geval_hallucination: True
-    enable_summac_zs: True
-    enable_summac_conv: True
+    enable_geval_summarization: False
+    enable_geval_hallucination: False
+    enable_summac_zs: False
+    enable_summac_conv: False
     enable_default_metrics: True
 
     summac_settings:
@@ -45,6 +57,6 @@ display:
 logging:
   log_resources: false
   log_prompts: false
-  log_response: false
+  log_response: true
   log_progress: True
   file: "processing.log"

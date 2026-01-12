@@ -11,7 +11,7 @@
   <meta name="generator" content="quarto-1.5.56">
 
   <meta name="author" content="">
-  <meta name="dcterms.date" content="2025-12-15">
+  <meta name="dcterms.date" content="2025-12-18">
   <title>Extracting Information from Messy Text</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -398,11 +398,11 @@
 <div class="quarto-title-authors">
 </div>
 
-  <p class="date">2025-12-15</p>
+  <p class="date">2025-12-18</p>
 </section>
-<section id="stage-1-extractive-summarization" class="slide level2">
-<h2>Stage 1: Extractive Summarization</h2>
-<p><strong>Input</strong>: Raw messy text with navigation, ads, error pages</p>
+<section id="stage-1-summarization" class="slide level2">
+<h2>Stage 1: Summarization</h2>
+<p><strong>Input</strong>: Raw messy text (aggregated to victim level) with navigation, ads, error pages etc.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb1-1"><a href=""></a><span class="fu">{</span></span>
 <span id="cb1-2"><a href=""></a>  <span class="dt">"input_text"</span><span class="fu">:</span> <span class="st">"Menu | Home... Abel soñaba ser ingeniero..."</span><span class="fu">,</span></span>
 <span id="cb1-3"><a href=""></a>  <span class="dt">"related_context"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"vic_grupo_social"</span><span class="fu">:</span> <span class="st">"Is the victim..."</span><span class="fu">,</span> <span class="er">...</span><span class="fu">},</span></span>
@@ -417,8 +417,8 @@
 <span id="cb2-4"><a href=""></a>  <span class="dt">"summary"</span><span class="fu">:</span> <span class="st">"Abel soñaba ser ingeniero. Fue detenido por policías."</span></span>
 <span id="cb2-5"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="stage-2-constrained-classification" class="slide level2">
-<h2>Stage 2: Constrained Classification</h2>
+<section id="stage-2-classification" class="slide level2">
+<h2>Stage 2: Classification</h2>
 <p><strong>Input</strong>: Clean summary + taxonomy question</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href=""></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href=""></a>  <span class="dt">"input_text"</span><span class="fu">:</span> <span class="st">"Abel soñaba ser ingeniero... detenido por policías"</span><span class="fu">,</span></span>
@@ -434,23 +434,18 @@
 </section>
 <section id="classification-metrics-source-level" class="slide level2">
 <h2>Classification Metrics (Source-Level)</h2>
-<p>Accuracy, Macro F1, and Cohen’s Kappa for each classification label</p>
+<p>Accuracy, Macro F1, and Cohen’s Kappa for each classification label, using Llama 3.1 8B instruct.</p>
 
-<img data-src="plots/metrics_per_label_source.png" style="width:90.0%" class="r-stretch"></section>
-<section id="aggregating-to-victim-level" class="slide level2">
-<h2>Aggregating to Victim-Level</h2>
-<p>Aggregate multiple news sources per victim using consensus (mode)</p>
+<img data-src="plots/Meta-Llama-3.1-8B-Instruct-AWQ-INT4_metrics_per_label_source.png" style="width:90.0%" class="r-stretch"></section>
+<section id="classification-metrics-victim-level" class="slide level2">
+<h2>Classification Metrics (Victim-Level)</h2>
+<p>Accuracy comparison across models for each classification label</p>
 
-<img data-src="plots/metrics_per_label_victim.png" style="width:90.0%" class="r-stretch"></section>
-<section id="performance-change-victim-source" class="slide level2">
-<h2>Performance Change (Victim − Source)</h2>
-<p>Performance gains from aggregation are inconsistent across labels</p>
-
-<img data-src="plots/metrics_per_label_diff.png" style="width:90.0%" class="r-stretch"></section>
+<img data-src="plots/accuracy_comparison_across_models.png" style="width:90.0%" class="r-stretch"></section>
 <section id="llm-based-summarization-metrics" class="slide level2">
 <h2>LLM-Based Summarization Metrics</h2>
 <p>COMET, BLEU, ROUGE require reference summaries. We have none.</p>
-<p>We use <strong>reference-free</strong> metrics instead:</p>
+<p>Used <strong>reference-free</strong> metrics instead:</p>
 <ul>
 <li><p><strong><a href="https://arxiv.org/abs/2303.16634">G-Eval</a></strong>: Prompt-based evaluator. Inputs source and summary, and tasks in stacked promtps to output scores.</p></li>
 <li><p><strong><a href="https://arxiv.org/abs/2111.09525">SummaC</a></strong>: Segments source and summary into sentences, use pretrained NLI models to compute scores.</p></li>
@@ -464,17 +459,12 @@
 <h2>LLM Metrics: Score Distributions</h2>
 
 <img data-src="plots/metrics_llm_summarization_dist.png" style="width:80.0%" class="r-stretch"></section>
-<section id="llm-metrics-limitations" class="slide level2">
-<h2>LLM Metrics: Limitations</h2>
-<p>These metrics underperform for our use case:</p>
+<section id="next-steps" class="slide level2">
+<h2>Next Steps</h2>
 <ul>
-<li><p><strong>Language mismatch</strong>: NLI models used in SummaC are trained on English; does not perform well on Spanish.</p></li>
-<li><p><strong>Noisy source</strong>: Models compare messy source vs clean summary, inflating inconsistency</p></li>
-<li><p><strong>Model mismatch</strong>: G-Eval designed for GPT-4; we used Llama 3.1 8B</p></li>
+<li>Stacking prompts</li>
+<li>Input documents in multiple turns</li>
 </ul>
-</section>
-<section class="slide level2">
-
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 

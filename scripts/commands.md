@@ -32,11 +32,16 @@ nvidia-smi
 cd /scratch/bbov/xzhao16/messy_text_server/
 module purge
 module load cray-python/3.11.5
+module load cuda
 python --version
 ```
 
 ### Create venv and install
 ```bash
+cd /scratch/bbov/xzhao16/messy_text_server/
+module purge
+module load cray-python/3.11.5
+module load cuda
 rm -rf venv
 python -m venv venv
 source venv/bin/activate
@@ -54,15 +59,17 @@ ls ~/.cache/huggingface/hub/
 cd /scratch/bbov/xzhao16/messy_text_server/
 pip install huggingface_hub
 ls ~/.cache/huggingface/hub/
+du -sh ~/.cache/huggingface/hub/*
 
 huggingface-cli login
 
 
 huggingface-cli download hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
 
-huggingface-cli download hugging-quants/gemma-2-9b-it-AWQ-INT4
-huggingface-cli download solidrust/Mistral-7B-Instruct-v0.3-AWQ
+huggingface-cli download gaunernst/gemma-3-12b-it-int4-awq
+huggingface-cli download mistralai/Ministral-3-8B-Instruct-2512
 huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ
+
 huggingface-cli download openai/gpt-oss-20b
 ```
 
@@ -71,7 +78,27 @@ huggingface-cli download openai/gpt-oss-20b
 ```bash
 cd /scratch/bbov/xzhao16/messy_text_server/
 source venv/bin/activate
-vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+module purge
+module load cray-python/3.11.5
+module load cuda
+ls ~/.cache/huggingface/hub/
+du -sh ~/.cache/huggingface/hub/*
+
+vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 49152
+
+vllm serve gaunernst/gemma-3-12b-it-int4-awq --port 8000 --host 0.0.0.0 --max-model-len 49152
+vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --config_format mistral --load_format mistral --port 8000 --host 0.0.0.0 --max-model-len 49152
+
+ls ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/
+nano ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/b25037543e9394b818fdfca67ab2a00ecc7dd641/config.json
+vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
+  --quantization awq \
+  --port 8000 \
+  --host 0.0.0.0 \
+  --max-model-len 49152
+
+vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
+vllm serve openai/gpt-oss-20b --async-scheduling --port 8000 --host 0.0.0.0 --max-model-len 49152
 ```
 
 ### Run main.py (separate terminal)
@@ -79,8 +106,8 @@ vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq
 cd /scratch/bbov/xzhao16/messy_text_server/
 module purge
 module load cray-python/3.11.5
+module load cuda
 source venv/bin/activate
-python main.py
 python scripts/run_processing.py
 python scripts/run_evaluation.py
 ```
@@ -88,9 +115,10 @@ python scripts/run_evaluation.py
 ### Check Status
 ```bash
 nvidia-smi
-ps aux | grep main.py
+ps aux | grep run_evaluation.py
 watch -n 2 nvidia-smi
 tail -f /scratch/bbov/xzhao16/messy_text_server/processing.log
+curl http://localhost:8000/metrics | grep vllm
 ```
 
 
@@ -100,13 +128,15 @@ tail -f /scratch/bbov/xzhao16/messy_text_server/processing.log
 nvidia-smi
 ls -d */
 source vllm_venv/bin/activate
-vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 8192
+vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 49152
 ```
 
 ### cursor terminal
 
 ```bash
 .\.venv\Scripts\Activate.ps1
-python scripts/run_processing.py
+python scripts/run_summary.py
+python scripts/run_summary_conversation.py
+python scripts/run_classification.py
 python scripts/run_evaluation.py
 ```

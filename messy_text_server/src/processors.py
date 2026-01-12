@@ -2,6 +2,7 @@ import json
 import re
 import logging
 from typing import Dict, Any, Optional
+from json_repair import repair_json
 
 class MessyTextLogicMixin:
     """
@@ -102,7 +103,7 @@ class MessyTextLogicMixin:
             str: The extracted summary text, or 'No relevant information found'.
         """
         content = response.choices[0].message.content
-        parsed = json.loads(content)
+        parsed = json.loads(repair_json(content))
         summary = parsed.get('summary', 'No relevant information found')
         return summary if summary else 'No relevant information found'
 
@@ -167,7 +168,7 @@ class MessyTextLogicMixin:
             str: The extracted classification result, or 'No information'.
         """
         content = response.choices[0].message.content
-        parsed = json.loads(content)
+        parsed = json.loads(repair_json(content))
         result = parsed.get('result', 'No information')
         return result if result else 'No information'
 

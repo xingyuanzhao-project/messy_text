@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "relevant_context": "<list of context keys found, or empty list>",
+      "summary": "<texto in spanish>"
+    },
+    "instructions": [
+      "If the input is an error/missing page (e.g., \"Página no encontrada\", \"404\", \"no se puede encontrar esa página\"), set info_found=\"FALSE\", relevant_context=[], summary=\"\"",
+      "Ignore navigation/site chrome (menú, buscar, categorías, compartir, ThemeGrill, WordPress, cookies, copyright)",
+      "relevant_context should list the keys from the related_context in that are found in the text (e.g., [\"vic_grupo_social\", \"captura_metodo\", \"perp_tipo1\"])",
+      "Extractive summary in Spanish: copy exact spans; DO NOT paraphrase; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\")",
+      "If no relevant info, relevant_context=[] and summary=\"\"",
+      "NO APOLOGIES, NO FILLER TEXT"
+    ]
+  },
+  "summary_first": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "relevant_context": "<list of context keys found, or empty list>",
+      "summary_by_item": "<dictionary of item: summary sentence. key is the context key, value is the summary sentence.>",
+      "summary": "<text in spanish>"
+    },
+    "instructions": [
+      {"STEP 1": "filtering",
+        "requirements":[
+          "If the input is an error/missing page (e.g., \"Página no encontrada\", \"404\", \"no se puede encontrar esa página\"), set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={}, {summary_label}=\"\".",
+          "Ignore navigation/site chrome (menú, buscar, categorías, compartir, ThemeGrill, WordPress, cookies, copyright)."
+      ]},
+      {"STEP 2": "fields building",
+        "requirements": [
+          "Use only the current {input_text_label} and {related_context_label} to decide {info_found_label}, {relevant_context_label}, summary_by_item and {summary_label}.",
+          "relevant_context should list the keys from {related_context_label} that are found in the text (e.g., [\"vic_grupo_social\", \"captura_metodo\", \"perp_tipo1\"]).",
+          "For each key X in {relevant_context_label}, check if there is any information about X in {input_text_label}. If yes, add one bullet to {summary_label} for X, copying the exact Spanish span(s) from {input_text_label} about X (no paraphrasing; preserve modality)."
+      ]},
+      {"STEP 3": "extractive summarization",
+        "requirements":[
+          "For each key X in {relevant_context_label}, write one short Spanish sentence summarizing that information for X and store it in summary_by_item[X].",
+          "Extractive summary in Spanish: copy exact spans; DO NOT paraphrase; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\")."
+      ]},
+      {"STEP 4": "edge case handling",
+        "requirements":[
+          "If no relevant info, set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={}, {summary_label}=\"\".",
+          "NO APOLOGIES, NO FILLER TEXT"
+        ]
+      }
+    ]
+  },
+  "summary_update": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "relevant_context": "<list of context keys found, or empty list>",
+      "summary_by_item": "<dictionary of item: summary sentence. key is the context key, value is the summary sentence.>",
+      "summary": "<texto in spanish>"
+    },
+    "instructions": [
+      {
+        "STEP 1": "context building",
+        "requirements": [
+          "Previous fields found: {previous_relevant_context}",
+          "Previous summary_by_item: {previous_summary_by_item}",
+          "If the previous summary above is empty or only whitespace, base {info_found_label}, {relevant_context_label} and {summary_label} only on {input_text_label} (the new document).",
+          "If the previous summary above is non-empty, update it by adding or refining victim-relevant facts from {input_text_label}, without removing correct existing details."
+        ]
+      },
+      {
+        "STEP 2": "filtering",
+        "requirements": [
+          "If the input is an error/missing page (e.g., \"Página no encontrada\", \"404\", \"no se puede encontrar esa página\"), set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={}, {summary_label}=\"\".",
+          "Ignore navigation/site chrome (menú, buscar, categorías, compartir, ThemeGrill, WordPress, cookies, copyright)."
+        ]
+      },
+      {
+        "STEP 3": "fields building",
+        "requirements": [
+          "Use only the current {input_text_label}, {related_context_label} and {previous_summary} to decide the new {info_found_label}, {relevant_context_label} of your document",
+          "if {previous_summary_by_item} is not empty, but you do not find any related information in {input_text_label}, keep the previous summary_by_item.",
+          "relevant_context should list the keys from {related_context_label} that are found in either {previous_summary} or {input_text_label} (e.g., [\"vic_grupo_social\", \"captura_metodo\", \"perp_tipo1\"]).",
+          "For each key X in {relevant_context_label}, check if there is any information about X in {previous_summary} or {input_text_label}. If yes, add one bullet to {summary_label} for X, copying the exact Spanish span(s) from {previous_summary} and/or {input_text_label} about X (no paraphrasing; preserve modality)."
+        ]
+      },
+      {
+        "STEP 4": "extractive summarization",
+        "requirements": [
+          "For each key X in existing {previous_summary_by_item}, you check if there is any new information about X in {input_text_label}. If yes, update one short Spanish sentence summarizing the aggregated information for X and store it in summary_by_item[X].",
+          "If no new information is found, keep the previous summary_by_item[X].",
+          "For each key X in the new {relevant_context_label} that is not in {previous_summary_by_item}, write one short Spanish sentence summarizing that information for X and store it in summary_by_item[X].",
+          "Extractive summary in Spanish: copy exact spans; DO NOT paraphrase; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\")."
+        ]
+      },
+      {
+        "STEP 6": "edge case handling",
+        "requirements": [
+          "If no relevant info in either {previous_summary} or {input_text_label}, set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={}, {summary_label}=\"\".",
+          "NO APOLOGIES, NO FILLER TEXT"
+        ]
+      }
+    ]
+  },
+  "classification": {
+    "instructions": [
+      "OUTPUT FORMAT: Return ONLY {{\"evidence\":\"evidence\", \"result\": \"your_classification\"}}",
+      "DO NOT ECHO THE INPUT, QUESTION, OR POSSIBLE_VALUES IN YOUR RESPONSE",
+      "Your result MUST be one of the possible_values: {possible_values}",
+      "If no information is found about this label, return empty string like {{\"evidence\": \"no information found about this label\", \"result\": \"\"}}"
+    ]
+  }
+}
+

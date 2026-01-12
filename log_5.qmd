@@ -20,9 +20,9 @@ format:
     incremental: false
 ---
 
-## Stage 1: Extractive Summarization
+## Stage 1: Summarization
 
-**Input**: Raw messy text with navigation, ads, error pages
+**Input**: Raw messy text (aggregated to victim level) with navigation, ads, error pages etc.
 
 ```json
 {
@@ -46,7 +46,7 @@ format:
 
 ---
 
-## Stage 2: Constrained Classification
+## Stage 2: Classification
 
 **Input**: Clean summary + taxonomy question
 
@@ -72,25 +72,17 @@ format:
 
 ## Classification Metrics (Source-Level)
 
-Accuracy, Macro F1, and Cohen's Kappa for each classification label
+Accuracy, Macro F1, and Cohen's Kappa for each classification label, using Llama 3.1 8B instruct.
 
-![](plots/metrics_per_label_source.png){width="90%"}
-
----
-
-## Aggregating to Victim-Level
-
-Aggregate multiple news sources per victim using consensus (mode)
-
-![](plots/metrics_per_label_victim.png){width="90%"}
+![](plots/Meta-Llama-3.1-8B-Instruct-AWQ-INT4_metrics_per_label_source.png){width="90%"}
 
 ---
 
-## Performance Change (Victim − Source)
+## Classification Metrics (Victim-Level)
 
-Performance gains from aggregation are inconsistent across labels
+Accuracy comparison across models for each classification label
 
-![](plots/metrics_per_label_diff.png){width="90%"}
+![](plots/accuracy_comparison_across_models.png){width="90%"}
 
 ---
 
@@ -98,7 +90,7 @@ Performance gains from aggregation are inconsistent across labels
 
 COMET, BLEU, ROUGE require reference summaries. We have none.
 
-We use **reference-free** metrics instead:
+Used **reference-free** metrics instead:
 
 - **[G-Eval](https://arxiv.org/abs/2303.16634)**: Prompt-based evaluator. Inputs source and summary, and tasks in stacked promtps to output scores.
 
@@ -118,15 +110,13 @@ We use **reference-free** metrics instead:
 
 ---
 
-## LLM Metrics: Limitations
+## Next Steps
 
-These metrics underperform for our use case:
+- Stacking prompts
+- Input documents in multiple turns
 
-- **Language mismatch**: NLI models used in SummaC are trained on English; does not perform well on Spanish.
-
-- **Noisy source**: Models compare messy source vs clean summary, inflating inconsistency
-
-- **Model mismatch**: G-Eval designed for GPT-4; we used Llama 3.1 8B
-
----
-
+- collapsing categories
+- unit of analysis
+- AEC, Upsala 
+- Extractive AND Summarization, restructre the OUTPUT PROMPT, thinking about COMPONENT, with PURPOSE.
+- when stacking, thinking about doc quality or coherence / complexity

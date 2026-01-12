@@ -1,5 +1,5 @@
 '''
-the orignal interface:
+the original interface:
 processed_df = process_dataframe_summary_and_classification(
     df=df_text,
     code_to_desc_map=code_to_desc_map,
@@ -7,8 +7,8 @@ processed_df = process_dataframe_summary_and_classification(
     vllm_client=client,
     model_name=model,
     start_index=0,
-    early_break=10,
-    inner_loop_break=5,
+    summary_row_limit=10,
+    classification_key_limit=5,
     log_resources=False,
     log_prompts=False,
     log_response=False,
@@ -47,15 +47,16 @@ def process_dataframe_summary_and_classification(
     model_name,
     log_file="processing.log",
     start_index=0,
-    early_break=None,
-    inner_loop_break=None,
+    summary_row_limit=None,
+    classification_key_limit=None,
     log_resources=False,
     log_prompts=False,
     log_response=False,
     log_progress=False,
     use_progress_bar=True,
     max_tokens_summary=1024,
-    max_tokens_classification=1048
+    max_tokens_classification=1048,
+    prompts_config=None,
 ):
     """
     Processes a DataFrame to generate summaries and classifications for text data using a synchronous approach.
@@ -70,8 +71,8 @@ def process_dataframe_summary_and_classification(
         model_name (str): The name of the model to use.
         log_file (str): Path to the log file. Defaults to "processing.log".
         start_index (int): Row index to start processing from. Defaults to 0.
-        early_break (Optional[int]): Stop after N rows (for testing). Defaults to None.
-        inner_loop_break (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
+        summary_row_limit (Optional[int]): Stop after N rows (for testing). Defaults to None.
+        classification_key_limit (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
         log_resources (bool): Whether to log memory usage per row. Defaults to False.
         log_prompts (bool): Whether to log prompts (unused, internal implementation). Defaults to False.
         log_response (bool): Whether to log full responses (unused, internal implementation). Defaults to False.
@@ -86,6 +87,11 @@ def process_dataframe_summary_and_classification(
     # Setup logger from config
     logger = setup_logger(log_file=log_file)
     
+    # Load prompt configuration if not provided
+    if prompts_config is None:
+        with open('config/prompts.json', 'r', encoding='utf-8') as f:
+            prompts_config = json.load(f)
+    
     # Build config dict for processor
     config = {
         'model': {'name': model_name},
@@ -93,7 +99,8 @@ def process_dataframe_summary_and_classification(
             'temperature': 0.0,
             'max_tokens_summary': max_tokens_summary,
             'max_tokens_classification': max_tokens_classification
-        }
+        },
+        'prompts': prompts_config,
     }
     
     # Build taxonomy dict for processor
@@ -105,9 +112,9 @@ def process_dataframe_summary_and_classification(
     # Instantiate pure processor
     processor = MessyTextProcessor(vllm_client, config, taxonomy, logger)
     
-    # Get classification keys, apply inner_loop_break
+    # Get classification keys, apply classification_key_limit
     all_keys = list(code_to_desc_map.keys())
-    keys_to_classify = all_keys[:inner_loop_break] if inner_loop_break else all_keys
+    keys_to_classify = all_keys[:classification_key_limit] if classification_key_limit else all_keys
     
     # Initialize result columns
     df_processed = df.copy()
@@ -120,8 +127,8 @@ def process_dataframe_summary_and_classification(
     results_list = []
     df_to_process = df_processed.iloc[start_index:]
     total_rows = len(df_to_process)
-    if early_break is not None and early_break < total_rows:
-        total_rows = early_break
+    if summary_row_limit is not None and summary_row_limit < total_rows:
+        total_rows = summary_row_limit
     
     row_counter = 0
     start_time = time.time()
@@ -131,8 +138,8 @@ def process_dataframe_summary_and_classification(
     with tqdm(total=total_rows, desc="Processing", position=0, leave=True, 
               disable=not use_progress_bar) as pbar:
         for row in df_to_process.itertuples():
-            # Early break check BEFORE processing (handles early_break=0 correctly)
-            if early_break is not None and row_counter >= early_break:
+            # Early break check BEFORE processing (handles summary_row_limit=0 correctly)
+            if summary_row_limit is not None and row_counter >= summary_row_limit:
                 break
             
             pbar.set_description(f"Processing (Index: {row.Index})")
@@ -169,7 +176,7 @@ def process_dataframe_summary_and_classification(
                         if log_response:
                             logger.info(f"  {key}: {classification}")
             
-            # Fill remaining keys with empty if inner_loop_break was applied
+            # Fill remaining keys with empty if classification_key_limit was applied
             for key in all_keys:
                 if f'{key}_classification' not in current_row_results:
                     current_row_results[f'{key}_classification'] = ""
@@ -274,8 +281,8 @@ async def process_dataframe_async(
     model_name,
     log_file="processing.log",
     start_index=0,
-    early_break=None,
-    inner_loop_break=None,
+    summary_row_limit=None,
+    classification_key_limit=None,
     log_resources=False,
     log_prompts=False,  # Kept for interface compatibility, unused
     log_response=False, # Kept for interface compatibility, unused
@@ -283,7 +290,8 @@ async def process_dataframe_async(
     use_progress_bar=True,
     max_concurrent_rows=50,
     max_tokens_summary=1024,
-    max_tokens_classification=1048
+    max_tokens_classification=1048,
+    prompts_config=None,
 ):
     """
     Processes a DataFrame asynchronously using concurrent execution for high throughput.
@@ -296,8 +304,8 @@ async def process_dataframe_async(
         model_name (str): The name of the model to use.
         log_file (str): Path to the log file. Defaults to "processing.log".
         start_index (int): Row index to start processing from. Defaults to 0.
-        early_break (Optional[int]): Stop after N rows (for testing). Defaults to None.
-        inner_loop_break (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
+        summary_row_limit (Optional[int]): Stop after N rows (for testing). Defaults to None.
+        classification_key_limit (Optional[int]): Stop classification after N keys per row (for testing). Defaults to None.
         log_resources (bool): Whether to log memory usage per row. Defaults to False.
         log_prompts (bool): Unused, kept for compatibility. Defaults to False.
         log_response (bool): Unused, kept for compatibility. Defaults to False.
@@ -313,13 +321,19 @@ async def process_dataframe_async(
     # Setup logger from config
     logger = setup_logger(log_file=log_file)
     
+    # Load prompt configuration if not provided
+    if prompts_config is None:
+        with open('config/prompts.json', 'r', encoding='utf-8') as f:
+            prompts_config = json.load(f)
+    
     config = {
         'model': {'name': model_name},
         'processing': {
             'temperature': 0.0,
             'max_tokens_summary': max_tokens_summary,
             'max_tokens_classification': max_tokens_classification
-        }
+        },
+        'prompts': prompts_config,
     }
     
     taxonomy = {
@@ -331,7 +345,7 @@ async def process_dataframe_async(
     processor = AsyncMessyTextProcessor(vllm_client, config, taxonomy, logger)
     
     all_keys = list(code_to_desc_map.keys())
-    keys_to_classify = all_keys[:inner_loop_break] if inner_loop_break else all_keys
+    keys_to_classify = all_keys[:classification_key_limit] if classification_key_limit else all_keys
     
     # Initialize columns in input df (optional, for structure)
     df_processed = df.copy()
@@ -342,9 +356,9 @@ async def process_dataframe_async(
             
     df_to_process = df_processed.iloc[start_index:]
     total_rows = len(df_to_process)
-    if early_break is not None and early_break < total_rows:
-        df_to_process = df_to_process.iloc[:early_break]
-        total_rows = early_break
+    if summary_row_limit is not None and summary_row_limit < total_rows:
+        df_to_process = df_to_process.iloc[:summary_row_limit]
+        total_rows = summary_row_limit
 
     # Concurrency Control
     semaphore = asyncio.Semaphore(max_concurrent_rows)
@@ -393,8 +407,14 @@ def main():
     
     logger = setup_logger(log_file=settings['logging']['file'])
     
-    # Step 2: Load data
-    df_text = pd.read_csv(settings['paths']['input'], encoding='utf-8')
+    # Load prompt configuration
+    prompts_path = settings['paths'].get('prompts', 'config/prompts.json')
+    with open(prompts_path, 'r', encoding='utf-8') as f:
+        prompts_config = json.load(f)
+    
+    # Step 2: Load data (use summary input path from config)
+    summary_paths = settings['paths']['summary']
+    df_text = pd.read_csv(summary_paths['input'], encoding='utf-8')
     
     with open('config/taxonomy.json', 'r', encoding='utf-8') as f:
         taxonomy = json.load(f)
@@ -454,8 +474,8 @@ def main():
             model_name=settings['model']['name'],
             log_file=settings['logging']['file'],
             start_index=settings['processing']['start_index'],
-            early_break=settings['processing']['early_break'],
-            inner_loop_break=settings['processing']['inner_loop_break'],
+            summary_row_limit=settings['processing'].get('summary_row_limit'),
+            classification_key_limit=settings['processing'].get('classification_key_limit'),
             log_resources=settings['logging']['log_resources'],
             log_prompts=settings['logging']['log_prompts'],
             log_response=settings['logging']['log_response'],
@@ -463,7 +483,8 @@ def main():
             use_progress_bar=settings['display']['use_progress_bar'],
             max_concurrent_rows=max_concurrent_rows,
             max_tokens_summary=settings['processing'].get('max_tokens_summary', 1024),
-            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048)
+            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048),
+            prompts_config=prompts_config,
         ))
     else:
         logger.info("Using SYNC processing mode (Legacy).")
@@ -475,15 +496,16 @@ def main():
             model_name=settings['model']['name'],
             log_file=settings['logging']['file'],
             start_index=settings['processing']['start_index'],
-            early_break=settings['processing']['early_break'],
-            inner_loop_break=settings['processing']['inner_loop_break'],
+            summary_row_limit=settings['processing'].get('summary_row_limit'),
+            classification_key_limit=settings['processing'].get('classification_key_limit'),
             log_resources=settings['logging']['log_resources'],
             log_prompts=settings['logging']['log_prompts'],
             log_response=settings['logging']['log_response'],
             log_progress=settings['logging']['log_progress'],
             use_progress_bar=settings['display']['use_progress_bar'],
             max_tokens_summary=settings['processing'].get('max_tokens_summary', 1024),
-            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048)
+            max_tokens_classification=settings['processing'].get('max_tokens_classification', 1048),
+            prompts_config=prompts_config,
         )
     
     # Save output
@@ -491,8 +513,9 @@ def main():
     processed_df['model'] = model_name
     processed_df.replace(['No information', 'No relevant information found'], '', inplace=True)
     
-    output_path = settings['paths']['output']['file']
-    extend_mode = settings['paths']['output'].get('extend', False)
+    classification_paths = settings['paths']['classification']
+    output_path = classification_paths['output']['file']
+    extend_mode = classification_paths['output'].get('extend', False)
     
     if extend_mode and Path(output_path).exists():
         existing_df = pd.read_csv(output_path, encoding='utf-8')

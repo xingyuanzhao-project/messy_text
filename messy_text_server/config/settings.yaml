@@ -1,18 +1,20 @@
 model:
-  name: "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4"
+  name: "mistralai/Ministral-3-8B-Instruct-2512"
   api_base: "http://localhost:8000/v1"
   api_key: "dummy"
 
 paths:
-  input: "df_text.csv"
-  output: "df_text_clas_server.csv"
-  eval_output: "df_text_eval.csv"
+  input: "df_text_by_victim.csv"
+  output:
+    file: "df_text_clas_multi_by_victim.csv"
+    extend: True
+  eval_output: "df_text_multi_eval_by_victim.csv"
   taxonomy: "config/taxonomy.json"
 
 async:
   enabled: True
   max_retries: 5
-  max_concurrent_rows: 50
+  max_concurrent_rows: 30
 
 processing:
   temperature: 0.0
@@ -25,10 +27,10 @@ processing:
 evaluation:
   rows_eval_break: null
   benchmarks:
-    enable_geval_summarization: True
-    enable_geval_hallucination: True
-    enable_summac_zs: True
-    enable_summac_conv: True
+    enable_geval_summarization: False
+    enable_geval_hallucination: False
+    enable_summac_zs: False
+    enable_summac_conv: False
     enable_default_metrics: True
 
     summac_settings:

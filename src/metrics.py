@@ -13,6 +13,7 @@ Uses DeepEval's built-in SummarizationMetric and HallucinationMetric with local 
 Reference: https://github.com/confident-ai/deepeval
 """
 
+import asyncio
 import json
 import logging
 from typing import Dict, Any, Optional, Union
@@ -407,12 +408,19 @@ class AsyncGEvalEvaluator(GEvalEvaluatorLogicMixin):
         """
         metric = self._create_summarization_metric(self.model)
         test_case = self._create_summarization_test_case(source, summary)
+        timeout = self.config['async'].get('timeout', 300)
 
         try:
-            await metric.a_measure(test_case, _show_indicator=False)
+            await asyncio.wait_for(
+                metric.a_measure(test_case, _show_indicator=False),
+                timeout=timeout
+            )
             score = metric.score
             self.logger.info(f"Summarization score: {score:.3f}")
             return score
+        except asyncio.TimeoutError:
+            self.logger.error(f"Summarization evaluation timed out after {timeout}s")
+            return 0.0
         except Exception as e:
             self.logger.error(f"Summarization evaluation failed: {e}")
             return 0.0

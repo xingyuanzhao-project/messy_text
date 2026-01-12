@@ -33,7 +33,7 @@ from tqdm.asyncio import tqdm as tqdm_async
 from tqdm.auto import tqdm
 
 from src.processors import MessyTextProcessor, AsyncMessyTextProcessor
-from src.utils import setup_logger, log_memory_usage, check_gpu_info, check_vllm_server, check_local_models
+from src.utils import setup_logger, log_memory_usage, check_gpu_info, check_vllm_server
 
 
 # =============================================================================
@@ -418,9 +418,6 @@ def main():
         logger.error("No GPU available. Exiting.")
         sys.exit(1)
     
-    # Local model check
-    check_local_models(settings['model']['name'], logger)
-    
     # vLLM server check
     vllm_ok, available_models, test_result = check_vllm_server(
         sync_client,
@@ -490,10 +487,25 @@ def main():
         )
     
     # Save output
+    model_name = settings['model']['name']
+    processed_df['model'] = model_name
     processed_df.replace(['No information', 'No relevant information found'], '', inplace=True)
-    output_path = settings['paths']['output']
-    processed_df.to_csv(output_path, index=False)
-    logger.info(f"Output saved to {output_path}")
+    
+    output_path = settings['paths']['output']['file']
+    extend_mode = settings['paths']['output'].get('extend', False)
+    
+    if extend_mode and Path(output_path).exists():
+        existing_df = pd.read_csv(output_path, encoding='utf-8')
+        rows_before = len(existing_df)
+        existing_df = existing_df[existing_df['model'] != model_name]
+        if len(existing_df) < rows_before:
+            logger.info(f"Overwriting {rows_before - len(existing_df)} existing rows for model '{model_name}'")
+        combined_df = pd.concat([existing_df, processed_df], ignore_index=True)
+        combined_df.to_csv(output_path, index=False, encoding='utf-8')
+        logger.info(f"Output extended: {len(existing_df)} existing + {len(processed_df)} new = {len(combined_df)} total rows")
+    else:
+        processed_df.to_csv(output_path, index=False, encoding='utf-8')
+        logger.info(f"Output saved to {output_path} ({len(processed_df)} rows)")
 
 
 if __name__ == '__main__':
