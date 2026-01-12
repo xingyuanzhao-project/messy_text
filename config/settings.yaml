@@ -31,7 +31,7 @@ processing:
   max_tokens_summary: 1024
   max_tokens_classification: 256
   start_index: 0
-  summary_row_limit: 1
+  summary_row_limit: 3
   classification_key_limit: 3
   conversation:
     enabled: True

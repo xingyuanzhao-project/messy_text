@@ -299,6 +299,30 @@ class MessyTextLogicMixin:
                 or {}
             )
 
+        # Derive previous_relevant_context and previous_summary_by_item from the last
+        # structured conversation result, if available. This allows prompt templates
+        # to reference {previous_relevant_context} and {previous_summary_by_item}
+        # without changing the public interface.
+        previous_relevant_context_list = []
+        previous_summary_by_item_dict = {}
+
+        previous_result = getattr(self, "last_summary_result", None)
+        if has_previous and isinstance(previous_result, ProcessorResult):
+            raw_ctx = previous_result.get("relevant_context")
+            if isinstance(raw_ctx, list):
+                previous_relevant_context_list = raw_ctx
+
+            raw_summary_by_item = previous_result.get("summary_by_item")
+            if isinstance(raw_summary_by_item, dict):
+                previous_summary_by_item_dict = raw_summary_by_item
+
+        previous_relevant_context_str = json.dumps(
+            previous_relevant_context_list, ensure_ascii=False
+        )
+        previous_summary_by_item_str = json.dumps(
+            previous_summary_by_item_dict, ensure_ascii=False
+        )
+
         output_format = summary_cfg.get("output_format")
         instructions_template = summary_cfg.get("instructions")
 
@@ -308,15 +332,26 @@ class MessyTextLogicMixin:
                 "'output_format' and 'instructions'."
             )
 
-        # Allow prompt templates to reference previous_summary and field labels dynamically.
+        # Allow prompt templates to reference previous_summary, previous structured
+        # fields, and label names dynamically.
+        class _SafeFormatDict(dict):
+            def __missing__(self, key: str) -> str:
+                # Preserve unknown placeholders literally, e.g. {previous_relevant_context}
+                return "{" + key + "}"
+
+        format_vars = _SafeFormatDict(
+            previous_summary=previous_summary or "",
+            previous_relevant_context=previous_relevant_context_str,
+            previous_summary_by_item=previous_summary_by_item_str,
+            info_found_label="info_found",
+            relevant_context_label="relevant_context",
+            summary_label="summary",
+            input_text_label="input_text",
+            related_context_label="related_context",
+        )
+
         instructions = [
-            instr.format(
-                previous_summary=previous_summary or "",
-                info_found_label="info_found",
-                relevant_context_label="relevant_context",
-                summary_label="summary",
-                input_text_label="input_text",
-            )
+            instr.format_map(format_vars)
             for instr in instructions_template
         ]
 
@@ -340,6 +375,7 @@ class MessyTextLogicMixin:
                 "properties": {
                     "info_found": {"type": "string"},
                     "relevant_context": {"type": "array"},
+                    "summary_by_item": {"type": "object"},
                     "summary": {"type": "string"}
                 },
                 "required": ["info_found", "relevant_context", "summary"]
