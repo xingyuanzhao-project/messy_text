@@ -1,0 +1,9 @@
+# Extractive Summarization of Messy Text
+
+When working with real-world data, researchers often encounter corpora that are neither clean nor well-structured. How can researchers efficiently extract and summarize structured information from messy, unstructured text in politically sensitive domains?
+
+Traditional text extraction methods such as OCR-based approaches struggle to filter irrelevant information from source text, leaving researchers with fragmented and unusable outputs. In social science domains, researchers often encounter news reports text that has inconsistent formatting, mixed languages, embedded noise, and irrelevant information. This paper argues that large language models (LLMs) offer a practical solution for processing messy political text at scale. Unlike prior applications of LLMs to clean benchmark datasets, we demonstrate that open-source models can effectively summarize real-world news articles while targeting specific information that researchers are interested in. We propose a flexible multi-turn summarization pipeline that updates the summary iteratively for each document input, enabling victim-level aggregation across fragmented narratives.
+
+We apply this pipeline to a corpus of news reports on disappearances in Mexico, then use the generated summaries to classify the data and compare results with human annotations, validating the accuracy of the summarization. Our pipeline is flexible, allowing comparison across multiple open-source LLM models.
+
+Preliminary results suggest that hours of computational processing can approximate weeks of human coding effort, with sufficient accuracy for downstream analysis. This approach lowers barriers for researchers working with imperfect real-world text in conflict, human rights, and event data research.

@@ -117,7 +117,7 @@ def _evaluate_metric(
     df,
     config,
     log_file,
-    rows_eval_break,
+    rows_eval_limit,
     log_progress,
     use_progress_bar,
     async_processing,
@@ -137,7 +137,7 @@ def _evaluate_metric(
         df (pd.DataFrame): Input DataFrame containing 'text' and 'summary_all_context' columns.
         config (Dict[str, Any]): Runtime settings.
         log_file (str): Path to the log file.
-        rows_eval_break (Optional[int]): Stop after N rows (for testing).
+        rows_eval_limit (Optional[int]): Stop after N rows (for testing).
         log_progress (bool): Enable verbose per-row logging.
         use_progress_bar (bool): Use tqdm progress bar.
         async_processing (bool): Use async evaluator.
@@ -165,8 +165,8 @@ def _evaluate_metric(
     ]
     
     # Apply row limit if set (None = all rows)
-    if rows_eval_break:
-        df_eval = df_valid.head(rows_eval_break).copy()
+    if rows_eval_limit:
+        df_eval = df_valid.head(rows_eval_limit).copy()
     else:
         df_eval = df_valid.copy()
     
@@ -272,7 +272,7 @@ def evaluate_geval_summarization(
     df,
     config,
     log_file="processing.log",
-    rows_eval_break=None,
+    rows_eval_limit=None,
     log_progress=False,
     use_progress_bar=True,
     async_processing=False,
@@ -316,7 +316,7 @@ def evaluate_geval_summarization(
         df=df,
         config=config,
         log_file=log_file,
-        rows_eval_break=rows_eval_break,
+        rows_eval_limit=rows_eval_limit,
         log_progress=log_progress,
         use_progress_bar=use_progress_bar,
         async_processing=async_processing,
@@ -338,7 +338,7 @@ def evaluate_geval_hallucination(
     df,
     config,
     log_file="processing.log",
-    rows_eval_break=None,
+    rows_eval_limit=None,
     log_progress=False,
     use_progress_bar=True,
     async_processing=False,
@@ -382,7 +382,7 @@ def evaluate_geval_hallucination(
         df=df,
         config=config,
         log_file=log_file,
-        rows_eval_break=rows_eval_break,
+        rows_eval_limit=rows_eval_limit,
         log_progress=log_progress,
         use_progress_bar=use_progress_bar,
         async_processing=async_processing,
@@ -404,7 +404,7 @@ def evaluate_summac_zs(
     df,
     config,
     log_file="processing.log",
-    rows_eval_break=None,
+    rows_eval_limit=None,
     log_progress=False,
     use_progress_bar=True,
     async_processing=False,  # Unused, kept for interface consistency
@@ -427,7 +427,7 @@ def evaluate_summac_zs(
         df=df,
         config=config,
         log_file=log_file,
-        rows_eval_break=rows_eval_break,
+        rows_eval_limit=rows_eval_limit,
         log_progress=log_progress,
         use_progress_bar=use_progress_bar,
         async_processing=False,  # SummaC is sync only
@@ -449,7 +449,7 @@ def evaluate_summac_conv(
     df,
     config,
     log_file="processing.log",
-    rows_eval_break=None,
+    rows_eval_limit=None,
     log_progress=False,
     use_progress_bar=True,
     async_processing=False,  # Unused, kept for interface consistency
@@ -472,7 +472,7 @@ def evaluate_summac_conv(
         df=df,
         config=config,
         log_file=log_file,
-        rows_eval_break=rows_eval_break,
+        rows_eval_limit=rows_eval_limit,
         log_progress=log_progress,
         use_progress_bar=use_progress_bar,
         async_processing=False,  # SummaC is sync only
@@ -494,7 +494,7 @@ def evaluate_default_metrics(
     df,
     config,
     log_file="processing.log",
-    rows_eval_break=None,
+    rows_eval_limit=None,
     log_progress=False,
     use_progress_bar=True,
     async_processing=False,  # Unused, kept for interface consistency
@@ -509,7 +509,7 @@ def evaluate_default_metrics(
         df (pd.DataFrame): Input DataFrame containing annotation and classification columns.
         config (Dict[str, Any]): Runtime settings.
         log_file (str): Path to the log file.
-        rows_eval_break (Optional[int]): Stop after N rows (for testing).
+        rows_eval_limit (Optional[int]): Stop after N rows (for testing).
         log_progress (bool): Enable verbose per-row logging.
         use_progress_bar (bool): Use tqdm progress bar.
         async_processing (bool): Unused, kept for interface consistency.
@@ -532,8 +532,8 @@ def evaluate_default_metrics(
     df_eval = df.copy()
 
     # Apply row limit if set (None = all rows)
-    if rows_eval_break:
-        df_eval = df_eval.head(rows_eval_break).copy()
+    if rows_eval_limit:
+        df_eval = df_eval.head(rows_eval_limit).copy()
 
     total_fields = len(evaluator.field_names)
     logger.info(f"Evaluating {total_fields} fields from taxonomy")
@@ -619,10 +619,11 @@ def main():
     
     logger = setup_logger(log_file=config['logging']['file'])
     
-    # Step 2: Load data
-    input_path = config['paths']['output']['file']
+    # Step 2: Load data using new eval paths interface
+    eval_paths = config['paths']['eval']
+    input_path = eval_paths['input']
     df = pd.read_csv(input_path, encoding='utf-8')
-    output_file = config['paths'].get('eval_output', 'df_text_eval.csv')
+    output_file = eval_paths['output']['file']
     
     # Step 3: Read evaluation settings
     eval_config = config.get('evaluation', {})
@@ -658,7 +659,7 @@ def main():
                     df=df_eval,
                     config=config,
                     log_file=config['logging']['file'],
-                    rows_eval_break=eval_config.get('rows_eval_break'),
+                    rows_eval_limit=eval_config.get('rows_eval_limit'),
                     log_progress=config['logging'].get('log_progress', False),
                     use_progress_bar=config['display'].get('use_progress_bar', True),
                     async_processing=async_config.get('enabled', False),
