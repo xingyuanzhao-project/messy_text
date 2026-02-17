@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 from json_repair import repair_json
+from src.utils import compute_span_offsets
 
 
 @dataclass
@@ -375,10 +376,23 @@ class MessyTextLogicMixin:
                 "properties": {
                     "info_found": {"type": "string"},
                     "relevant_context": {"type": "array"},
-                    "summary_by_item": {"type": "object"},
+                    "summary_by_item": {
+                        "type": "object",
+                        "description": "Per-label extractive spans for traceback",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "span": {"type": "string"}
+                                },
+                                "required": ["span"]
+                            }
+                        }
+                    },
                     "summary": {"type": "string"}
                 },
-                "required": ["info_found", "relevant_context", "summary"]
+                "required": ["info_found", "relevant_context", "summary_by_item", "summary"]
             }}
         }
 
@@ -473,6 +487,44 @@ class MessyTextLogicMixin:
         parsed = json.loads(repair_json(content))
         result = parsed.get('result', 'No information')
         return result if result else 'No information'
+
+
+def _attach_span_offsets_to_result(
+    result: Optional[ProcessorResult],
+    source_text: str,
+    doc_id: Optional[Any],
+) -> Optional[ProcessorResult]:
+    """
+    Enrich summary_by_item entries with offsets computed from source_text.
+
+    Offsets are only computed when summary_by_item is a dict; otherwise the
+    result is returned unchanged.
+    """
+    if result is None:
+        return None
+
+    summary_by_item = result.get("summary_by_item")
+    if not isinstance(summary_by_item, dict):
+        return result
+
+    # Ensure doc_id is propagated from the runner, not the model output.
+    # This keeps span records aligned with the input index and avoids model-
+    # injected identifiers.
+    for spans in summary_by_item.values():
+        if not isinstance(spans, list):
+            continue
+        for item in spans:
+            if isinstance(item, dict):
+                item["doc_id"] = doc_id
+
+    def _get_source_text(target_doc_id: Any) -> str:
+        if doc_id is not None and target_doc_id == doc_id:
+            return source_text
+        return ""
+
+    updated_summary_by_item = compute_span_offsets(summary_by_item, _get_source_text)
+    result.values["summary_by_item"] = updated_summary_by_item
+    return result
 
 
 class MessyTextProcessor(MessyTextLogicMixin):
@@ -752,22 +804,31 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
 @dataclass
 class MessyTextConversationState:
     """
-    Holds lightweight state for a multi-turn MessyText conversation.
+    Holds state for a multi-turn MessyText conversation.
 
-    This object is intentionally minimal and focused on summarization so it can be
-    extended later without breaking the interface. For now, it keeps track of the
-    most recent summary, the number of processed turns, and the most recent
-    structured result object.
+    This object tracks all results across turns, enabling traceback to original
+    spans and document sources. It provides properties for convenient access to
+    the most recent result and summary.
 
     Attributes:
-        last_summary (str): Summary produced in the most recent turn.
         turn_index (int): Number of turns that have been processed so far.
-        last_result (Optional[ProcessorResult]): Structured result for the most
-            recent turn, including fields like 'info_found' and 'summary'.
+        results (List[ProcessorResult]): All structured results from each turn,
+            preserving the full conversation history including spans and doc_ids.
     """
-    last_summary: str = ""
     turn_index: int = 0
-    last_result: Optional[ProcessorResult] = None
+    results: List[ProcessorResult] = field(default_factory=list)
+
+    @property
+    def last_result(self) -> Optional[ProcessorResult]:
+        """Return the most recent ProcessorResult, or None if no turns processed."""
+        return self.results[-1] if self.results else None
+
+    @property
+    def last_summary(self) -> str:
+        """Return the summary from the most recent turn, or empty string."""
+        if not self.results:
+            return ""
+        return self.results[-1].get("summary") or ""
 
 
 class MessyTextConversationTurnProcessor:
@@ -881,6 +942,7 @@ class MessyTextConversationTurnProcessor:
 
         # Expose the most recent conversation result on the underlying processor
         # for debugging or richer consumers.
+        result = _attach_span_offsets_to_result(result, cleaned_text, doc_id)
         self.processor.last_summary_result = result
 
         # Optional: per-turn logging when log_response is enabled
@@ -909,10 +971,14 @@ class MessyTextConversationTurnProcessor:
                 result,
             )
 
+        # Build updated state: append result to history list
+        new_results = conversation_state.results.copy()
+        if result is not None:
+            new_results.append(result)
+
         updated_state = MessyTextConversationState(
-            last_summary=summary,
             turn_index=conversation_state.turn_index + 1,
-            last_result=result,
+            results=new_results,
         )
         return summary, updated_state
 
@@ -1079,6 +1145,7 @@ class AsyncMessyTextConversationTurnProcessor:
                 )
                 summary = ""
 
+        result = _attach_span_offsets_to_result(result, cleaned_text, doc_id)
         self.processor.last_summary_result = result
 
         log_cfg = (getattr(self.processor, "config", {}) or {}).get("logging", {}) or {}
@@ -1106,10 +1173,14 @@ class AsyncMessyTextConversationTurnProcessor:
                 result,
             )
 
+        # Build updated state: append result to history list
+        new_results = conversation_state.results.copy()
+        if result is not None:
+            new_results.append(result)
+
         updated_state = MessyTextConversationState(
-            last_summary=summary,
             turn_index=conversation_state.turn_index + 1,
-            last_result=result,
+            results=new_results,
         )
         return summary, updated_state
 

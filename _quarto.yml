@@ -13,7 +13,6 @@ format:
   revealjs:
     theme: [default, custom.scss]
     slide-number: true
-    transition: fade
     preview-links: auto
     chalkboard: false
 

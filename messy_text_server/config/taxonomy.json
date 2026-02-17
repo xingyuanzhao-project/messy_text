@@ -196,5 +196,130 @@
       "Yes (explain more in the final comments section)",
       "No"
     ]
+  },
+  "fallback_values": [
+    "Other",
+    "Other(s)",
+    "No information",
+    "The article mentions that THERE WAS NOT a response",
+    "Perpetrator",
+    "Particulars (when you cannot identify their affiliation to an organized criminal group)",
+    "Particulars (when belonging to an organized criminal group is not identifiable)",
+    "Disappearance",
+    "Disappeared"
+  ],
+  "category_merging": {
+    "perp_tipo": {
+      "State agent (press article does not specify more information)": "State-affiliated",
+      "Municipal police": "State-affiliated",
+      "State police": "State-affiliated",
+      "Federal police": "State-affiliated",
+      "Army": "State-affiliated",
+      "Navy": "State-affiliated",
+      "Air Force": "State-affiliated",
+      "Ministerial police (they depend on the PGR - Office of the Federal Attorney)": "State-affiliated",
+      "Organized crime (Z)": "Criminal-organization-affiliated",
+      "Organized crime (Caballeros Templarios)": "Criminal-organization-affiliated",
+      "Organized crime (Cartel de Sinaloa)": "Criminal-organization-affiliated",
+      "Organized crime (Cartel de Jalisco Nueva Generación)": "Criminal-organization-affiliated",
+      "Organized crime (Beltrán Leyva)": "Criminal-organization-affiliated",
+      "Organized crime (Cartel del Golfo)": "Criminal-organization-affiliated",
+      "Organized crime (Cartel de Juárez)": "Criminal-organization-affiliated",
+      "Organized crime (Los Rojos)": "Criminal-organization-affiliated",
+      "Organized crime (Los Ardillos)": "Criminal-organization-affiliated",
+      "Organized crime (La Familia Michoacana)": "Criminal-organization-affiliated",
+      "Organized crime (name is unspecified)": "Criminal-organization-affiliated",
+      "Relatives": "Unaffiliated individual",
+      "Has or had a romantic relationship with victim": "Unaffiliated individual"
+    },
+    "captura_metodo": {
+      "Kidnapping": "Kidnapping",
+      "Plagio (kidnapping in a legal sense)": "Kidnapping",
+      "Levantón (kidnapping but pejorative use towards the victim)": "Kidnapping",
+      "Detention/arrest": "Official detention",
+      "Military or political operation (raid)": "Official detention",
+      "Scam": "Scam"
+    },
+    "proced_contactado": {
+      "Municipal police": "Security forces",
+      "State police": "Security forces",
+      "Federal police": "Security forces",
+      "Army": "Security forces",
+      "Navy": "Security forces",
+      "Air Force": "Security forces",
+      "Ministerial police (they depend on the PGR - Office of the Federal Attorney)": "Security forces",
+      "District attorney's office": "Prosecution/Justice bodies",
+      "Office of the inspector general (previous title of district attorney's office)": "Prosecution/Justice bodies",
+      "Prosecutor": "Prosecution/Justice bodies",
+      "Commision on Human Rights": "Human rights bodies",
+      "Governor": "Elected officials",
+      "Mayor": "Elected officials"
+    },
+    "desenlace": {
+      "Still disappeared": "Still disappeared",
+      "Found dead": "Found",
+      "Found alive": "Found",
+      "Found, but does not specify if dead or alive": "Found",
+      "Liberated by captors": "Found",
+      "Liberated by authorities": "Found",
+      "Escaped or was liberated through their own means": "Found"
+    },
+    "captura_tipo": {
+      "Places related to the victim (house, workplace, private property)": "Places related to the victim",
+      "Economic, social, industrial, agricultural and service centers": "Public and institutional spaces",
+      "Authorities (government offices, military facilities)": "Public and institutional spaces",
+      "Educational and medical facilities": "Public and institutional spaces",
+      "Places for free expression, association and gatherings": "Public and institutional spaces",
+      "Unoccupied or barren public spaces": "Public and institutional spaces",
+      "Means and routes of transport and places of connection": "Public and institutional spaces",
+      "International and protected spaces": "Public and institutional spaces",
+      "Special centers and barracks for detention": "Public and institutional spaces"
+    },
+    "desenlace_tipo": {
+      "Places related to the victim (house, workplace, private property)": "Places related to the victim",
+      "Economic, social, industrial, agricultural and service centers": "Public and institutional spaces",
+      "Authorities (government offices, military facilities)": "Public and institutional spaces",
+      "Educational and medical facilities": "Public and institutional spaces",
+      "Places for free expression, association and gatherings": "Public and institutional spaces",
+      "Unoccupied or barren public spaces": "Public and institutional spaces",
+      "Means and routes of transport and places of connection": "Public and institutional spaces",
+      "International and protected spaces": "Public and institutional spaces",
+      "Centers and quarters for detention": "Public and institutional spaces"
+    },
+    "vic_grupo_social": {
+      "Students": "Students",
+      "Civil servants (Police, mayor, public worker, etc)": "Civil servants",
+      "People associated with politics": "Civil servants",
+      "Professionals (Entrepreneur, Engineer, Professor, Journalist, etc)": "Professionals",
+      "People that work in service industries (taxi driver, salesman, etc)": "Professionals",
+      "Land Worker": "Professionals",
+      "Organized crime": "Organized crime",
+      "Activists (political activist, human rights, etc)": "Activists",
+      "Belonging to some sexual identity group (LGBTQ)": "LGBTQ"
+    },
+    "amenaza_quien": {
+      "Organized crime": "Organization",
+      "Armed group": "Organization",
+      "Relative": "Known individual",
+      "Neighbor": "Known individual",
+      "Someone known by the victim": "Known individual"
+    },
+    "cautiverio_trato": {
+      "Torture": "Physical violence",
+      "Strangulation": "Physical violence",
+      "Dismembered": "Physical violence",
+      "Witness of the torture of their relatives": "Witness of the torture of their relatives",
+      "Identity theft": "Identity theft"
+    },
+    "proced_sent_tipo": {
+      "Condemnatory": "Condemnatory",
+      "Consecutive": "Condemnatory",
+      "Absolving": "Absolving"
+    }
+  },
+  "no_coarsening_fields": ["proced_contacto", "Tribunal_tipo", "soc_civil"],
+  "merged_label_pairs": {
+    "perp_tipo": ["perp_tipo1", "perp_tipo2"],
+    "proced_contacto": ["proced_contacto1", "proced_contacto2"]
   }
 }

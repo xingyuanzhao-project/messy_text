@@ -1,0 +1,185 @@
+---
+title: "Extractive Summarization of Messy Text"
+format: revealjs
+---
+
+## Motivation
+
+- Researchers often work with messy, unstructured text corpora (scraped web content with noise)
+
+- These corpora are not ready for downstream research tasks
+
+- Cleaning them manually is expensive
+
+---
+
+## Contributions
+
+- Enables researchers to get structured information from messy text
+- Enables downstream tasks for other researchers purposes
+
+---
+
+## Dataset
+
+- News reports on disappearance cases in Mexico collected and annotated by UMN
+
+---
+
+### Scraped File Errors
+
+(1) Error pages
+
+Guerrero_Abel A G_2: 
+```
+Página no encontrada - Agencia de Noticias IRZA Saltar al contenido Agencia de Noticias IRZA desde 1992 Menú INICIO GUERRERO CHILPANCINGO ACAPULCO COSTA CHICA COSTA GRANDE CENTRO MONTAÑA NORTE TIERRA CALIENTE SIERRA CONGRESO GOBIERNO DEL ESTADO POLÍTICA POLICIACA DEPORTES NOTA ROJA × Buscar: Botón de búsqueda ¡Vaya! No se puede encontrar esa página. No hemos encontrado nada aquí. ¿Qué tal si pruebas el buscador? 404 error Buscar: Botón de búsqueda
+```
+```
+Page not found - IRZA News Agency Skip to content IRZA News Agency since 1992 Menu HOME GUERRERO CHILPANCINGO ACAPULCO COSTA CHICA COSTA GRANDE CENTRO MONTAÑA NORTE TIERRA CALIENTE SIERRA CONGRESS STATE GOVERNMENT POLITICS POLICE SPORTS CRIME NEWS × Search: Search button Oops! That page can't be found. We haven't found anything here. How about trying the search bar? 404 error Search: Search button
+```
+
+---
+
+(2) Website formats, such as navigation menus.
+
+Guerrero_Abel A G_1:
+```
+Abel soñaba ser ingeniero y dejó su pueblo. Se topó con policías: ya cumplió un mes desaparecido | SinEmbargo MX lunes 15 de septiembre de 2025 Periodismo digital con rigor Portada Lo + Compartido Lo + Leído Al Aire Opinión Galileo Sofá México Economía Publicidad Directorio Contacto lunes 15 de septiembre de 2025 Portada Lo + Compartido Lo + Leído Al Aire Opinión Galileo Sofá México Economía Publicidad Directorio Contacto Síguenos en: Facebook Twitter Telegram Instagram TikTok YouTube Periodismo digital con rigor
+```
+
+```
+Abel dreamed of being an engineer and left his hometown. He ran into the police: he's been missing for a month now | SinEmbargo MX Monday, September 15, 2025 Rigorous Digital Journalism Front Page Most Shared Most Read On Air Opinion Galileo Sofa Mexico Economy Advertising Directory Contact Monday, September 15, 2025 Front Page Most Shared Most Read On Air Opinion Galileo Sofa Mexico Economy Advertising Directory Contact Follow us on: Facebook Twitter Telegram Instagram TikTok YouTube Rigorous Digital Journalism
+```
+
+---
+
+(3) Distractive information that are somewhat related but should not be there, such as suggested articles or comments from other users.
+
+Guerrero_Abel A G_1:
+```
+Destacadas Ver sección Destacadas 1 Secretaría de Seguridad y Paz de Guanajuato detiene a 8 con armas, vehículos y droga 2 Peso llega a 18.34 unidades por dólar, su mejor nivel en 14 meses; BMV rompe récord 3 Trump anuncia un segundo ataque militar contra ""narcos"" venezolanos;
+```
+
+```
+Featured See Featured section 1 Guanajuato Security and Peace Secretariat arrests 8 with weapons, vehicles and drugs 2 Peso reaches 18.34 units per dollar, its best level in 14 months; BMV breaks record 3 Trump announces a second military attack against Venezuelan ""narcos"";
+```
+
+---
+
+# Method
+
+## Model Setup
+
+- Llama 3.1 8B Instruct (AWQ INT4)
+- Llama 3.1 70B Instruct (AWQ INT4)
+- Gemma 3 12B IT (INT4 AWQ)
+- Gemma 3 27B IT (INT4 AWQ) (todo)
+- Ministral 3 8B Instruct
+- Mistral 24B Instruct (todo)
+
+---
+
+
+## Extraction vs Summarization
+
+- Summarization: condenses text, may paraphrase
+- Extraction: copies exact spans from source text
+- Simple summarization loses traceability to source
+- Our task requires both: summarize by item, using extracted spans as evidence
+
+---
+
+## Pipeline
+
+::: {style="background-color: white; padding: 10px; border-radius: 8px; --mermaid-label-bg-color: white; --mermaid-edge-color: #333;"}
+```{mermaid}
+%%{init: {'theme': 'default'}}%%
+flowchart TD
+    D1[/"Doc 1 + item definitions"/] -->|extract| S1[["#123;item: span#125; → summary_1"]]
+    S1 -->|feed| S2
+    D2[/"Doc 2 + item definitions"/] -->|update| S2[["#123;item: span#125; → summary_2"]]
+    S2 -->|feed| S3
+    D3[/"Doc 3 + item definitions"/] -->|update| S3[["#123;item: span#125; → summary_3"]]
+```
+:::
+
+---
+
+
+## Pipeline
+
+- For each victim, process their documents one at a time
+- Each turn sends the LLM: input text + label definitions (what to look for) + previous summary (if exists)
+
+---
+
+- First turn: extract spans from document by label item
+- Subsequent turns: 
+  - Existing label, new info found -> add new spans, keep old spans
+  - Existing label, no new info -> keep previous unchanged
+  - New label found -> extract spans from current document
+- Output per turn: `summary_by_item` (exact spans per label) + combined `summary`
+
+---
+
+### Example Results
+
+**spans.csv** — extracted evidence per field
+
+| victim_id | label_key | span | offset |
+|-----------|-----------|------|--------|
+| Coahuila_Abel M H | vic_grupo_social | "Most of the disappeared were taxi drivers..." | -1 |
+| Coahuila_Abel M H | proced_contacto1 | "Relatives of the disappeared" | 2249 |
+
+---
+
+**results.csv** — summary by turn
+
+| victim_id | turn | summary |
+|-----------|------|----------------|
+| Coahuila_Aurora Zuzeth T P | 0 | — |
+| Coahuila_Aurora Zuzeth T P | 1 | "Someone took them from two addresses" 
+
+---
+
+# Evaluation
+
+## Human Gold Standard
+
+- Classification based off the summary text
+- Human annotations are used as the gold standard for comparison
+- Compared the results from the baseline simple summarization and the proposed method
+
+---
+
+## Baseline vs Proposed Method
+
+![](../plots/large_models/metrics_victim.png)
+
+---
+
+## {.center}
+
+![](../plots/large_models/metrics_incident.png)
+
+---
+
+## {.center}
+
+![](../plots/large_models/metrics_perpetrator.png)
+
+---
+
+## {.center}
+
+![](../plots/large_models/metrics_legal_procedure.png)
+
+---
+
+# Conclusion and Future Work
+
+- Drafting the paper
+
+- Some labels are decreased in accuracy for some reason, need to investigate why
+
+- Find other ways to evaluate the hallucinations

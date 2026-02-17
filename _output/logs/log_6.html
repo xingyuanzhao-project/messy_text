@@ -10,7 +10,7 @@
 <link href="log_6_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.56">
 
-  <title>LLM Classification Post-Processing</title>
+  <title>Extractive Summarization</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -390,125 +390,150 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">LLM Classification Post-Processing</h1>
+  <h1 class="title">Extractive Summarization</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="stacking-prompts-conversation-mode" class="slide level2">
-<h2>1. Stacking Prompts: Conversation Mode</h2>
-<p><strong>Problem</strong>: Single document → Distracted info</p>
+<section id="multi-turn-summarization" class="slide level2">
+<h2>1. Multi-turn Summarization</h2>
+<p><strong>Problem</strong>: Single document → Distractive info</p>
 <p><strong>Solution</strong>: Send documents one by one, update summary incrementally</p>
-<pre><code>Doc 1 → summary_first → summary_1
+<pre><code>Doc 1 → first_summary → summary_1
 Doc 2 + summary_1 → summary_update → summary_2
 Doc 3 + summary_2 → summary_update → summary_3
 ...</code></pre>
 </section>
-<section id="prompt-summary_update-verbatim" class="slide level2">
-<h2>Prompt: summary_update (verbatim)</h2>
+<section id="prompt-summary-by-item-update" class="slide level2">
+<h2>Prompt: Summary by Item Update</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href=""></a><span class="fu">{</span></span>
 <span id="cb2-2"><a href=""></a>  <span class="dt">"instructions"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb2-3"><a href=""></a>    <span class="st">"If the previous summary above is non-empty, update it by </span></span>
-<span id="cb2-4"><a href=""></a><span class="st">     adding or refining victim-relevant facts from input_text, </span></span>
-<span id="cb2-5"><a href=""></a><span class="st">     without removing correct existing details."</span><span class="ot">,</span></span>
-<span id="cb2-6"><a href=""></a>    <span class="st">"For each key X in existing previous_summary_by_item, check </span></span>
-<span id="cb2-7"><a href=""></a><span class="st">     if there is any new information about X in input_text. </span></span>
-<span id="cb2-8"><a href=""></a><span class="st">     If yes, update summary_by_item[X]."</span></span>
-<span id="cb2-9"><a href=""></a>  <span class="ot">]</span></span>
-<span id="cb2-10"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href=""></a>    <span class="er">...</span></span>
+<span id="cb2-4"><a href=""></a>    <span class="st">"If the previous summary above is non-empty, update it by </span></span>
+<span id="cb2-5"><a href=""></a><span class="st">     adding or refining victim-relevant facts from input_text, </span></span>
+<span id="cb2-6"><a href=""></a><span class="st">     without removing correct existing details."</span><span class="ot">,</span></span>
+<span id="cb2-7"><a href=""></a>    <span class="st">"For each key X in existing previous_summary_by_item, check </span></span>
+<span id="cb2-8"><a href=""></a><span class="st">     if there is any new information about X in input_text. </span></span>
+<span id="cb2-9"><a href=""></a><span class="st">     If yes, update summary_by_item[X]."</span></span>
+<span id="cb2-10"><a href=""></a>     <span class="er">...</span></span>
+<span id="cb2-11"><a href=""></a>  <span class="ot">]</span></span>
+<span id="cb2-12"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="extractive-summarization" class="slide level2">
 <h2>2. Extractive Summarization</h2>
 <p><strong>output_format</strong> (from prompts.json):</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href=""></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href=""></a>  <span class="dt">"summary_by_item"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"vic_grupo_social"</span><span class="fu">:</span> <span class="st">"..."</span><span class="fu">,</span> <span class="dt">"captura_metodo"</span><span class="fu">:</span> <span class="st">"..."</span><span class="fu">},</span></span>
-<span id="cb3-3"><a href=""></a>  <span class="dt">"summary"</span><span class="fu">:</span> <span class="st">"&lt;texto in spanish&gt;"</span></span>
+<span id="cb3-3"><a href=""></a>  <span class="dt">"summary"</span><span class="fu">:</span> <span class="st">"&lt;text in spanish&gt;"</span></span>
 <span id="cb3-4"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="collapse-categories" class="slide level2">
-<h2>3. Collapse Categories</h2>
-<h3 id="monophyletic-problems">3.1 Monophyletic Problems</h3>
-<ol type="1">
-<li><p><strong>HIERARCHICAL</strong>: Parent category exists alongside its children. LLM may pick child, human may pick parent. Example: “State agent” vs “Municipal police”</p></li>
-<li><p><strong>OVERLAPPING</strong>: Multiple labels describe same concept. Example: “Kidnapping” vs “Plagio” vs “Levantón”</p></li>
-<li><p><strong>NON-EXCLUSIVE</strong>: A single entity can belong to multiple categories. Example: Mayor is both “Civil servant” AND “People associated with politics”</p></li>
-</ol>
+<section class="slide level2">
+
+<p>Guerrero_Adolfo V de la P Example:</p>
+<p>The three missing officials are members of the Guerrero state government. The armed group intercepted the victims and took them by force. The disappearance occurred in the municipal seat of Arcelia. The armed group that carried out the abduction belongs to a criminal organization. The families of the missing individuals filed complaints with the authorities. It is not specified which authority responded to the complaint. No specific court or tribunal is mentioned….</p>
 </section>
 <section class="slide level2">
 
-<h3 id="catch-all-categories">3.2 Catch-all Categories</h3>
-<p>NO CATCHALL: Positive criteria only, no residual categories as complement set of others</p>
-<ul>
-<li>“Other”, “No information” absorb ambiguous cases</li>
-</ul>
-</section>
-<section class="slide level2">
-
-<h3 id="parenthetical-suffixes">3.3 Parenthetical Suffixes</h3>
-<p>Human annotates: <code>"Municipal police (they depend on the PGR...)"</code></p>
-<p>LLM treats <code>()</code> as supplementary → outputs: <code>"Municipal police"</code></p>
-<p><strong>Result</strong>: String mismatch → false negative</p>
-</section>
-<section id="example-captura_tipo" class="slide level2">
-<h2>Example: captura_tipo</h2>
-<blockquote>
-<p>“The victim was an 8-year-old girl who was approached by an adult male while playing outside a <strong>bus route office</strong> in a <strong>residential area</strong> in Ciudad Juárez.”</p>
-</blockquote>
-<ul>
-<li><strong>LLM</strong>: Economic, social, industrial… (bus office = service center)</li>
-<li><strong>Human</strong>: Places related to the victim (residential area)</li>
-</ul>
-<p><strong>Both valid</strong> → false negative in evaluation</p>
-</section>
-<section id="solution-4-stage-pipeline" class="slide level2">
-<h2>Solution: 4-Stage Pipeline</h2>
+<p><strong>spans.csv</strong> — extracted evidence per field</p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 16%">
+<col style="width: 22%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Stage</th>
-<th>Action</th>
+<th>victim_id</th>
+<th>label_key</th>
+<th>span</th>
+<th>offset</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>1</td>
-<td>Normalize: NaN→““, strip parentheses</td>
+<td>Coahuila_Abel M H</td>
+<td>vic_grupo_social</td>
+<td>“Most of the disappeared were taxi drivers…”</td>
+<td>-1</td>
 </tr>
 <tr class="even">
-<td>2</td>
-<td>Merge: tipo1+tipo2 → tipo (list)</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>Coarsen: Municipal police → State-affiliated</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>Recalculate _match columns</td>
+<td>Coahuila_Abel M H</td>
+<td>proced_contacto1</td>
+<td>“Relatives of the disappeared”</td>
+<td>2249</td>
 </tr>
 </tbody>
 </table>
 </section>
+<section class="slide level2">
+
+<p><strong>results.csv</strong> — summary by turn</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 18%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>victim_id</th>
+<th>turn</th>
+<th>summary_by_item.captura_metodo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Coahuila_Aurora Zuzeth T P</td>
+<td>0</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Coahuila_Aurora Zuzeth T P</td>
+<td>1</td>
+<td>“Someone took them from two addresses”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="merging-labels" class="slide level2">
+<h2>3. Merging Labels</h2>
+<ul>
+<li>Overlapping labels (Kidnapping / Plagio / Levantón)</li>
+<li>Separated labels (perp_tipo1 + perp_tipo2)</li>
+<li>Parenthetical notes stripped (Particulars (when you cannot identify their affiliation to an organized criminal group))</li>
+</ul>
+<p>→ Post-processing before evaluation</p>
+</section>
+<section id="example-captura_tipo" class="slide level2">
+<h2>Example: captura_tipo</h2>
+<p><strong>Example</strong>: “The victim was an 8-year-old girl who was approached by an adult male while playing outside a <strong>bus route office</strong> in a <strong>residential area</strong> in Ciudad Juárez.”</p>
+<ul>
+<li><strong>LLM</strong>: Economic, social, industrial… (bus office = service center)</li>
+<li><strong>Human</strong>: Places related to the victim (residential area)</li>
+</ul>
+</section>
 <section id="results" class="slide level2">
 <h2>Results</h2>
-
-<img data-src="../plots/post_processing/metrics_old_raw.png" style="width:90.0%" class="r-stretch quarto-figure-center"><p class="caption">OLD (Raw)</p></section>
-<section id="results-post-processed" class="slide level2">
-<h2>Results (Post-Processed)</h2>
-
-<img data-src="../plots/post_processing/metrics_new_postprocessed.png" style="width:90.0%" class="r-stretch quarto-figure-center"><p class="caption">NEW (Post-Processed)</p></section>
-<section id="results-difference" class="slide level2">
-<h2>Results (Difference)</h2>
-
-<img data-src="../plots/post_processing/metrics_diff.png" style="width:90.0%" class="r-stretch quarto-figure-center"><p class="caption">DIFF (NEW - OLD)</p></section>
+<img data-src="../plots/post_processing_v2/accuracy_victim.png" class="r-stretch">
+</section>
+<section id="section" class="slide level2 center">
+<h2></h2>
+<img data-src="../plots/post_processing_v2/accuracy_incident.png" class="r-stretch">
+</section>
+<section id="section-1" class="slide level2 center">
+<h2></h2>
+<img data-src="../plots/post_processing_v2/accuracy_perpetrator.png" class="r-stretch">
+</section>
+<section id="section-2" class="slide level2 center">
+<h2></h2>
+<img data-src="../plots/post_processing_v2/accuracy_legal_procedure.png" class="r-stretch">
+</section>
 <section id="conclusion" class="slide level2">
 <h2>Conclusion</h2>
 <p><strong>Improved</strong>: vic_grupo_social, captura_tipo, desenlace, desenlace_tipo</p>
 <p><strong>Not fully resolved</strong>: perp_tipo, proced_contacto (merged labels)</p>
-<ul>
-<li>List comparison introduces complexity</li>
-</ul>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 

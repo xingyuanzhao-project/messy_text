@@ -9,15 +9,28 @@ paths:
     output:
       file: "df_text_by_report_conversation_summary.csv"
       extend: False
+  records:
+    results:
+      output:
+        file: "df_text_by_report_conversation_records_results.csv"
+        extend: False
+    states:
+      output:
+        file: "df_text_by_report_conversation_records_states.csv"
+        extend: False
+    spans:
+      output:
+        file: "df_text_by_report_conversation_records_spans.csv"
+        extend: False
   classification:
     input: "df_text_by_report_conversation_summary.csv"
     output:
       file: "df_text_by_report_conversation_classification.csv"
       extend: False
   eval:
-    input: "df_text_by_report_conversation_classification.csv"
+    input: "results_large_models/df_text_by_report_conversation_classification.csv"
     output:
-      file: "df_text_by_report_conversation_evaluation.csv"
+      file: "results_large_models/df_text_by_report_conversation_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 
@@ -31,7 +44,7 @@ processing:
   max_tokens_summary: 1024
   max_tokens_classification: 256
   start_index: 0
-  summary_row_limit: null
+  summary_row_limit: 10
   classification_key_limit: null
   conversation:
     enabled: True
@@ -41,9 +54,9 @@ evaluation:
   benchmarks:
     enable_geval_summarization: False
     enable_geval_hallucination: False
-    enable_summac_zs: False
-    enable_summac_conv: False
-    enable_default_metrics: True
+    enable_summac_zs: True
+    enable_summac_conv: True
+    enable_default_metrics: False
 
     summac_settings:
       device: "cuda"
@@ -55,8 +68,8 @@ display:
   use_progress_bar: True
 
 logging:
-  log_resources: false
-  log_prompts: false
-  log_response: true
+  log_resources: False
+  log_prompts: False
+  log_response: False
   log_progress: True
   file: "processing.log"

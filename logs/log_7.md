@@ -1,11 +1,13 @@
-1. seperate the labels into:
-the noun class
-the verb class
-etc...
+1. Label Grouping (4 classes, 15 labels total)
 
-to answer "what is that one here" question.
+| Class | Subclass | Labels |
+|-------|----------|--------|
+| Entity | Perpetrator | `perp_tipo1`, `perp_tipo2`, `amenaza_quien` |
+| Entity | Victim | `vic_grupo_social`, `soc_civil` |
+| Event | Victim Experience | `captura_metodo`, `captura_tipo`, `cautiverio_trato`, `desenlace`, `desenlace_tipo` |
+| Event | Legal Procedure | `proced_contacto1`, `proced_contacto2`, `proced_contactado`, `proced_sent_tipo`, `Tribunal_tipo` |
 
-like, classify the categories themselves. so others can see it easier.
+Purpose: answer "what does this label describe?" at a glance.
 
 2. 
 after that: draft/outline of the paper
@@ -72,3 +74,28 @@ for label, spans in summary_by_item.items():
         source = get_source_text(item['doc_id'])
         item['offset'] = source.find(item['span'])
 ```
+
+## 4. Span Storage: Relational Design
+
+### 4.1 Main Table (existing)
+`df_text_by_report_conversation_evaluation.csv`
+
+| index (PK) | victim | text | summary_all_context | {label}_classification | {label}_match |
+|------------|--------|------|---------------------|------------------------|---------------|
+| Guerrero_Abel A G_1 | Guerrero_Abel A G | "Abel soñaba ser..." | "Abel, un joven..." | Students | 1 |
+| Guerrero_Abel A G_2 | Guerrero_Abel A G | "Página no encontrada..." | "Abel, un joven..." | Students | 1 |
+
+### 4.2 Spans Table (proposed)
+`spans.csv`
+
+- 分组键：`label_key`（标识是哪条摘要/claim）
+- 记录粒度：`span`（每行一条可追溯证据），携带 `label_key`, `span`, `doc_id`, `turn_index`，`offset` 为后处理可选字段（见 3.1.3）
+
+| index (FK) | label_key | span | doc_id | offset | turn_index |
+|------------|-----------|------|--------|--------|------------|
+| Guerrero_Abel A G_1 | vic_grupo_social | estudiante de ingeniería civil | doc_0 | 156 | 0 |
+| Guerrero_Abel A G_1 | perp_tipo1 | policías de Chilpancingo | doc_0 | 512 | 0 |
+| Guerrero_Abel A G_2 | vic_grupo_social | joven estudiante | doc_1 | 89 | 1 |
+
+
+

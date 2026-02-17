@@ -181,3 +181,62 @@ def check_vllm_server(client, expected_model: str, logger: logging.Logger):
     except Exception as e:
         logger.error(f"vLLM test request failed: {e}")
         return False, available_models, None
+
+
+def compute_span_offsets(
+    summary_by_item: dict,
+    get_source_text: callable,
+) -> dict:
+    """
+    Compute character offsets for extracted spans by searching in source documents.
+
+    This is a post-hoc utility that enriches summary_by_item with offset information
+    for traceback to original text positions.
+
+    Args:
+        summary_by_item (dict): Dictionary mapping label keys to lists of span items.
+            Expected format: {
+                "<label_key>": [
+                    {"span": "<exact text>", "doc_id": "<id>"},
+                    ...
+                ]
+            }
+        get_source_text (callable): Function that takes a doc_id and returns the
+            source text string. Signature: (doc_id: Any) -> str
+
+    Returns:
+        dict: The same structure with 'offset' added to each span item.
+            Offset is -1 if span not found in source text.
+
+    Example:
+        >>> def get_source(doc_id):
+        ...     sources = {"doc1": "Abel soñaba ser músico."}
+        ...     return sources.get(doc_id, "")
+        >>> summary_by_item = {
+        ...     "vic_grupo_social": [{"span": "músico", "doc_id": "doc1"}]
+        ... }
+        >>> result = compute_span_offsets(summary_by_item, get_source)
+        >>> result["vic_grupo_social"][0]["offset"]
+        16
+    """
+    if not summary_by_item:
+        return summary_by_item
+
+    for label, spans in summary_by_item.items():
+        if not isinstance(spans, list):
+            continue
+        for item in spans:
+            if not isinstance(item, dict):
+                continue
+            span_text = item.get("span", "")
+            doc_id = item.get("doc_id")
+            if span_text and doc_id is not None:
+                try:
+                    source = get_source_text(doc_id)
+                    item["offset"] = source.find(span_text) if source else -1
+                except Exception:
+                    item["offset"] = -1
+            else:
+                item["offset"] = -1
+
+    return summary_by_item

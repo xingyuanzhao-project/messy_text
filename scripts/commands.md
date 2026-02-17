@@ -53,12 +53,14 @@ pip freeze
 
 ### Check model cache
 ```bash
+ln -s /scratch/bbov/xzhao16/huggingface_cache ~/.cache/huggingface
 ls ~/.cache/huggingface/hub/
 ```
 
 ### Download model
 ```bash
 cd /scratch/bbov/xzhao16/messy_text_server/
+source venv/bin/activate
 pip install huggingface_hub
 ls ~/.cache/huggingface/hub/
 du -sh ~/.cache/huggingface/hub/*
@@ -70,6 +72,13 @@ huggingface-cli download gaunernst/gemma-3-12b-it-int4-awq
 huggingface-cli download mistralai/Ministral-3-8B-Instruct-2512
 huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ
 huggingface-cli download openai/gpt-oss-20b
+
+huggingface-cli download hugging-quants/gemma-2-27b-it-AWQ
+
+huggingface-cli download hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+huggingface-cli download pytorch/gemma-3-27b-it-AWQ-INT4
+huggingface-cli download stelterlab/Mistral-Small-24B-Instruct-2501-AWQ
+
 ```
 
 
@@ -79,6 +88,7 @@ cd /scratch/bbov/xzhao16/messy_text_server/
 source venv/bin/activate
 module purge
 module load cray-python/3.11.7
+python --version
 module load cuda
 ls ~/.cache/huggingface/hub/
 du -sh ~/.cache/huggingface/hub/*
@@ -98,6 +108,15 @@ vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
 
 vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve openai/gpt-oss-20b --async-scheduling --port 8000 --host 0.0.0.0 --max-model-len 49152
+
+vllm serve hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4 \
+  --quantization awq \
+  --tensor-parallel-size 4 \
+  --port 8000 \
+  --host 0.0.0.0 \
+  --max-model-len 49152 \
+  --gpu-memory-utilization 0.90 \
+  --max-num-seqs 50
 ```
 
 ### Run main.py (separate terminal)
@@ -107,12 +126,14 @@ module purge
 module load cray-python/3.11.7
 module load cuda
 source venv/bin/activate
+
 python scripts/run_summary.py
 python scripts/run_summary_conversation.py
 python scripts/run_classification.py
 python scripts/run_evaluation.py
 
 python scripts/run_summary_conversation.py && python scripts/run_classification.py && python scripts/run_evaluation.py
+python scripts/run_classification.py && python scripts/run_evaluation.py
 ```
 
 ### Check Status

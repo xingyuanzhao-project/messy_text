@@ -84,6 +84,14 @@ from src.processors import (  # noqa: E402
     MessyTextConversationTurnProcessor,
     MessyTextProcessor,
 )
+from src.recorders import (  # noqa: E402
+    flatten_spans_from_state,
+    serialize_result_entry,
+    serialize_state_entry,
+    write_results,
+    write_spans,
+    write_states,
+)
 from src.utils import (  # noqa: E402
     check_gpu_info,
     check_vllm_server,
@@ -96,7 +104,7 @@ async def _process_victim_async(
     victim_id: str,
     group_df: pd.DataFrame,
     turn_processor: AsyncMessyTextConversationTurnProcessor,
-) -> Tuple[str, Dict[int, str]]:
+) -> Tuple[str, Dict[int, str], MessyTextConversationState]:
     """
     Asynchronously processes all documents for a single victim.
 
@@ -107,9 +115,10 @@ async def _process_victim_async(
             processor used to obtain candidate summaries from the model.
 
     Returns:
-        Tuple[str, Dict[int, str]]:
+        Tuple[str, Dict[int, str], MessyTextConversationState]:
             - The victim_id.
             - A mapping from pandas row index to the per-turn summary string.
+            - The final conversation state containing all turn results.
     """
 
     # Ensure deterministic ordering of documents within a victim.
@@ -123,7 +132,7 @@ async def _process_victim_async(
     # Runner-owned conversation memory. This tracks the running summary and
     # ensures that non-informative documents do not overwrite existing context.
     running_summary: str = ""
-    state = MessyTextConversationState(last_summary="", turn_index=0)
+    state = MessyTextConversationState(turn_index=0)
     per_row_summaries: List[str] = []
 
     for doc_id, raw_text in zip(doc_ids, texts):
@@ -133,10 +142,7 @@ async def _process_victim_async(
         # last_result to decide whether this turn is informative.
         candidate_summary, turn_state = await turn_processor.process_turn(
             raw_text=raw_text,
-            state=MessyTextConversationState(
-                last_summary=running_summary,
-                turn_index=state.turn_index,
-            ),
+            state=state,
             doc_id=doc_id,
         )
 
@@ -160,14 +166,14 @@ async def _process_victim_async(
 
         per_row_summaries.append(running_summary)
 
-        state.turn_index += 1
+        state = turn_state
 
     # Map per-row summaries back to the original pandas indices of group_sorted.
     index_to_summary: Dict[int, str] = {}
     for row_idx, summary in zip(index_list, per_row_summaries):
         index_to_summary[row_idx] = summary
 
-    return victim_id, index_to_summary
+    return victim_id, index_to_summary, state
 
 
 def _process_victim_sync(
@@ -175,7 +181,7 @@ def _process_victim_sync(
     group_df: pd.DataFrame,
     turn_processor: MessyTextConversationTurnProcessor,
     use_progress_bar: bool,
-) -> Tuple[str, Dict[int, str]]:
+) -> Tuple[str, Dict[int, str], MessyTextConversationState]:
     """
     Synchronously processes all documents for a single victim.
 
@@ -186,9 +192,10 @@ def _process_victim_sync(
             used to obtain candidate summaries from the model.
 
     Returns:
-        Tuple[str, Dict[int, str]]:
+        Tuple[str, Dict[int, str], MessyTextConversationState]:
             - The victim_id.
             - A mapping from pandas row index to the per-turn summary string.
+            - The final conversation state containing all turn results.
     """
 
     group_sorted = group_df.sort_values(by="index")
@@ -197,7 +204,7 @@ def _process_victim_sync(
     doc_ids = list(group_sorted["index"])
 
     running_summary: str = ""
-    state = MessyTextConversationState(last_summary="", turn_index=0)
+    state = MessyTextConversationState(turn_index=0)
     per_row_summaries: List[str] = []
 
     # Optional document-level progress bar within each victim, mirroring the
@@ -212,10 +219,7 @@ def _process_victim_sync(
             for doc_id, raw_text in zip(doc_ids, texts):
                 candidate_summary, turn_state = turn_processor.process_turn(
                     raw_text=raw_text,
-                    state=MessyTextConversationState(
-                        last_summary=running_summary,
-                        turn_index=state.turn_index,
-                    ),
+                    state=state,
                     doc_id=doc_id,
                 )
 
@@ -236,16 +240,13 @@ def _process_victim_sync(
 
                 per_row_summaries.append(running_summary)
 
-                state.turn_index += 1
+                state = turn_state
                 pbar_docs.update(1)
     else:
         for doc_id, raw_text in zip(doc_ids, texts):
             candidate_summary, turn_state = turn_processor.process_turn(
                 raw_text=raw_text,
-                state=MessyTextConversationState(
-                    last_summary=running_summary,
-                    turn_index=state.turn_index,
-                ),
+                state=state,
                 doc_id=doc_id,
             )
 
@@ -266,13 +267,13 @@ def _process_victim_sync(
 
             per_row_summaries.append(running_summary)
 
-            state.turn_index += 1
+            state = turn_state
 
     index_to_summary: Dict[int, str] = {}
     for row_idx, summary in zip(index_list, per_row_summaries):
         index_to_summary[row_idx] = summary
 
-    return victim_id, index_to_summary
+    return victim_id, index_to_summary, state
 
 
 async def _process_dataframe_conversation_async(
@@ -281,7 +282,7 @@ async def _process_dataframe_conversation_async(
     config: Dict,
     prompts: Dict,
     logger,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, List[Tuple[str, MessyTextConversationState]]]:
     """
     Asynchronously processes a report-level DataFrame using victim-level
     multi-turn conversations.
@@ -352,7 +353,7 @@ async def _process_dataframe_conversation_async(
 
         tasks.append(_bounded_task())
 
-    results: List[Tuple[str, Dict[int, str]]] = []
+    results: List[Tuple[str, Dict[int, str], MessyTextConversationState]] = []
     for coro in tqdm_async.as_completed(
         tasks,
         total=len(tasks),
@@ -363,11 +364,15 @@ async def _process_dataframe_conversation_async(
         results.append(result)
 
     # Apply summaries back to the DataFrame using the collected mappings.
-    for _victim_id, index_to_summary in results:
+    for _victim_id, index_to_summary, _state in results:
         for row_idx, summary in index_to_summary.items():
             df_processed.at[row_idx, "summary_all_context"] = summary
 
-    return df_processed
+    victim_states: List[Tuple[str, MessyTextConversationState]] = [
+        (victim_id, state) for victim_id, _summary_map, state in results
+    ]
+
+    return df_processed, victim_states
 
 
 def _process_dataframe_conversation_sync(
@@ -376,7 +381,7 @@ def _process_dataframe_conversation_sync(
     config: Dict,
     prompts: Dict,
     logger,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, List[Tuple[str, MessyTextConversationState]]]:
     """
     Synchronously processes a report-level DataFrame using victim-level
     multi-turn conversations.
@@ -427,7 +432,7 @@ def _process_dataframe_conversation_sync(
     if summary_row_limit is not None:
         victim_groups = victim_groups[:summary_row_limit]
 
-    results: List[Tuple[str, Dict[int, str]]] = []
+    results: List[Tuple[str, Dict[int, str], MessyTextConversationState]] = []
     with tqdm(
         total=len(victim_groups),
         desc="Processing victims (conversation)",
@@ -443,11 +448,15 @@ def _process_dataframe_conversation_sync(
             results.append(result)
             pbar.update(1)
 
-    for _victim_id, index_to_summary in results:
+    for _victim_id, index_to_summary, _state in results:
         for row_idx, summary in index_to_summary.items():
             df_processed.at[row_idx, "summary_all_context"] = summary
 
-    return df_processed
+    victim_states: List[Tuple[str, MessyTextConversationState]] = [
+        (victim_id, state) for victim_id, _summary_map, state in results
+    ]
+
+    return df_processed, victim_states
 
 
 def main() -> None:
@@ -538,7 +547,7 @@ def main() -> None:
             api_key=settings["model"]["api_key"],
             max_retries=max_retries,
         )
-        processed_df = asyncio.run(
+        processed_df, victim_states = asyncio.run(
             _process_dataframe_conversation_async(
                 df=df_text,
                 async_client=async_client,
@@ -549,7 +558,7 @@ def main() -> None:
         )
     else:
         logger.info("Using SYNC victim-level conversation processing.")
-        processed_df = _process_dataframe_conversation_sync(
+        processed_df, victim_states = _process_dataframe_conversation_sync(
             df=df_text,
             sync_client=sync_client,
             config=settings,
@@ -587,6 +596,74 @@ def main() -> None:
     else:
         processed_df.to_csv(output_path, index=False, encoding="utf-8")
         logger.info(f"Output saved to {output_path} ({len(processed_df)} rows)")
+
+    # Step 6: Persist conversation records (results, states, spans) if configured
+    records_cfg = settings["paths"].get("records", {})
+    if victim_states and records_cfg:
+        results_rows = []
+        states_rows = []
+        spans_rows = []
+
+        for victim_id, state in victim_states:
+            states_rows.append(
+                serialize_state_entry(
+                    state=state,
+                    victim_id=victim_id,
+                    model_name=model_name,
+                )
+            )
+            spans_rows.extend(
+                flatten_spans_from_state(
+                    state=state,
+                    victim_id=victim_id,
+                    model_name=model_name,
+                )
+            )
+            for turn_index, result in enumerate(state.results):
+                results_rows.append(
+                    serialize_result_entry(
+                        result=result,
+                        victim_id=victim_id,
+                        model_name=model_name,
+                        turn_index=turn_index,
+                    )
+                )
+
+        # Results
+        results_output_cfg = (records_cfg.get("results") or {}).get("output", {})
+        results_path = Path(results_output_cfg.get("file", "conversation_results.csv"))
+        results_extend = results_output_cfg.get("extend", False)
+        write_results(
+            rows=results_rows,
+            path=results_path,
+            extend=results_extend,
+            model_name=model_name,
+        )
+        logger.info(f"Results records saved to {results_path} ({len(results_rows)} rows)")
+
+        # States
+        states_output_cfg = (records_cfg.get("states") or {}).get("output", {})
+        states_path = Path(states_output_cfg.get("file", "conversation_states.csv"))
+        states_extend = states_output_cfg.get("extend", False)
+        write_states(
+            rows=states_rows,
+            path=states_path,
+            extend=states_extend,
+            model_name=model_name,
+        )
+        logger.info(f"State records saved to {states_path} ({len(states_rows)} rows)")
+
+        # Spans
+        spans_output_cfg = (records_cfg.get("spans") or {}).get("output", {})
+        spans_path = Path(spans_output_cfg.get("file", "conversation_spans.csv"))
+        spans_extend = spans_output_cfg.get("extend", False)
+        write_spans(
+            rows=spans_rows,
+            path=spans_path,
+            extend=spans_extend,
+            model_name=model_name,
+        )
+        logger.info(f"Span records saved to {spans_path} ({len(spans_rows)} rows)")
 
 
 if __name__ == "__main__":

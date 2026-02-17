@@ -17,8 +17,12 @@
   "summary_first": {
     "output_format": {
       "info_found": "<TRUE|FALSE>",
-      "relevant_context": "<list of context keys found, or empty list>",
-      "summary_by_item": "<dictionary of item: summary sentence. key is the context key, value is the summary sentence.>",
+      "relevant_context": ["<label keys found>"],
+      "summary_by_item": {
+        "<label_key>": [
+          {"span": "<exact SENTENCE from input text>"}
+        ]
+      },
       "summary": "<text in spanish>"
     },
     "instructions": [
@@ -27,7 +31,8 @@
       "Use only the current {input_text_label} and {related_context_label} to decide {info_found_label}, {relevant_context_label}, summary_by_item and {summary_label}.",
       "relevant_context should list the keys from {related_context_label} that are found in the text (e.g., [\"vic_grupo_social\", \"captura_metodo\", \"perp_tipo1\"]).",
       "For each key X in {relevant_context_label}, check if there is any information about X in {input_text_label}. If yes, add one bullet to {summary_label} for X, copying the exact Spanish span(s) from {input_text_label} about X (no paraphrasing; preserve modality).",
-      "For each key X in {relevant_context_label}, write one short Spanish sentence summarizing that information for X and store it in summary_by_item[X].",
+      "For each key X in {relevant_context_label}, extract the exact Spanish span(s) from {input_text_label} about X and store them in summary_by_item[X] as a list of objects with 'span' (the exact text).",
+      "Each span must be a full original sentence ending in sentence punctuation (., ?, !, or equivalent) with no truncation or stitching; if you cannot find a full sentence for X, leave summary_by_item[X] as an empty list and do not invent placeholders.",
       "Extractive summary in Spanish: copy exact spans; DO NOT paraphrase; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\").",
       "If no relevant info, set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={{}}, {summary_label}=\"\".",
       "NO APOLOGIES, NO FILLER TEXT"
@@ -36,8 +41,12 @@
   "summary_update": {
     "output_format": {
       "info_found": "<TRUE|FALSE>",
-      "relevant_context": "<list of context keys found, or empty list>",
-      "summary_by_item": "<dictionary of item: summary sentence. key is the context key, value is the summary sentence.>",
+      "relevant_context": ["<label keys found>"],
+      "summary_by_item": {
+        "<label_key>": [
+          {"span": "<exact SENTENCE from input text>"}
+        ]
+      },
       "summary": "<texto in spanish>"
     },
     "instructions": [
@@ -51,9 +60,10 @@
       "if {previous_summary_by_item} is not empty, but you do not find any related information in {input_text_label}, keep the previous summary_by_item.",
       "relevant_context should list the keys from {related_context_label} that are found in either {previous_summary} or {input_text_label} (e.g., [\"vic_grupo_social\", \"captura_metodo\", \"perp_tipo1\"]).",
       "For each key X in {relevant_context_label}, check if there is any information about X in {previous_summary} or {input_text_label}. If yes, add one bullet to {summary_label} for X, copying the exact Spanish span(s) from {previous_summary} and/or {input_text_label} about X (no paraphrasing; preserve modality).",
-      "For each key X in existing {previous_summary_by_item}, you check if there is any new information about X in {input_text_label}. If yes, update one short Spanish sentence summarizing the aggregated information for X and store it in summary_by_item[X].",
-      "If no new information is found, keep the previous summary_by_item[X].",
-      "For each key X in the new {relevant_context_label} that is not in {previous_summary_by_item}, write one short Spanish sentence summarizing that information for X and store it in summary_by_item[X].",
+      "For each key X in existing {previous_summary_by_item}, check if there is any new information about X in {input_text_label}. If yes, add the new span(s) to summary_by_item[X] as objects with 'span' (exact text). Keep existing spans from {previous_summary_by_item}.",
+      "If no new information is found for X, keep the previous summary_by_item[X] unchanged.",
+      "For each key X in the new {relevant_context_label} that is not in {previous_summary_by_item}, extract exact Spanish span(s) from {input_text_label} and store them in summary_by_item[X] as a list of objects with 'span'.",
+      "Each span must be a full original sentence ending in sentence punctuation (., ?, !, or equivalent) with no truncation or stitching; if you cannot find a full sentence for X, leave summary_by_item[X] as an empty list and do not invent placeholders.",
       "Extractive summary in Spanish: copy exact spans; DO NOT paraphrase; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\").",
       "If no relevant info in either {previous_summary} or {input_text_label}, set {info_found_label}=\"FALSE\", {relevant_context_label}=[], summary_by_item={{}}, {summary_label}=\"\".",
       "NO APOLOGIES, NO FILLER TEXT"

@@ -1,16 +1,16 @@
 ---
-title: "LLM Classification Post-Processing"
+title: "Extractive Summarization"
 format: revealjs
 ---
 
-## 1. Stacking Prompts: Conversation Mode
+## 1. Multi-turn Summarization
 
-**Problem**: Single document → Distracted info
+**Problem**: Single document → Distractive info
 
 **Solution**: Send documents one by one, update summary incrementally
 
 ```
-Doc 1 → summary_first → summary_1
+Doc 1 → first_summary → summary_1
 Doc 2 + summary_1 → summary_update → summary_2
 Doc 3 + summary_2 → summary_update → summary_3
 ...
@@ -18,17 +18,19 @@ Doc 3 + summary_2 → summary_update → summary_3
 
 ---
 
-## Prompt: summary_update (verbatim)
+## Prompt: Summary by Item Update
 
 ```json
 {
   "instructions": [
+    ...
     "If the previous summary above is non-empty, update it by 
      adding or refining victim-relevant facts from input_text, 
      without removing correct existing details.",
     "For each key X in existing previous_summary_by_item, check 
      if there is any new information about X in input_text. 
      If yes, update summary_by_item[X]."
+     ...
   ]
 }
 ```
@@ -42,79 +44,71 @@ Doc 3 + summary_2 → summary_update → summary_3
 ```json
 {
   "summary_by_item": {"vic_grupo_social": "...", "captura_metodo": "..."},
-  "summary": "<texto in spanish>"
+  "summary": "<text in spanish>"
 }
 ```
 
 ---
 
-## 3. Collapse Categories
+Guerrero_Adolfo V de la P Example:
 
-### 3.1 Monophyletic Problems
-
-1. **HIERARCHICAL**: Parent category exists alongside its children. LLM may pick child, human may pick parent. Example: "State agent" vs "Municipal police"
-
-2. **OVERLAPPING**: Multiple labels describe same concept. Example: "Kidnapping" vs "Plagio" vs "Levantón"
-
-3. **NON-EXCLUSIVE**: A single entity can belong to multiple categories. Example: Mayor is both "Civil servant" AND "People associated with politics"
+The three missing officials are members of the Guerrero state government. The armed group intercepted the victims and took them by force. The disappearance occurred in the municipal seat of Arcelia. The armed group that carried out the abduction belongs to a criminal organization. The families of the missing individuals filed complaints with the authorities. It is not specified which authority responded to the complaint. No specific court or tribunal is mentioned....
 
 ---
 
-### 3.2 Catch-all Categories
+**spans.csv** — extracted evidence per field
 
-NO CATCHALL: Positive criteria only, no residual categories as complement set of others
-
-- "Other", "No information" absorb ambiguous cases
+| victim_id | label_key | span | offset |
+|-----------|-----------|------|--------|
+| Coahuila_Abel M H | vic_grupo_social | "Most of the disappeared were taxi drivers..." | -1 |
+| Coahuila_Abel M H | proced_contacto1 | "Relatives of the disappeared" | 2249 |
 
 ---
 
-### 3.3 Parenthetical Suffixes
+**results.csv** — summary by turn
 
-Human annotates: `"Municipal police (they depend on the PGR...)"`
+| victim_id | turn | summary |
+|-----------|------|----------------|
+| Coahuila_Aurora Zuzeth T P | 0 | — |
+| Coahuila_Aurora Zuzeth T P | 1 | "Someone took them from two addresses" 
 
-LLM treats `()` as supplementary → outputs: `"Municipal police"`
+---
 
-**Result**: String mismatch → false negative
+## 3. Merging Labels
+
+- Overlapping labels (Kidnapping / Plagio / Levantón)
+- Separated labels (perp_tipo1 + perp_tipo2)
+- Parenthetical notes stripped (Particulars (when you cannot identify their affiliation to an organized criminal group))
+
+→ Post-processing before evaluation
 
 ---
 
 ## Example: captura_tipo
 
-> "The victim was an 8-year-old girl who was approached by an adult male while playing outside a **bus route office** in a **residential area** in Ciudad Juárez."
+**Example**: "The victim was an 8-year-old girl who was approached by an adult male while playing outside a **bus route office** in a **residential area** in Ciudad Juárez."
 
 - **LLM**: Economic, social, industrial... (bus office = service center)
 - **Human**: Places related to the victim (residential area)
-
-**Both valid** → false negative in evaluation
-
----
-
-## Solution: 4-Stage Pipeline
-
-| Stage | Action |
-|-------|--------|
-| 1 | Normalize: NaN→"", strip parentheses |
-| 2 | Merge: tipo1+tipo2 → tipo (list) |
-| 3 | Coarsen: Municipal police → State-affiliated |
-| 4 | Recalculate _match columns |
 
 ---
 
 ## Results
 
-![OLD (Raw)](../plots/post_processing/metrics_old_raw.png){width=90%}
+![](../plots/post_processing_v2/accuracy_victim.png){.r-stretch}
 
----
+## {.center}
 
-## Results (Post-Processed)
+![](../plots/post_processing_v2/accuracy_incident.png){.r-stretch}
 
-![NEW (Post-Processed)](../plots/post_processing/metrics_new_postprocessed.png){width=90%}
+## {.center}
 
----
+![](../plots/post_processing_v2/accuracy_perpetrator.png){.r-stretch}
 
-## Results (Difference)
+## {.center}
 
-![DIFF (NEW - OLD)](../plots/post_processing/metrics_diff.png){width=90%}
+![](../plots/post_processing_v2/accuracy_legal_procedure.png){.r-stretch}
+
 
 ---
 
@@ -123,5 +117,3 @@ LLM treats `()` as supplementary → outputs: `"Municipal police"`
 **Improved**: vic_grupo_social, captura_tipo, desenlace, desenlace_tipo
 
 **Not fully resolved**: perp_tipo, proced_contacto (merged labels)
-
-- List comparison introduces complexity
