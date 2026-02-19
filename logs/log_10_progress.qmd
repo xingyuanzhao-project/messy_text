@@ -5,64 +5,128 @@ format: revealjs
 
 ## Motivation
 
-- Researchers often work with messy, unstructured text corpora (scraped web content with noise)
-
-- These corpora are not ready for downstream research tasks
-
-- Cleaning them manually is expensive
+Researchers may want to code _new data or source materials_ based on a *prior set of messy example cases* (and possibly a codebook). 
 
 ---
 
-## Contributions
+## Motivation
 
-- Enables researchers to get structured information from messy text
-- Enables downstream tasks for other researchers purposes
-
----
-
-## Dataset
-
-- News reports on disappearance cases in Mexico collected and annotated by UMN
+However, we may encounter some issues:
+1. Training the new coders comes at a cost
+2. LLMs and AI are now here to help
+3. Documents were initially organized by origin or source and not task
+   or unit of analysis.
 
 ---
 
-### Scraped File Errors
+## Task Definition
+
+*Main task:* How do we reuse the *old* codebook or the *old* work / examples / annotations from the human coders to inform the new coding task?
+
+---
+
+*Complications:* 
+
+1. Training costs and lost knowledge
+2. badly recorded earlier annotations (so coders coded features rather
+   than spans)
+3. Coders translated from language 1 and coded a dataset in language
+   2?
+4. Coders used multiple documents across multiple languages to make
+   the dataset.
+5. The original corpora used in the above were not cleaned for modern
+   LLM inputting, so there as implicit document cleaning and
+   organization before coding / annotation. 
+
+---
+
+### Sample of the Messy Text
 
 (1) Error pages
 
-Guerrero_Abel A G_2: 
-```
-Página no encontrada - Agencia de Noticias IRZA Saltar al contenido Agencia de Noticias IRZA desde 1992 Menú INICIO GUERRERO CHILPANCINGO ACAPULCO COSTA CHICA COSTA GRANDE CENTRO MONTAÑA NORTE TIERRA CALIENTE SIERRA CONGRESO GOBIERNO DEL ESTADO POLÍTICA POLICIACA DEPORTES NOTA ROJA × Buscar: Botón de búsqueda ¡Vaya! No se puede encontrar esa página. No hemos encontrado nada aquí. ¿Qué tal si pruebas el buscador? 404 error Buscar: Botón de búsqueda
-```
-```
-Page not found - IRZA News Agency Skip to content IRZA News Agency since 1992 Menu HOME GUERRERO CHILPANCINGO ACAPULCO COSTA CHICA COSTA GRANDE CENTRO MONTAÑA NORTE TIERRA CALIENTE SIERRA CONGRESS STATE GOVERNMENT POLITICS POLICE SPORTS CRIME NEWS × Search: Search button Oops! That page can't be found. We haven't found anything here. How about trying the search bar? 404 error Search: Search button
-```
+![Guerrero_Abel A G_2](../docs/sample_reports/Guerrero_Abel%20A%20G_2.png)
+
 
 ---
 
 (2) Website formats, such as navigation menus.
 
-Guerrero_Abel A G_1:
-```
-Abel soñaba ser ingeniero y dejó su pueblo. Se topó con policías: ya cumplió un mes desaparecido | SinEmbargo MX lunes 15 de septiembre de 2025 Periodismo digital con rigor Portada Lo + Compartido Lo + Leído Al Aire Opinión Galileo Sofá México Economía Publicidad Directorio Contacto lunes 15 de septiembre de 2025 Portada Lo + Compartido Lo + Leído Al Aire Opinión Galileo Sofá México Economía Publicidad Directorio Contacto Síguenos en: Facebook Twitter Telegram Instagram TikTok YouTube Periodismo digital con rigor
-```
 
-```
-Abel dreamed of being an engineer and left his hometown. He ran into the police: he's been missing for a month now | SinEmbargo MX Monday, September 15, 2025 Rigorous Digital Journalism Front Page Most Shared Most Read On Air Opinion Galileo Sofa Mexico Economy Advertising Directory Contact Monday, September 15, 2025 Front Page Most Shared Most Read On Air Opinion Galileo Sofa Mexico Economy Advertising Directory Contact Follow us on: Facebook Twitter Telegram Instagram TikTok YouTube Rigorous Digital Journalism
-```
+![Coahuila_Abel M H_1](../docs/sample_reports/Coahuila_Abel%20M%20H_1.png)
+
 
 ---
 
 (3) Distractive information that are somewhat related but should not be there, such as suggested articles or comments from other users.
 
-Guerrero_Abel A G_1:
-```
-Destacadas Ver sección Destacadas 1 Secretaría de Seguridad y Paz de Guanajuato detiene a 8 con armas, vehículos y droga 2 Peso llega a 18.34 unidades por dólar, su mejor nivel en 14 meses; BMV rompe récord 3 Trump anuncia un segundo ataque militar contra ""narcos"" venezolanos;
+![Coahuila_Bernando A](../docs/sample_reports/Coahuila_Bernando%20A.png)
+
+---
+
+## What is the UA and how is is related to the texts?
+
+Unit of analysis (UA) for what we have here is the kidnapping victim
+from the UMN-ODIM datasets. For each one we need to go back to the
+source texts and 
+
+- Align annotations with the original texts
+- Allows re-use the annotations and coded data via connection to the
+  source texts
+
+The final goal is to eventually use this to train an LLM to forecast
+and classify future texts or future classification and coding new
+documents or reports of possible kidnappings.
+
+---
+
+## Methods being used and compared
+
+What are we comparing / answering?
+
+How do we construct the summaries (not pure "cat file1 file2") 
+
+
+
+## Unit of Analysis Problem
+
+The UA in UMN dataset: victim
+
+The final goal is to eventually use this to train an LLM to forecast
+and classify future texts or future classification and coding new
+documents or reports of possible kidnappings.
+
+So the required UA for the downstream task: reports
+
+
+<!---it means that we have annotations for each victim, such as victim's social group, method of capture, etc, but for downstream task, we need to go back to the source texts and align the annotations with the original texts--->
+
+---
+
+## Unit of Analysis Problem
+
+Things we need to do:
+- Align annotations with the original texts
+- Allows re-use the annotations and coded data via connection to the
+  source texts
+
+
+
+---
+
+**output_format** (from prompts.json):
+
+```json
+{
+  "summary_by_item": {"vic_grupo_social": "...", "captura_metodo": "..."},
+  "summary": "<text in spanish>"
+}
 ```
 
-```
-Featured See Featured section 1 Guanajuato Security and Peace Secretariat arrests 8 with weapons, vehicles and drugs 2 Peso reaches 18.34 units per dollar, its best level in 14 months; BMV breaks record 3 Trump announces a second military attack against Venezuelan ""narcos"";
-```
+---
+
+Guerrero_Adolfo V de la P Example:
+
+The three missing officials are members of the Guerrero state government. The armed group intercepted the victims and took them by force. The disappearance occurred in the municipal seat of Arcelia. The armed group that carried out the abduction belongs to a criminal organization. The families of the missing individuals filed complaints with the authorities. It is not specified which authority responded to the complaint. No specific court or tribunal is mentioned....
 
 ---
 
