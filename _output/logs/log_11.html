@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
   </style>
   <link rel="stylesheet" href="log_11_files/libs/revealjs/dist/theme/quarto.css">
   <link href="log_11_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -335,10 +400,15 @@
 <h2>Motivation</h2>
 <h3 id="original-task">Original Task</h3>
 <p>Code new data or source materials based on a prior set of example cases (and possibly a codebook).</p>
+<h3 id="data">Data</h3>
+<p>Disappearances reports in Mexico collected and annotated by UMN.</p>
+</section>
+<section class="slide level2">
+
 <h3 id="complications">Complications</h3>
 <ol type="1">
 <li>Training the new coders comes at a cost</li>
-<li>LLMs and AI are now here to help</li>
+<li>LLMs are now here to help</li>
 <li>Documents were initially organized by origin or source and not task or unit of analysis.</li>
 </ol>
 </section>
@@ -346,12 +416,14 @@
 
 <h3 id="main-task">Main Task</h3>
 <p>How do we reuse the <em>old</em> codebook / work / examples / annotations from the human coders to inform the new coding task?</p>
+</section>
+<section class="slide level2">
+
 <h3 id="complications-1">Complications</h3>
 <ol type="1">
 <li>Training costs and lost knowledge</li>
 <li>Unit of analysis problem: the existing works are coded by features of victims, rather than spans or documents.</li>
-<li>Coders translated from language 1 and coded a dataset in language 2?</li>
-<li>Coders used multiple documents across multiple languages to make the dataset.</li>
+<li>Coders used multiple documents across multiple languages to annotate and make the dataset.</li>
 <li>The original corpora used in the above were not cleaned for modern LLM inputting</li>
 </ol>
 </section>
@@ -380,15 +452,260 @@
 <section class="slide level2">
 
 <h3 id="unit-of-analysis-problem">Unit of Analysis Problem</h3>
-<p>The final goal is to eventually use this to train an LLM to forecast and classify future texts or future classification and coding new documents or reports of possible kidnappings.</p>
-<p>So the required UA for the downstream task: reports</p>
-<p>Things we need to do: - Align annotations with the original texts - Allows re-use the annotations and coded data via connection to the source texts</p>
+<p>Downstream tasks:</p>
+<ul>
+<li>Utilize the documents and annotations to train an LLM</li>
+<li>Code new documents or reports of possible kidnappings.</li>
+<li>Forecast and classify future texts or future classification</li>
+</ul>
+<p>So the required UA for the downstream task: documents</p>
 </section>
 <section class="slide level2">
 
+<h3 id="things-we-need-to-do">Things we need to do:</h3>
+<ul>
+<li>Align annotations with the original texts</li>
+<li>Allows re-use the annotations and coded data via connection to the source texts</li>
+<li>Generate noise-free summaries of the documents</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="what-needs-to-be-cleaned-and-summarized">What needs to be cleaned and summarized?</h3>
+<ul>
+<li>Regather the candidate reports.</li>
+<li>Clear out the extraneous information (HTML tags, comments, advertising)</li>
+<li>Summarize these reports into a common representation or format</li>
+<li>Propose features based on the summaries that may match those provided before by the human annotators based on the definitions in the codebook</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="generative-ai-vs-extractive-ai">Generative AI vs Extractive AI</h3>
+<ul>
+<li>Generation Task: condenses text, may paraphrase</li>
+<li>Extraction Task: copies exact spans from source text</li>
+<li>Simple generative summarization loses traceability to source</li>
+<li>Our task requires both extraction and generation</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="general-case-vs-specific-case">General case vs specific case</h3>
+<div style="font-size: 0.65em;">
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Local Issue</th>
+<th>General version</th>
+<th>Specifics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data collected by news source do not match UA</td>
+<td>Access data by coverage then extract events or UA</td>
+<td>UA alignment using llm</td>
+</tr>
+<tr class="even">
+<td>Annotations by UA do not match downstream task</td>
+<td>Features are to be annotated by experts across multiple docs</td>
+<td>UA alignment using llm</td>
+</tr>
+<tr class="odd">
+<td>Multiple reports aggregated to get data fields</td>
+<td>Document de-duplication and info extraction</td>
+<td>Extractive AI</td>
+</tr>
+<tr class="even">
+<td>Users carried out multiple simultaneous tasks to code</td>
+<td>Multiple tasks and tools can be applied</td>
+<td>Using multi turns stateful workflows</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="method" class="slide level2">
+<h2>Method</h2>
+<h3 id="model-setup">Model Setup</h3>
+<ul>
+<li>Llama 3.1 8B Instruct (AWQ INT4)</li>
+<li>Llama 3.1 70B Instruct (AWQ INT4)</li>
+<li>Gemma 3 12B IT (INT4 AWQ)</li>
+<li>Gemma 3 27B IT (INT4 AWQ) (todo)</li>
+<li>Ministral 3 8B Instruct</li>
+<li>Mistral 24B Instruct (todo)</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="what-are-we-comparing-answering">What are we comparing / answering?</h3>
+<ul>
+<li>Generative only vs Extractive Summarization</li>
+<li>Performance across models</li>
+<li>Performance between larger and smaller models</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="pipeline">Pipeline</h3>
+<ul>
+<li>For each victim, process their documents one at a time</li>
+<li>Each turn sends the LLM:
+<ul>
+<li>input text</li>
+<li>label definitions (what to look for)</li>
+<li>previous summary (if exists)</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Input:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb1-1"><a href=""></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href=""></a>  <span class="dt">"previous_summary"</span><span class="fu">:</span> <span class="st">"&lt;text in spanish&gt;"</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href=""></a>  <span class="dt">"input_text"</span><span class="fu">:</span> <span class="st">"&lt;text in spanish&gt;"</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href=""></a>  <span class="dt">"label_definitions"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"amenaza_quien"</span><span class="er">:</span> <span class="st">"Who carried out the threats?"</span><span class="ot">,</span> <span class="er">...</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb1-5"><a href=""></a>  <span class="dt">"instructions"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"For each key X in existing previous_summary_by_item, check if there is any new information about X in input_text. If yes, update summary_by_item[X]."</span><span class="ot">]</span></span>
+<span id="cb1-6"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Output:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource json number-lines code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href=""></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href=""></a>  <span class="dt">"spans_by_item"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"amenaza_quien"</span><span class="fu">:</span> <span class="st">"..."</span><span class="fu">,</span> <span class="dt">"captura_metodo"</span><span class="fu">:</span> <span class="st">"..."</span><span class="fu">},</span></span>
+<span id="cb2-3"><a href=""></a>  <span class="dt">"summary"</span><span class="fu">:</span> <span class="st">"&lt;text in spanish&gt;"</span></span>
+<span id="cb2-4"><a href=""></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section class="slide level2">
+
+<p><img data-src="../plots/diagrams/workflow_diagram_1.png"> <!-- ![](../plots/diagrams/workflow_diagram_2.png) --></p>
+</section>
+<section class="slide level2">
+
+<h3 id="example-results">Example Results</h3>
+<p><strong>spans.csv</strong> — extracted evidence per field</p>
+<div style="font-size: 0.80em;">
+<table class="caption-top">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 16%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>victim_id</th>
+<th>label_key</th>
+<th>span</th>
+<th>span_index</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Veracruz_A Y P B</td>
+<td>captura_metodo</td>
+<td>“…an armed group took them away…”</td>
+<td>5258</td>
+</tr>
+<tr class="even">
+<td>Veracruz_J G G</td>
+<td>captura_metodo</td>
+<td>“…people were picked up by police…”</td>
+<td>4420</td>
+</tr>
+<tr class="odd">
+<td>Coahuila_A M H</td>
+<td>proced_contacto1</td>
+<td>“Relatives of the disappeared”</td>
+<td>2249</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="slide level2">
+
+<p><strong>results.csv</strong> — summary by turn</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 18%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>victim_id</th>
+<th>turn</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Coahuila_A J P S”</td>
+<td>0</td>
+<td>“…the person reported missing was located…”</td>
+</tr>
+<tr class="even">
+<td>Coahuila_A J P S</td>
+<td>3</td>
+<td>“…a student at UANE, was seen by…”</td>
+</tr>
+<tr class="odd">
+<td>Coahuila_A J P S</td>
+<td>4</td>
+<td>“…The Deputy Attorney General’s Office reported that…”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="evaluation" class="slide level2">
+<h2>Evaluation</h2>
+<h3 id="human-gold-standard">Human Gold Standard</h3>
+<ul>
+<li>Classification based off the summary text</li>
+<li>Human annotations are used as the gold standard for comparison</li>
+<li>Compared the results from the baseline simple summarization and the proposed method</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="baseline-vs-proposed-method">Baseline vs Proposed Method</h3>
+<p><em>plots need some rework</em></p>
+
+<img data-src="../plots/large_models/metrics_victim.png" class="r-stretch"></section>
+<section class="slide level2">
+
+<h3 class="center" id="section"></h3>
+
+<img data-src="../plots/large_models/metrics_incident.png" class="r-stretch"></section>
+<section class="slide level2">
+
+<h3 class="center" id="section-1"></h3>
+
+<img data-src="../plots/large_models/metrics_perpetrator.png" class="r-stretch"></section>
+<section class="slide level2">
+
+<h3 class="center" id="section-2"></h3>
+
+<img data-src="../plots/large_models/metrics_legal_procedure.png" class="r-stretch"></section>
+<section id="conclusion-and-future-work" class="slide level2">
+<h2>Conclusion and Future Work</h2>
+<ul>
+<li>Descriptive statistics of the data</li>
+<li>Evaluations across models</li>
+<li>Drafting the paper</li>
+</ul>
+</section>
+<section id="acknowledgments" class="slide level2">
+<h2>Acknowledgments</h2>
+<p>This research was funded by NSF.</p>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
-
+<p>This research was funded by NSF.</p>
 </div>
 </div>
 </section>

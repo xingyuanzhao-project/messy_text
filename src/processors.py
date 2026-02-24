@@ -11,7 +11,7 @@ from src.utils import compute_span_offsets
 @dataclass
 class ProcessorResult:
     """
-    Generic result container for a single LLM-backed processor call.
+    Generic result container object for a single LLM-backed processor call.
 
     This object is intentionally task-agnostic: it can represent summary,
     classification, or any future task that uses the guided_json interface.
