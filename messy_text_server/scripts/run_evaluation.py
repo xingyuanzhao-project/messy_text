@@ -23,6 +23,52 @@ from src.utils import setup_logger, check_vllm_server
 
 
 # =============================================================================
+# NLTK Resource Preflight (SummaC dependency)
+# =============================================================================
+
+def _ensure_nltk_punkt_tab(logger, auto_download=True):
+    """
+    Ensures NLTK punkt_tab is available for SummaC sentence tokenization.
+
+    Behavior:
+        1) Check for local punkt_tab data.
+        2) If missing and auto_download=True, attempt download once.
+        3) If still missing, fail fast with a reproducible command.
+    """
+    try:
+        import nltk
+    except ImportError as exc:
+        raise RuntimeError(
+            "Missing required dependency: nltk. "
+            "Install dependencies first (example: .\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt)."
+        ) from exc
+
+    resource_path = "tokenizers/punkt_tab/english"
+
+    try:
+        nltk.data.find(resource_path)
+        logger.info("NLTK resource check passed: punkt_tab is available.")
+        return
+    except LookupError:
+        if auto_download:
+            logger.warning("NLTK resource 'punkt_tab' not found. Attempting automatic download...")
+            try:
+                nltk.download("punkt_tab", quiet=True)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(f"Automatic punkt_tab download attempt failed: {exc}")
+
+    # Verify again after optional download attempt.
+    try:
+        nltk.data.find(resource_path)
+        logger.info("NLTK resource installation succeeded: punkt_tab is now available.")
+    except LookupError as exc:
+        raise RuntimeError(
+            "Missing NLTK resource: punkt_tab. Run:\n"
+            ".\\.venv\\Scripts\\python.exe -c \"import nltk; nltk.download('punkt_tab')\""
+        ) from exc
+
+
+# =============================================================================
 # Parent Helper Function: Shared Evaluation Logic
 # =============================================================================
 
@@ -628,6 +674,20 @@ def main():
     # Step 3: Read evaluation settings
     eval_config = config.get('evaluation', {})
     benchmarks = eval_config.get('benchmarks', {})
+
+    # Step 3.1: SummaC dependency preflight (punkt_tab)
+    # Default behavior is auto-download; set evaluation.auto_download_nltk_data=false
+    # for strict fail-fast operation in production environments.
+    summac_enabled = bool(
+        benchmarks.get('enable_summac_zs', False) or
+        benchmarks.get('enable_summac_conv', False)
+    )
+    auto_download_nltk_data = eval_config.get('auto_download_nltk_data', True)
+    if summac_enabled:
+        _ensure_nltk_punkt_tab(
+            logger=logger,
+            auto_download=auto_download_nltk_data
+        )
     
     # Step 4: Registry inside main - maps metric name to function
     metric_functions = {

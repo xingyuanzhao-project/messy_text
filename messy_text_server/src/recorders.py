@@ -90,11 +90,11 @@ def flatten_spans_from_state(
     rows: List[Dict[str, Any]] = []
 
     for turn_index, result in enumerate(state.results):
-        summary_by_item = result.get("summary_by_item")
-        if not isinstance(summary_by_item, dict):
+        spans_dict = result.get("spans_by_item") or result.get("summary_by_item")
+        if not isinstance(spans_dict, dict):
             continue
 
-        for label_key, spans in summary_by_item.items():
+        for label_key, spans in spans_dict.items():
             if not isinstance(spans, list):
                 continue
             for item in spans:

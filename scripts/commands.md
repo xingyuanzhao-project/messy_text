@@ -94,6 +94,13 @@ ls ~/.cache/huggingface/hub/
 du -sh ~/.cache/huggingface/hub/*
 
 vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 49152
+vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 \
+  --quantization awq \
+  --tensor-parallel-size 4 \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --max-model-len 49152 \
+  --gpu-memory-utilization 0.90
 
 vllm serve gaunernst/gemma-3-12b-it-int4-awq --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --config_format mistral --load_format mistral --port 8000 --host 0.0.0.0 --max-model-len 49152
@@ -129,6 +136,8 @@ source venv/bin/activate
 
 python scripts/run_summary.py
 python scripts/run_summary_conversation.py
+python scripts/run_summary_conversation_by_label.py
+sleep 3600 && python scripts/run_summary_conversation_by_label.py
 python scripts/run_classification.py
 python scripts/run_evaluation.py
 
@@ -147,7 +156,7 @@ curl http://localhost:8000/metrics | grep vllm
 ```
 
 
-
+# local setup
 ### local ubuntu vm
 ```bash
 nvidia-smi
@@ -162,6 +171,7 @@ vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq
 .\.venv\Scripts\Activate.ps1
 python scripts/run_summary.py
 python scripts/run_summary_conversation.py
+python scripts/run_summary_conversation_by_label.py
 python scripts/run_classification.py
 python scripts/run_evaluation.py
 ```

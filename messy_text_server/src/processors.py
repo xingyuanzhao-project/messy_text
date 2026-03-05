@@ -1,3 +1,4 @@
+import asyncio
 import json
 import re
 import logging
@@ -5,13 +6,14 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 from json_repair import repair_json
+from tqdm.asyncio import tqdm as tqdm_async
 from src.utils import compute_span_offsets
 
 
 @dataclass
 class ProcessorResult:
     """
-    Generic result container for a single LLM-backed processor call.
+    Generic result container object for a single LLM-backed processor call.
 
     This object is intentionally task-agnostic: it can represent summary,
     classification, or any future task that uses the guided_json interface.
@@ -92,7 +94,26 @@ class ProcessorResult:
             output_text = response.choices[0].message.content
             try:
                 repaired_out = repair_json(output_text)
-                output_struct = json.loads(repaired_out)
+                _parsed = json.loads(repaired_out)
+                if isinstance(_parsed, dict):
+                    output_struct = _parsed
+                elif isinstance(_parsed, list) and len(_parsed) == 1 and isinstance(_parsed[0], dict):
+                    output_struct = _parsed[0]
+                    error_messages.append("output_struct was a single-element list; unwrapped to dict")
+                elif isinstance(_parsed, list):
+                    _merged: Dict[str, Any] = {}
+                    for _item in _parsed:
+                        if isinstance(_item, dict):
+                            _merged.update(_item)
+                    output_struct = _merged if _merged else None
+                    error_messages.append(
+                        f"output_struct was a list of {len(_parsed)} items; merged dict fields"
+                    )
+                else:
+                    output_struct = None
+                    error_messages.append(
+                        f"output_struct is {type(_parsed).__name__}, expected dict; skipping field extraction"
+                    )
             except Exception as exc:  # noqa: BLE001
                 error_messages.append(f"Failed to parse output_struct: {exc}")
         except Exception as exc:  # noqa: BLE001
@@ -159,6 +180,35 @@ class ProcessorResult:
             return not result
         return False
 
+
+@dataclass
+class MessyTextConversationState:
+    """
+    Holds state for a multi-turn MessyText conversation.
+
+    This object tracks all results across turns, enabling traceback to original
+    spans and document sources. It provides properties for convenient access to
+    the most recent result and summary.
+
+    Attributes:
+        turn_index (int): Number of turns that have been processed so far.
+        results (List[ProcessorResult]): All structured results from each turn,
+            preserving the full conversation history including spans and doc_ids.
+    """
+    turn_index: int = 0
+    results: List[ProcessorResult] = field(default_factory=list)
+
+    @property
+    def last_result(self) -> Optional[ProcessorResult]:
+        """Return the most recent ProcessorResult, or None if no turns processed."""
+        return self.results[-1] if self.results else None
+
+    @property
+    def last_summary(self) -> str:
+        """Return the summary from the most recent turn, or empty string."""
+        if not self.results:
+            return ""
+        return self.results[-1].get("summary") or ""
 
 class MessyTextLogicMixin:
     """
@@ -674,7 +724,14 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
     Asynchronous processor implementation for high-throughput servers.
     Uses async/await patterns with AsyncOpenAI client.
     """
-    def __init__(self, client: Any, config: Dict[str, Any], taxonomy: Dict[str, Any], logger: logging.Logger):
+    def __init__(
+        self,
+        client: Any,
+        config: Dict[str, Any],
+        taxonomy: Dict[str, Any],
+        logger: logging.Logger,
+        llm_semaphore: Optional[asyncio.Semaphore] = None,
+    ):
         """
         Initializes the asynchronous processor.
 
@@ -683,9 +740,12 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
             config (Dict[str, Any]): Runtime settings (model name, tokens, etc).
             taxonomy (Dict[str, Any]): Static definitions (context_definitions, label_options).
             logger (logging.Logger): Logger instance.
+            llm_semaphore (Optional[asyncio.Semaphore]): If provided, each LLM
+                call acquires this semaphore, capping in-flight requests globally.
         """
         super().__init__(config, taxonomy, logger)
         self.client = client
+        self._llm_semaphore = llm_semaphore
 
     async def summarize_text(self, text: str, doc_id: Optional[Any] = None) -> str:
         """
@@ -709,7 +769,11 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
 
         kwargs = self._get_summary_args(text)
         try:
-            response = await self.client.chat.completions.create(**kwargs)
+            if self._llm_semaphore:
+                async with self._llm_semaphore:
+                    response = await self.client.chat.completions.create(**kwargs)
+            else:
+                response = await self.client.chat.completions.create(**kwargs)
         except Exception as e:  # noqa: BLE001
             self.logger.error(f"Summarization failed: {e}")
             messages = kwargs.get("messages", []) or [{}]
@@ -768,7 +832,11 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
             return "No information"
 
         try:
-            response = await self.client.chat.completions.create(**kwargs)
+            if self._llm_semaphore:
+                async with self._llm_semaphore:
+                    response = await self.client.chat.completions.create(**kwargs)
+            else:
+                response = await self.client.chat.completions.create(**kwargs)
         except Exception as e:  # noqa: BLE001
             self.logger.error(f"Classification failed for {key}: {e}")
             messages = kwargs.get("messages", []) or [{}]
@@ -800,35 +868,6 @@ class AsyncMessyTextProcessor(MessyTextLogicMixin):
             return classification
         return "No information"
 
-
-@dataclass
-class MessyTextConversationState:
-    """
-    Holds state for a multi-turn MessyText conversation.
-
-    This object tracks all results across turns, enabling traceback to original
-    spans and document sources. It provides properties for convenient access to
-    the most recent result and summary.
-
-    Attributes:
-        turn_index (int): Number of turns that have been processed so far.
-        results (List[ProcessorResult]): All structured results from each turn,
-            preserving the full conversation history including spans and doc_ids.
-    """
-    turn_index: int = 0
-    results: List[ProcessorResult] = field(default_factory=list)
-
-    @property
-    def last_result(self) -> Optional[ProcessorResult]:
-        """Return the most recent ProcessorResult, or None if no turns processed."""
-        return self.results[-1] if self.results else None
-
-    @property
-    def last_summary(self) -> str:
-        """Return the summary from the most recent turn, or empty string."""
-        if not self.results:
-            return ""
-        return self.results[-1].get("summary") or ""
 
 
 class MessyTextConversationTurnProcessor:
@@ -1241,3 +1280,1180 @@ class AsyncMessyTextConversationOrchestrator:
                 break
 
         return summaries, state
+
+
+# ---------------------------------------------------------------------------
+# Per-label extraction processor (base, sync, async)
+# ---------------------------------------------------------------------------
+
+
+class LabelExtractorLogicMixin:
+    """
+    Contains pure logic for single-label span extraction from document text.
+
+    Handles text cleaning and prompt construction for extracting spans
+    relevant to exactly one taxonomy label from a single document.
+    Decoupled from I/O (client calls).
+
+    This mixin reads prompt configuration from the following keys:
+
+        prompts.label_extract_first  — first-turn extraction (no previous spans).
+        prompts.label_extract_update — update-turn extraction (has previous spans).
+
+    These are independent of the prompt keys used by the existing
+    MessyTextLogicMixin so that old prompts remain untouched.
+    """
+
+    def __init__(
+        self,
+        config: Dict[str, Any],
+        label_key: str,
+        label_definition: str,
+        logger: logging.Logger,
+    ):
+        """
+        Initializes the label extractor logic mixin.
+
+        Args:
+            config (Dict[str, Any]): Runtime settings. Expected keys include
+                model.name, processing.temperature, processing.max_tokens_summary,
+                and prompts with label_extract_first / label_extract_update.
+            label_key (str): The taxonomy key this extractor is bound to
+                (e.g. 'vic_grupo_social'). Selected by the caller before
+                construction; not looked up internally.
+            label_definition (str): The human-readable definition for
+                label_key. Provided by the caller; not looked up internally.
+            logger (logging.Logger): Logger instance.
+        """
+        self.config = config
+        self.label_key = label_key
+        self.label_definition = label_definition
+        self.logger = logger
+        self.model_name = config['model']['name']
+
+    def clean_text(self, text: str) -> str:
+        """
+        Applies regex cleaning to input text.
+
+        Args:
+            text (str): The raw input text to clean.
+
+        Returns:
+            str: The cleaned text with URLs removed and whitespace normalized.
+        """
+        if not isinstance(text, str):
+            return str(text)
+        text = re.sub(
+            r'https?://\S+|\([^)]*/[^)]*\)|[\ue000-\uf8ff]|\b\d/\d\b', '', text
+        )
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    def _get_label_extract_args(
+        self,
+        text: str,
+        previous_spans: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Constructs arguments for a single-label extraction API call.
+
+        Selects between first-turn and update-turn prompt configurations
+        based on whether previous_spans are provided. Uses self.label_key
+        and self.label_definition bound at construction time.
+
+        Args:
+            text (str): The cleaned document text.
+            previous_spans (Optional[List[Dict[str, Any]]]): Spans extracted for
+                this label in previous turns, or None for the first turn.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing model arguments (model,
+            messages, etc.) suitable for chat.completions.create.
+        """
+        prompts_cfg = self.config.get("prompts") or {}
+
+        has_previous = previous_spans is not None and len(previous_spans) > 0
+        extract_cfg = prompts_cfg.get("label_spans_extract") or {}
+
+        output_format = extract_cfg.get("output_format")
+        instructions_template = extract_cfg.get("instructions")
+
+        if output_format is None or instructions_template is None:
+            raise ValueError(
+                "Label extraction prompt configuration must provide "
+                "'output_format' and 'instructions'."
+            )
+
+        previous_spans_str = json.dumps(
+            previous_spans or [], ensure_ascii=False
+        )
+
+        class _SafeFormatDict(dict):
+            def __missing__(self, key: str) -> str:
+                return "{" + key + "}"
+
+        format_vars = _SafeFormatDict(
+            label=self.label_key,
+            label_key=self.label_key,
+            label_definition=self.label_definition,
+            previous_spans=previous_spans_str,
+            info_found_label="info_found",
+            spans_label="spans",
+            input_text_label="input_text",
+        )
+
+        instructions = [
+            instr.format_map(format_vars)
+            for instr in instructions_template
+        ]
+
+        prompt_structure = {
+            'input_text': text,
+            'label_key': self.label_key,
+            'label_definition': self.label_definition,
+            'previous_spans': previous_spans or [],
+            'output_format': output_format,
+            'instructions': instructions,
+        }
+
+        prompt_content = str(prompt_structure)
+
+        return {
+            "model": self.model_name,
+            "messages": [{'role': 'user', 'content': prompt_content}],
+            "temperature": self.config['processing']['temperature'],
+            "max_tokens": self.config['processing']['max_tokens_summary'],
+            "extra_body": {"guided_json": {
+                "type": "object",
+                "properties": {
+                    "info_found": {"type": "string"},
+                    "spans": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "span": {"type": "string"}
+                            },
+                            "required": ["span"]
+                        }
+                    },
+                    "confidence_score": {"type": "string"}
+                },
+                "required": ["info_found", "spans", "confidence_score"]
+            }}
+        }
+
+
+class LabelExtractor(LabelExtractorLogicMixin):
+    """
+    Synchronous single-label extraction processor.
+
+    Processes one taxonomy label against one document text, returning a
+    ProcessorResult with the extraction output for that label.
+
+    The label_key and label_definition are bound at construction time by
+    the caller (runner loop). This object has no access to the full taxonomy.
+    """
+
+    def __init__(
+        self,
+        client: Any,
+        config: Dict[str, Any],
+        label_key: str,
+        label_definition: str,
+        logger: logging.Logger,
+    ):
+        """
+        Initializes the synchronous label extractor.
+
+        Args:
+            client (OpenAI): The synchronous OpenAI/vLLM client instance.
+            config (Dict[str, Any]): Runtime settings (model name, tokens, etc).
+            label_key (str): The taxonomy key this extractor is bound to.
+            label_definition (str): The human-readable definition for label_key.
+            logger (logging.Logger): Logger instance.
+        """
+        super().__init__(config, label_key, label_definition, logger)
+        self.client = client
+
+    def extract_label(
+        self,
+        text: str,
+        previous_spans: Optional[List[Dict[str, Any]]] = None,
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Run a single-label extraction call and return the ProcessorResult.
+
+        Uses self.label_key and self.label_definition bound at construction.
+
+        Args:
+            text (str): The cleaned document text.
+            previous_spans (Optional[List[Dict[str, Any]]]): Spans from previous
+                turns for this label, or None for the first turn.
+            doc_id (Optional[Any]): Document identifier for traceback.
+
+        Returns:
+            ProcessorResult: Structured result containing info_found, spans,
+            and summary for this single label.
+        """
+        if not text or not text.strip():
+            return ProcessorResult(
+                task_name="label_extract",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "spans": [], "summary": ""},
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={"label_key": self.label_key},
+            )
+
+        kwargs = self._get_label_extract_args(
+            text=text,
+            previous_spans=previous_spans,
+        )
+
+        try:
+            response = self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label extraction failed for {self.label_key}: {e}", exc_info=True)
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_extract",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "spans": [], "summary": ""},
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={"label_key": self.label_key},
+            )
+
+        result = ProcessorResult.from_llm_call(
+            task_name="label_extract",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+        result.metadata["label_key"] = self.label_key
+        return result
+
+
+class AsyncLabelExtractor(LabelExtractorLogicMixin):
+    """
+    Asynchronous single-label extraction processor.
+
+    Processes one taxonomy label against one document text, returning a
+    ProcessorResult with the extraction output for that label.
+    Uses async/await patterns with AsyncOpenAI client.
+
+    The label_key and label_definition are bound at construction time by
+    the caller (runner loop). This object has no access to the full taxonomy.
+    """
+
+    def __init__(
+        self,
+        client: Any,
+        config: Dict[str, Any],
+        label_key: str,
+        label_definition: str,
+        logger: logging.Logger,
+        llm_semaphore: Optional[asyncio.Semaphore] = None,
+    ):
+        """
+        Initializes the asynchronous label extractor.
+
+        Args:
+            client (AsyncOpenAI): The asynchronous OpenAI/vLLM client instance.
+            config (Dict[str, Any]): Runtime settings (model name, tokens, etc).
+            label_key (str): The taxonomy key this extractor is bound to.
+            label_definition (str): The human-readable definition for label_key.
+            logger (logging.Logger): Logger instance.
+            llm_semaphore (Optional[asyncio.Semaphore]): If provided, each LLM
+                call acquires this semaphore, capping in-flight requests globally.
+        """
+        super().__init__(config, label_key, label_definition, logger)
+        self.client = client
+        self._llm_semaphore = llm_semaphore
+
+    async def extract_label(
+        self,
+        text: str,
+        previous_spans: Optional[List[Dict[str, Any]]] = None,
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Asynchronously run a single-label extraction call.
+
+        Uses self.label_key and self.label_definition bound at construction.
+
+        Args:
+            text (str): The cleaned document text.
+            previous_spans (Optional[List[Dict[str, Any]]]): Spans from previous
+                turns for this label, or None for the first turn.
+            doc_id (Optional[Any]): Document identifier for traceback.
+
+        Returns:
+            ProcessorResult: Structured result containing info_found, spans,
+            and summary for this single label.
+        """
+        if not text or not text.strip():
+            return ProcessorResult(
+                task_name="label_extract",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "spans": [], "summary": ""},
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={"label_key": self.label_key},
+            )
+
+        kwargs = self._get_label_extract_args(
+            text=text,
+            previous_spans=previous_spans,
+        )
+
+        try:
+            if self._llm_semaphore:
+                async with self._llm_semaphore:
+                    response = await self.client.chat.completions.create(**kwargs)
+            else:
+                response = await self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label extraction failed for {self.label_key}: {e}", exc_info=True)
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_extract",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "spans": [], "summary": ""},
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={"label_key": self.label_key},
+            )
+
+        result = ProcessorResult.from_llm_call(
+            task_name="label_extract",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+        result.metadata["label_key"] = self.label_key
+        return result
+
+
+# ---------------------------------------------------------------------------
+# Label-based span extraction processor (base, sync, async)
+# ---------------------------------------------------------------------------
+
+
+class TextLabelsSummaryLogicMixin:
+    """
+    Contains pure logic for producing a document summary from per-label
+    extraction results.
+
+    Handles prompt construction for the summarization call that takes
+    pre-extracted label evidence as input and produces a coherent
+    document-level summary.
+    Decoupled from I/O (client calls).
+
+    This mixin reads prompt configuration from the following key:
+
+        prompts.label_summary — summarization from per-label evidence.
+
+    This is independent of the prompt keys used by the existing
+    MessyTextLogicMixin so that old prompts remain untouched.
+    """
+
+    def __init__(
+        self,
+        config: Dict[str, Any],
+        taxonomy: Dict[str, Any],
+        logger: logging.Logger,
+    ):
+        """
+        Initializes the label summary logic mixin.
+
+        Args:
+            config (Dict[str, Any]): Runtime settings. Expected keys include
+                model.name, processing.temperature, processing.max_tokens_summary,
+                and prompts with label_summary.
+            taxonomy (Dict[str, Any]): Static definitions (context_definitions,
+                label_options).
+            logger (logging.Logger): Logger instance.
+        """
+        self.config = config
+        self.definitions = taxonomy['context_definitions']
+        self.labels = taxonomy['label_options']
+        self.logger = logger
+        self.model_name = config['model']['name']
+
+    def clean_text(self, text: str) -> str:
+        """
+        Applies regex cleaning to input text.
+
+        Args:
+            text (str): The raw input text to clean.
+
+        Returns:
+            str: The cleaned text with URLs removed and whitespace normalized.
+        """
+        if not isinstance(text, str):
+            return str(text)
+        text = re.sub(
+            r'https?://\S+|\([^)]*/[^)]*\)|[\ue000-\uf8ff]|\b\d/\d\b', '', text
+        )
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+    def _get_label_summary_args(
+        self,
+        text: str,
+        label_results: Dict[str, ProcessorResult],
+        previous_summary: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Constructs arguments for a label-based summary API call.
+
+        Takes the original document text and the per-label extraction results,
+        formatting them into a prompt that asks the model to produce a coherent
+        summary from the extracted evidence.
+
+        Args:
+            text (str): The cleaned document text.
+            label_results (Dict[str, ProcessorResult]): Mapping from label_key
+                to the ProcessorResult returned by the label extractor for
+                that key.
+            previous_summary (Optional[str]): The running summary from earlier
+                turns, or None/empty string for the first turn.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing model arguments (model,
+            messages, etc.) suitable for chat.completions.create.
+        """
+        prompts_cfg = self.config.get("prompts") or {}
+        has_previous = bool(previous_summary and previous_summary.strip())
+        if has_previous:
+            summary_cfg = (
+                prompts_cfg.get("label_summary_update")
+                or prompts_cfg.get("label_summary_first")
+                or {}
+            )
+        else:
+            summary_cfg = (
+                prompts_cfg.get("label_summary_first")
+                or {}
+            )
+
+        output_format = summary_cfg.get("output_format")
+        instructions_template = summary_cfg.get("instructions")
+
+        if output_format is None or instructions_template is None:
+            raise ValueError(
+                "Label summary prompt configuration must provide "
+                "'output_format' and 'instructions'."
+            )
+
+        spans_by_item: Dict[str, Any] = {
+            label_key: result.get("spans") or []
+            for label_key, result in label_results.items()
+        }
+
+        spans_by_item_str = json.dumps(spans_by_item, ensure_ascii=False)
+
+        class _SafeFormatDict(dict):
+            def __missing__(self, key: str) -> str:
+                return "{" + key + "}"
+
+        format_vars = _SafeFormatDict(
+            spans_by_item=spans_by_item_str,
+            previous_summary=previous_summary or "",
+            info_found_label="info_found",
+        )
+
+        instructions = [
+            instr.format_map(format_vars)
+            for instr in instructions_template
+        ]
+
+        prompt_structure = {
+            'input_text': text,
+            'spans_by_item': spans_by_item,
+            'previous_summary': previous_summary or "",
+            'output_format': output_format,
+            'instructions': instructions,
+        }
+
+        prompt_content = str(prompt_structure)
+
+        return {
+            "model": self.model_name,
+            "messages": [{'role': 'user', 'content': prompt_content}],
+            "temperature": self.config['processing']['temperature'],
+            "max_tokens": self.config['processing']['max_tokens_summary'],
+            "extra_body": {"guided_json": {
+                "type": "object",
+                "properties": {
+                    "info_found": {"type": "string"},
+                    "spans_by_item": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "span": {"type": "string"}
+                                },
+                                "required": ["span"]
+                            }
+                        }
+                    },
+                    "summary": {"type": "string"}
+                },
+                "required": ["info_found", "spans_by_item", "summary"]
+            }}
+        }
+
+    def _get_synthesis_args(
+        self,
+        per_doc_summaries: List[str],
+    ) -> Dict[str, Any]:
+        """
+        Constructs arguments for a synthesis API call from per-document summaries.
+
+        Unlike _get_label_summary_args, this method does not branch on
+        previous_summary and always uses the 'label_synthesis' prompt key.
+        It is intended for the reconciliation step of the concurrent pipeline:
+        all per-document summaries have already been produced independently
+        by the concurrent orchestrator, and this call merges them into a
+        single coherent victim-level summary.
+
+        Args:
+            per_doc_summaries (List[str]): Per-document summary strings produced
+                by the concurrent summarization stage, one per document for this
+                victim.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing model arguments (model,
+            messages, etc.) suitable for chat.completions.create.
+        """
+        prompts_cfg = self.config.get("prompts") or {}
+        synthesis_cfg = prompts_cfg.get("label_synthesis") or {}
+
+        output_format = synthesis_cfg.get("output_format")
+        instructions_template = synthesis_cfg.get("instructions")
+
+        if output_format is None or instructions_template is None:
+            raise ValueError(
+                "Label synthesis prompt configuration must provide "
+                "'output_format' and 'instructions'."
+            )
+
+        per_doc_summaries_str = json.dumps(per_doc_summaries, ensure_ascii=False)
+
+        class _SafeFormatDict(dict):
+            def __missing__(self, key: str) -> str:
+                return "{" + key + "}"
+
+        format_vars = _SafeFormatDict(
+            per_doc_summaries=per_doc_summaries_str,
+            info_found_label="info_found",
+        )
+
+        instructions = [
+            instr.format_map(format_vars)
+            for instr in instructions_template
+        ]
+
+        prompt_structure = {
+            'per_doc_summaries': per_doc_summaries,
+            'output_format': output_format,
+            'instructions': instructions,
+        }
+
+        prompt_content = str(prompt_structure)
+
+        return {
+            "model": self.model_name,
+            "messages": [{'role': 'user', 'content': prompt_content}],
+            "temperature": self.config['processing']['temperature'],
+            "max_tokens": self.config['processing']['max_tokens_summary'],
+            "extra_body": {"guided_json": {
+                "type": "object",
+                "properties": {
+                    "info_found": {"type": "string"},
+                    "summary": {"type": "string"}
+                },
+                "required": ["info_found", "summary"]
+            }}
+        }
+
+
+class TextLabelsSummaryProcessor(TextLabelsSummaryLogicMixin):
+    """
+    Synchronous label-based summary processor.
+
+    Takes pre-extracted per-label ProcessorResults and the original document
+    text, makes a single LLM call, and returns a ProcessorResult whose values
+    match the existing conversation summary contract (info_found,
+    relevant_context, summary_by_item, summary).
+    """
+
+    def __init__(
+        self,
+        client: Any,
+        config: Dict[str, Any],
+        taxonomy: Dict[str, Any],
+        logger: logging.Logger,
+    ):
+        """
+        Initializes the synchronous label summary processor.
+
+        Args:
+            client (OpenAI): The synchronous OpenAI/vLLM client instance.
+            config (Dict[str, Any]): Runtime settings (model name, tokens, etc).
+            taxonomy (Dict[str, Any]): Static definitions (context_definitions,
+                label_options).
+            logger (logging.Logger): Logger instance.
+        """
+        super().__init__(config, taxonomy, logger)
+        self.client = client
+
+    def summarize_from_labels(
+        self,
+        text: str,
+        label_results: Dict[str, ProcessorResult],
+        previous_summary: Optional[str] = None,
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Run a summary call from per-label extraction results.
+
+        Args:
+            text (str): The cleaned document text.
+            label_results (Dict[str, ProcessorResult]): Mapping from label_key
+                to the ProcessorResult returned by the label extractor.
+            previous_summary (Optional[str]): The running summary from earlier
+                turns, or None for the first turn.
+            doc_id (Optional[Any]): Document identifier for traceback.
+
+        Returns:
+            ProcessorResult: Structured result containing info_found,
+            relevant_context, summary_by_item, and summary.
+        """
+        if not text or not text.strip():
+            return ProcessorResult(
+                task_name="label_summary",
+                model_name=self.model_name,
+                declared_fields={},
+                values={
+                    "info_found": "FALSE",
+                    "relevant_context": [],
+                    "summary_by_item": {},
+                    "summary": "",
+                },
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={},
+            )
+
+        kwargs = self._get_label_summary_args(
+            text=text,
+            label_results=label_results,
+            previous_summary=previous_summary,
+        )
+
+        try:
+            response = self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label summary failed: {e}")
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_summary",
+                model_name=self.model_name,
+                declared_fields={},
+                values={
+                    "info_found": "FALSE",
+                    "relevant_context": [],
+                    "summary_by_item": {},
+                    "summary": "",
+                },
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={},
+            )
+
+        return ProcessorResult.from_llm_call(
+            task_name="label_summary",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+
+    def synthesize_from_summaries(
+        self,
+        per_doc_summaries: List[str],
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Produces a single synthesized victim-level summary from per-document summaries.
+
+        This is the reconciliation step for the concurrent pipeline: after all
+        documents have been summarized independently by the concurrent
+        orchestrator, this method makes one LLM call to merge them into a
+        single coherent victim-level narrative.
+
+        Args:
+            per_doc_summaries (List[str]): Per-document summary strings produced
+                by the concurrent summarization stage. Empty strings are allowed
+                (they represent documents with no relevant information found).
+            doc_id (Optional[Any]): Identifier for traceability (typically
+                the victim_id).
+
+        Returns:
+            ProcessorResult: Structured result with info_found and summary.
+        """
+        non_empty = [s for s in per_doc_summaries if s and s.strip()]
+        if not non_empty:
+            return ProcessorResult(
+                task_name="label_synthesis",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "summary": ""},
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={},
+            )
+
+        kwargs = self._get_synthesis_args(per_doc_summaries=non_empty)
+
+        try:
+            response = self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label synthesis failed: {e}")
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_synthesis",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "summary": ""},
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={},
+            )
+
+        return ProcessorResult.from_llm_call(
+            task_name="label_synthesis",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+
+
+class AsyncTextLabelsSummaryProcessor(TextLabelsSummaryLogicMixin):
+    """
+    Asynchronous label-based summary processor.
+
+    Takes pre-extracted per-label ProcessorResults and the original document
+    text, makes a single LLM call, and returns a ProcessorResult whose values
+    match the existing conversation summary contract (info_found,
+    relevant_context, summary_by_item, summary).
+    Uses async/await patterns with AsyncOpenAI client.
+    """
+
+    def __init__(
+        self,
+        client: Any,
+        config: Dict[str, Any],
+        taxonomy: Dict[str, Any],
+        logger: logging.Logger,
+        llm_semaphore: Optional[asyncio.Semaphore] = None,
+    ):
+        """
+        Initializes the asynchronous label summary processor.
+
+        Args:
+            client (AsyncOpenAI): The asynchronous OpenAI/vLLM client instance.
+            config (Dict[str, Any]): Runtime settings (model name, tokens, etc).
+            taxonomy (Dict[str, Any]): Static definitions (context_definitions,
+                label_options).
+            logger (logging.Logger): Logger instance.
+            llm_semaphore (Optional[asyncio.Semaphore]): If provided, each LLM
+                call acquires this semaphore, capping in-flight requests globally.
+        """
+        super().__init__(config, taxonomy, logger)
+        self.client = client
+        self._llm_semaphore = llm_semaphore
+
+    async def summarize_from_labels(
+        self,
+        text: str,
+        label_results: Dict[str, ProcessorResult],
+        previous_summary: Optional[str] = None,
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Asynchronously run a summary call from per-label extraction results.
+
+        Args:
+            text (str): The cleaned document text.
+            label_results (Dict[str, ProcessorResult]): Mapping from label_key
+                to the ProcessorResult returned by the label extractor.
+            previous_summary (Optional[str]): The running summary from earlier
+                turns, or None for the first turn.
+            doc_id (Optional[Any]): Document identifier for traceback.
+
+        Returns:
+            ProcessorResult: Structured result containing info_found,
+            relevant_context, summary_by_item, and summary.
+        """
+        if not text or not text.strip():
+            return ProcessorResult(
+                task_name="label_summary",
+                model_name=self.model_name,
+                declared_fields={},
+                values={
+                    "info_found": "FALSE",
+                    "relevant_context": [],
+                    "summary_by_item": {},
+                    "summary": "",
+                },
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={},
+            )
+
+        kwargs = self._get_label_summary_args(
+            text=text,
+            label_results=label_results,
+            previous_summary=previous_summary,
+        )
+
+        try:
+            if self._llm_semaphore:
+                async with self._llm_semaphore:
+                    response = await self.client.chat.completions.create(**kwargs)
+            else:
+                response = await self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label summary failed: {e}")
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_summary",
+                model_name=self.model_name,
+                declared_fields={},
+                values={
+                    "info_found": "FALSE",
+                    "relevant_context": [],
+                    "summary_by_item": {},
+                    "summary": "",
+                },
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={},
+            )
+
+        return ProcessorResult.from_llm_call(
+            task_name="label_summary",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+
+    async def synthesize_from_summaries(
+        self,
+        per_doc_summaries: List[str],
+        doc_id: Optional[Any] = None,
+    ) -> ProcessorResult:
+        """
+        Asynchronously produces a single synthesized victim-level summary from
+        per-document summaries.
+
+        This is the reconciliation step for the concurrent pipeline: after all
+        documents have been summarized independently by the concurrent
+        orchestrator, this method makes one LLM call to merge them into a
+        single coherent victim-level narrative.
+
+        Args:
+            per_doc_summaries (List[str]): Per-document summary strings produced
+                by the concurrent summarization stage. Empty strings are allowed
+                (they represent documents with no relevant information found).
+            doc_id (Optional[Any]): Identifier for traceability (typically
+                the victim_id).
+
+        Returns:
+            ProcessorResult: Structured result with info_found and summary.
+        """
+        non_empty = [s for s in per_doc_summaries if s and s.strip()]
+        if not non_empty:
+            return ProcessorResult(
+                task_name="label_synthesis",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "summary": ""},
+                input_text="",
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=None,
+                metadata={},
+            )
+
+        kwargs = self._get_synthesis_args(per_doc_summaries=non_empty)
+
+        try:
+            if self._llm_semaphore:
+                async with self._llm_semaphore:
+                    response = await self.client.chat.completions.create(**kwargs)
+            else:
+                response = await self.client.chat.completions.create(**kwargs)
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Label synthesis failed: {e}")
+            messages = kwargs.get("messages", []) or [{}]
+            input_text = str(messages[0].get("content", ""))
+            return ProcessorResult(
+                task_name="label_synthesis",
+                model_name=self.model_name,
+                declared_fields={},
+                values={"info_found": "FALSE", "summary": ""},
+                input_text=input_text,
+                input_struct=None,
+                output_text="",
+                output_struct=None,
+                doc_id=doc_id,
+                error=str(e),
+                metadata={},
+            )
+
+        return ProcessorResult.from_llm_call(
+            task_name="label_synthesis",
+            model_name=self.model_name,
+            request_kwargs=kwargs,
+            response=response,
+            doc_id=doc_id,
+        )
+
+
+class TextConversationOrchestrator:
+    """
+    Orchestrates a multi-turn MessyText conversation over a sequence of documents.
+
+    This class is responsible for:
+
+    - Deciding where to start (initial state).
+    - Stepping through documents sequentially.
+    - Passing the updated MessyTextConversationState between turns.
+
+    The summary processor is a pure call object. This orchestrator owns all
+    state transitions: it reads state.last_summary to supply previous_summary,
+    appends each result, and increments turn_index. The processor has no
+    awareness of state.
+    """
+
+    def __init__(self, summary_processor: TextLabelsSummaryProcessor) -> None:
+        """
+        Args:
+            summary_processor (TextLabelsSummaryProcessor): Processor that
+                receives per-label extraction results and produces a
+                consolidated summary via a single LLM call.
+        """
+        self.summary_processor = summary_processor
+
+    def run_conversation(
+        self,
+        documents: Iterable[Tuple[str, Dict[str, ProcessorResult], Optional[Any]]],
+        initial_state: Optional[MessyTextConversationState] = None,
+        stop_condition: Optional[
+            Callable[[MessyTextConversationState, str], bool]
+        ] = None,
+    ) -> Tuple[List[str], MessyTextConversationState]:
+        """
+        Runs a sequential conversation over a collection of pre-labelled documents.
+
+        Args:
+            documents: Each element is a 3-tuple of
+                (text, label_results, doc_id). text is the raw document string.
+                label_results maps label_key to its ProcessorResult from
+                extraction. doc_id is an optional identifier for traceability.
+            initial_state: Starting conversation state. If None, a new empty
+                state is created.
+            stop_condition: Optional callback receiving (state, summary). If it
+                returns True the loop stops after that turn.
+
+        Returns:
+            Tuple of per-turn summary strings and the final conversation state.
+        """
+        state = initial_state or MessyTextConversationState()
+        summaries: List[str] = []
+
+        for text, label_results, doc_id in documents:
+            result = self.summary_processor.summarize_from_labels(
+                text=text,
+                label_results=label_results,
+                previous_summary=state.last_summary,
+                doc_id=doc_id,
+            )
+
+            new_results = state.results.copy()
+            new_results.append(result)
+            state = MessyTextConversationState(
+                turn_index=state.turn_index + 1,
+                results=new_results,
+            )
+
+            summary = result.get("summary") or ""
+            summaries.append(summary)
+
+            if stop_condition is not None and stop_condition(state, summary):
+                break
+
+        return summaries, state
+
+
+class AsyncTextConversationOrchestrator:
+    """
+    Asynchronous orchestrator that fires all document summary calls concurrently
+    for a single victim, then assembles results into an ordered state.
+
+    Unlike TextConversationOrchestrator, turns are not sequential within this
+    class — all LLM calls are launched at once via asyncio.gather. Because
+    there is no sequential dependency chain, each call receives the same
+    previous_summary (from initial_state). Results are returned in submission
+    order (asyncio.gather preserves order). The runner is responsible for any
+    reconciliation across results (e.g. span union).
+
+    This class is responsible for:
+
+    - Deciding where to start (initial state).
+    - Firing all document summary calls concurrently.
+    - Storing results in submission order with turn_index tracking.
+    - Passing doc_id through to each result for downstream traceability.
+    """
+
+    def __init__(self, summary_processor: AsyncTextLabelsSummaryProcessor) -> None:
+        """
+        Args:
+            summary_processor (AsyncTextLabelsSummaryProcessor): Async processor
+                that receives per-label extraction results and produces a
+                consolidated summary via a single LLM call.
+        """
+        self.summary_processor = summary_processor
+
+    async def run_conversation(
+        self,
+        documents: Iterable[Tuple[str, Dict[str, ProcessorResult], Optional[Any]]],
+        initial_state: Optional[MessyTextConversationState] = None,
+        use_progress_bar: bool = False,
+    ) -> Tuple[List[str], MessyTextConversationState]:
+        """
+        Concurrently processes all documents, then assembles results in order.
+
+        All LLM calls are launched simultaneously. Each call receives the same
+        previous_summary from initial_state (no sequential chaining). Results
+        arrive in submission order via asyncio.gather.
+
+        Args:
+            documents: Each element is a 3-tuple of (text, label_results, doc_id).
+                text is the raw document string. label_results maps label_key to
+                its ProcessorResult from extraction. doc_id is passed through to
+                each result for traceability and indexing.
+            initial_state: Starting conversation state. If None, a new empty
+                state is created. Its last_summary is shared as previous_summary
+                for all concurrent calls.
+            use_progress_bar: Whether to display a tqdm progress bar tracking
+                per-document summary completion.
+
+        Returns:
+            Tuple of per-document summary strings (in submission order) and the
+            final conversation state with all results appended in submission
+            order and turn_index reflecting the number of documents processed.
+        """
+        state = initial_state or MessyTextConversationState()
+        previous_summary = state.last_summary
+
+        doc_list = list(documents)
+
+        tasks = [
+            self.summary_processor.summarize_from_labels(
+                text=text,
+                label_results=label_results,
+                previous_summary=previous_summary,
+                doc_id=doc_id,
+            )
+            for text, label_results, doc_id in doc_list
+        ]
+
+        results: List[ProcessorResult] = list(
+            await tqdm_async.gather(
+                *tasks,
+                desc=f"Summarising docs ({len(doc_list)} documents)",
+                leave=False,
+                disable=not use_progress_bar,
+            )
+        )
+
+        summaries: List[str] = []
+        new_results = state.results.copy()
+        turn_index = state.turn_index
+
+        for result in results:
+            new_results.append(result)
+            turn_index += 1
+            summaries.append(result.get("summary") or "")
+
+        final_state = MessyTextConversationState(
+            turn_index=turn_index,
+            results=new_results,
+        )
+
+        return summaries, final_state

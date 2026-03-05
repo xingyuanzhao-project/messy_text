@@ -166,6 +166,8 @@ Output:
 ```
 ---
 
+### Pipeline
+
 ![](../plots/diagrams/workflow_diagram_1.png)
 <!-- ![](../plots/diagrams/workflow_diagram_2.png) -->
 

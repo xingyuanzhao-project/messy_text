@@ -1,5 +1,5 @@
 """
-Conversation-based processing entry point for MessyText.
+Conversation-based multi-turn processing entry point for MessyText.
 
 This script implements a multi-turn, victim-level summarization pipeline:
 

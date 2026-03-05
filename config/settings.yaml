@@ -7,30 +7,30 @@ paths:
   summary:
     input: "df_text_by_report.csv"
     output:
-      file: "df_text_by_report_conversation_summary.csv"
+      file: "df_text_by_report_conversation_by_label_summary.csv"
       extend: False
   records:
     results:
       output:
-        file: "df_text_by_report_conversation_records_results.csv"
+        file: "df_text_by_report_conversation_by_label_records_results.csv"
         extend: False
     states:
       output:
-        file: "df_text_by_report_conversation_records_states.csv"
+        file: "df_text_by_report_conversation_by_label_records_states.csv"
         extend: False
     spans:
       output:
-        file: "df_text_by_report_conversation_records_spans.csv"
+        file: "df_text_by_report_conversation_by_label_records_spans.csv"
         extend: False
   classification:
-    input: "df_text_by_report_conversation_summary.csv"
+    input: "df_text_by_report_conversation_by_label_summary.csv"
     output:
-      file: "df_text_by_report_conversation_classification.csv"
+      file: "df_text_by_report_conversation_by_label_classification.csv"
       extend: False
   eval:
-    input: "results_large_models/df_text_by_report_conversation_classification.csv"
+    input: "results_large_models/df_text_by_report_conversation_by_label_classification.csv"
     output:
-      file: "results_large_models/df_text_by_report_conversation_evaluation.csv"
+      file: "results_large_models/df_text_by_report_conversation_by_label_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 
@@ -38,13 +38,14 @@ async:
   enabled: True
   max_retries: 5
   max_concurrent_rows: 20
+  max_concurrent_llm_calls: 25
 
 processing:
   temperature: 0.0
   max_tokens_summary: 1024
   max_tokens_classification: 256
   start_index: 0
-  summary_row_limit: 10
+  summary_row_limit: null
   classification_key_limit: null
   conversation:
     enabled: True

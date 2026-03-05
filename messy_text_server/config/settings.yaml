@@ -1,5 +1,5 @@
 model:
-  name: "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4"
+  name: "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4"
   api_base: "http://localhost:8000/v1"
   api_key: "dummy"
 
@@ -7,30 +7,30 @@ paths:
   summary:
     input: "df_text_by_report.csv"
     output:
-      file: "df_text_by_report_conversation_summary.csv"
+      file: "df_text_by_report_conversation_by_label_summary.csv"
       extend: False
   records:
     results:
       output:
-        file: "df_text_by_report_conversation_records_results.csv"
+        file: "df_text_by_report_conversation_by_label_records_results.csv"
         extend: False
     states:
       output:
-        file: "df_text_by_report_conversation_records_states.csv"
+        file: "df_text_by_report_conversation_by_label_records_states.csv"
         extend: False
     spans:
       output:
-        file: "df_text_by_report_conversation_records_spans.csv"
+        file: "df_text_by_report_conversation_by_label_records_spans.csv"
         extend: False
   classification:
-    input: "df_text_by_report_conversation_summary.csv"
+    input: "df_text_by_report_conversation_by_label_summary.csv"
     output:
-      file: "df_text_by_report_conversation_classification.csv"
+      file: "df_text_by_report_conversation_by_label_classification.csv"
       extend: False
   eval:
-    input: "df_text_by_report_conversation_classification.csv"
+    input: "df_text_by_report_conversation_by_label_classification.csv"
     output:
-      file: "df_text_by_report_conversation_evaluation.csv"
+      file: "df_text_by_report_conversation_by_label_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 
@@ -38,6 +38,7 @@ async:
   enabled: True
   max_retries: 5
   max_concurrent_rows: 25
+  max_concurrent_llm_calls: 25
 
 processing:
   temperature: 0.0

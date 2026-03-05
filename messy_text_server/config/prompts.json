@@ -76,6 +76,79 @@
       "Your result MUST be one of the possible_values: {possible_values}",
       "If no information is found about this label, return empty string like {{\"evidence\": \"no information found about this label\", \"result\": \"\"}}"
     ]
+  },
+  "label_spans_extract": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "spans": [
+        {"span": "<exact SENTENCE from input text>"}
+      ],
+      "confidence_score": "<0.0-1.0>"
+    },
+    "instructions": [
+      "Extract spans from {input_text_label} relevant to label={label} , given the definition: {label_definition}. You are allowed to extract multiple spans from the input text.",
+      "If the input is an error/missing page (e.g., \"Página no encontrada\", \"404\", \"no se puede encontrar esa página\"), set {info_found_label}=\"FALSE\", {spans_label}=[], confidence_score=0.0.",
+      "Ignore navigation/site chrome (menú, buscar, categorías, compartir, ThemeGrill, WordPress, cookies, copyright).",
+      "If you find ANY relevant information for {label}, set {info_found}=\"TRUE\" and extract exact Spanish sentences into {spans}. If you find multiple spans, extract all of them and add them to {spans}.",
+      "Each span must be a full original sentence ending in sentence punctuation (., ?, !, or equivalent); no truncation, no stitching, no paraphrasing; preserve modality (\"soñaba ser\", \"quería ser\", \"aspiraba a\").",
+      "Set confidence_score to a value in [0,1]. Use higher values when spans explicitly match {label_definition}; lower when weak/ambiguous.",
+      "If no relevant information is found, set {info_found_label}=\"FALSE\", {spans_label}=[], confidence_score=0.0.",
+      "NO APOLOGIES, NO FILLER TEXT."
+    ]
+  },
+  "label_summary_first": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "spans_by_item": {
+        "<label_key>": [
+          {"span": "<exact SENTENCE from input text>"}
+        ]
+      },
+      "summary": "<concise summary in spanish>"
+    },
+    "instructions": [
+      "Based on given {spans_by_item}, create a summary.",
+      "For each key X in {spans_by_item}, you should have at least one sentence in your summary.",
+      "The summary should be a concise summary of the input text, and should be in Spanish. The summary should be no more than 500 words.",
+      "If {spans_by_item} is empty or all keys have empty span lists, set {info_found_label}=\"FALSE\" and return an empty summary.",
+      "If any key in {spans_by_item} has at least one span, set {info_found_label}=\"TRUE\".",
+      "NO APOLOGIES, NO FILLER TEXT"
+    ]
+  },
+  "label_summary_update": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "spans_by_item": {
+        "<label_key>": [
+          {"span": "<exact SENTENCE from input text>"}
+        ]
+      },
+      "summary": "<concise updated summary in spanish>"
+    },
+    "instructions": [
+      "Previous summary: {previous_summary}",
+      "Based on given {spans_by_item} and the previous summary above, create an updated summary.",
+      "For each key X in {spans_by_item}, you should have at least one sentence in your summary.",
+      "If {previous_summary} is non-empty, incorporate it: keep existing details and add new information with new evidence from {spans_by_item}, without removing what was already known. Refine sentences if necessary to make them more accurate and concise. ",
+      "If {previous_summary} is empty or only whitespace, base the summary only on {spans_by_item}.",
+      "The summary should be a concise summary in Spanish. The summary should be no more than 500 words.",
+      "If {spans_by_item} is empty or all keys have empty span lists, and {previous_summary} is also empty, set {info_found_label}=\"FALSE\" and return an empty summary.",
+      "If any key in {spans_by_item} has at least one span, or {previous_summary} is non-empty, set {info_found_label}=\"TRUE\".",
+      "NO APOLOGIES, NO FILLER TEXT"
+    ]
+  },
+  "label_synthesis": {
+    "output_format": {
+      "info_found": "<TRUE|FALSE>",
+      "summary": "<synthesized victim-level summary in spanish>"
+    },
+    "instructions": [
+      "Based on given {per_doc_summaries}, which are per-document summaries produced independently for a single victim, create one single coherent victim-level summary.",
+      "Summaries may contain duplicates or overlapping information from different documents. Deduplicate and synthesize into a coherent narrative without repetition.",
+      "The summary should be concise and in Spanish. No more than 500 words.",
+      "If {per_doc_summaries} is empty or all summaries are empty strings, set {info_found_label}=\"FALSE\" and return an empty summary.",
+      "If any summary in {per_doc_summaries} is non-empty, set {info_found_label}=\"TRUE\".",
+      "NO APOLOGIES, NO FILLER TEXT"
+    ]
   }
 }
-
