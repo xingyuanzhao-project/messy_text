@@ -20,5 +20,10 @@ __pycache__/
 archive/
 references/
 
+# Allow tracking literature review references
+!references/
+!references/literature_review/
+!references/literature_review/**
+
 # Secrets
 hftoken.md
