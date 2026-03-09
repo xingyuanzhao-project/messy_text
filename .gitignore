@@ -18,12 +18,9 @@ __pycache__/
 
 # Archives
 archive/
-references/
-
-# Allow tracking literature review references
-!references/
-!references/literature_review/
-!references/literature_review/**
+references/hallucination/
+references/similar tasks/
+references/applications-of-gpt-in-political-science-research-extracting-information-from-unstructured-text.pdf
 
 # Secrets
 hftoken.md
