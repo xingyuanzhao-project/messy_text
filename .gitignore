@@ -16,8 +16,10 @@ __pycache__/
 
 /.quarto/
 
-# References
+# Archives
 archive/
+
+# References
 references/**
 !references/*.bib
 
