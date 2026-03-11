@@ -1,9 +1,9 @@
 ---
-name: review-with-reasoning-task
+name: refine-and-review
 description: Review a claim for logical correctness by tracing its asserted mechanism, then deliver a clear verdict and corrected formulation if needed. Use when the user asks to review, evaluate, validate, sanity-check, or correct a claim or explanation. Do not rephrase first; reason to a conclusion before producing any output, and avoid oscillating under pushback.
 ---
 
-# Review with Reasoning Task
+# Refine and Review
 
 ## Purpose
 
@@ -65,6 +65,30 @@ If challenged on a prior action or interpretation:
 - Present the verdict and, where applicable, the corrected claim as the response.
 - Do not narrate the reasoning process as a substitute for the deliverable.
 - Do not produce mid-reasoning output.
+
+## Correction handling
+
+### Treat corrections as conceptual, not token-level
+
+When the user rejects a term, phrase, or formulation, the rejection applies to the concept it represents, not just the exact string of characters used.
+
+- Do not infer that a near-synonym or rephrasing of the rejected term is still acceptable.
+- Do not reason: "they rejected X, therefore X+1 is available."
+- Ask: what concept did the rejected term represent? Reject that concept, not just that word.
+- If the user says they dislike a word, treat the framing that word was doing as rejected, not just the word itself.
+
+Example of the failure to avoid: user rejects "reviewer." Agent infers "human review" is still acceptable because the exact string "reviewer" does not appear as a standalone noun. This is token-level parsing. The concept — a person-role framing — was what was rejected.
+
+### Use conversation history as the stable evidence source
+
+When analyzing a failure, tracing what was instructed, or resolving a correction, use the conversation record as the authoritative source of evidence.
+
+- Do not use the current file state as evidence about what was written, instructed, or rejected in prior turns.
+- File state is mutable. Conversation history is not.
+- If the file has changed since the relevant exchange, it no longer reflects what was done or said at that point. Reasoning from it produces conclusions about the wrong state.
+- When the user points to a prior exchange, reason from the transcript of that exchange, not from what the file looks like now.
+
+Example of the failure to avoid: agent is asked to identify where it failed. It reads the current file, finds the paragraph is gone, and concludes "there is nothing to fix because that text no longer exists." This mistakes the absence of evidence in the current file for absence of a problem in the prior turn. The transcript is the correct evidence source.
 
 ## Examples
 

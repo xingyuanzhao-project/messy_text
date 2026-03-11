@@ -28,13 +28,49 @@ Contribution to downstream tasks:
 
 ## Non-LLM Methods for Messy Text
 
-Review the existing methods for dealing with messy text that are not using LLMs, such as OCR-based approaches.
+Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of llm models. Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.
+
+
+Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone. 
+
+Human labor represents the alternative approach, typically involving trained coders who read through raw scraped documents and manually remove irrelevant content, identify article boundaries, and flag ambiguous passages. While human judgment can handle contextual distinctions that pattern-matching cannot, the approach carries significant practical limitations. The volume of documents in a large web-scraped corpus makes manual cleaning prohibitively slow and expensive. When content is topically adjacent to the main article, such as related-article previews or editorially similar commentary, decisions about relevance depend on subtle contextual cues that different coders may read differently, leading to inconsistent outputs across the corpus. At scale, these costs and inconsistencies make human labor an impractical solution for large heterogeneous corpora.
+
+Both rule-based preprocessing and human labor are insufficient for handling the noisy corpus examined in this paper, as the volume, heterogeneity, and semantic complexity exceed what non-LLM methods can realistically manage.
 
 ## LLM Methods for Messy Text
 
-(https://arxiv.org/html/2601.17058v1)
+Recent work on LLM based data preparation argues that large language models can perform data cleaning beyond the limits of rule based methods. LLM methods are used not only for standardization and error processing, but also for data integration tasks such as entity matching, where the model determines whether a pair of data records corresponds to the same real-world entity.
 
-Review the existing methods for dealing with messy text that are using LLMs, such as the ones that use the data annotation approach.
+This shift of methodology paradigm matters for messy text because LLMs can use semantic reasoning to make decisions that depend on context rather than fixed patterns alone. For a corpus like ours, this means they can better handle differences across websites and distinguish article content from plausible but irrelevant surrounding text, making them a more suitable approach than non LLM methods for preparing the corpus for downstream analysis.
+
+
+LLM is proved to proform these tasks
+
+2. it can directly provide the thigns the rule based methods provide, and better, for it ignroes the difference among the diff webs. 
+paraprhase and cite from ( (1) Data Standardization [115, 51] aims to transform heterogeneous, inconsistent, or non-conforming data into a unified representation that satisfies predefined consistency requirements. Formally, given a dataset 
+𝒟
+ and consistency criteria 
+𝒞
+, it applies or learns a standardization)∙
+ (2) Data Error Processing [11, 19, 36] refers to the two-stage process of detecting erroneous values and subsequently repairing them to restore data reliability. For)
+
+and 
+
+Data Error Processing. Given a data item, data error processing typically involves two stages: detecting errors and then correcting them. Common error types include typographical mistakes (typos), anomalous numeric values, and violations of data dependencies. Existing approaches to error processing can generally be grouped into four major categories.
+
+❶ Prompt-Based End-to-End Error Processing. This approach relies on structured prompts that describe explicit error detection and correction instructions, organize p
+
+thus, we can justify that llm indeed can deal with these problem.
+
+ 3. it also provides "∙
+ (1) Entity Matching [38, 32] refers to the task of deciding whether two records correspond to the same real-world entity, facilitating data alignment within a single dataset or across multiple " so it can do the annotation soruce tracing things we talked about. cite correctly.
+
+this is a nice touchup so that we can trace back the anootation from where that comefrom.
+
+
+ 4. but it also have these prbolems:
+ 1. ∙
+ (3) Data Imputation and a. it is not what we want. we dont need to gues swaht is missing. b. it faces hallucintaion.
 
 ## Extraction and Summarization
 
