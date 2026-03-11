@@ -30,7 +30,6 @@ Contribution to downstream tasks:
 
 Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of llm models. Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.
 
-
 Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone. 
 
 Human labor represents the alternative approach, typically involving trained coders who read through raw scraped documents and manually remove irrelevant content, identify article boundaries, and flag ambiguous passages. While human judgment can handle contextual distinctions that pattern-matching cannot, the approach carries significant practical limitations. The volume of documents in a large web-scraped corpus makes manual cleaning prohibitively slow and expensive. When content is topically adjacent to the main article, such as related-article previews or editorially similar commentary, decisions about relevance depend on subtle contextual cues that different coders may read differently, leading to inconsistent outputs across the corpus. At scale, these costs and inconsistencies make human labor an impractical solution for large heterogeneous corpora.
@@ -43,34 +42,21 @@ Recent work on LLM based data preparation argues that large language models can 
 
 This shift of methodology paradigm matters for messy text because LLMs can use semantic reasoning to make decisions that depend on context rather than fixed patterns alone. For a corpus like ours, this means they can better handle differences across websites and distinguish article content from plausible but irrelevant surrounding text, making them a more suitable approach than non LLM methods for preparing the corpus for downstream analysis.
 
+Existing works show that LLMs can effectively perform various data preparation tasks for heterogeneous and imperfect data, including data standardization, error processing, and entity matching.
 
-LLM is proved to proform these tasks
+LLMs can also perform the data standardization and error processing tasks that rule based preprocessing was originally meant to provide. In particular, data standardization transforms heterogeneous, inconsistent, or non conforming data into a unified representation that satisfies consistency requirements, such as converting differently structured scraped webpages into a consistent article centered representation. Because LLMs can infer these transformations from context rather than relying on site specific rules, they are better suited to heterogeneous web corpora collected from many different sources.
 
-2. it can directly provide the thigns the rule based methods provide, and better, for it ignroes the difference among the diff webs. 
-paraprhase and cite from ( (1) Data Standardization [115, 51] aims to transform heterogeneous, inconsistent, or non-conforming data into a unified representation that satisfies predefined consistency requirements. Formally, given a dataset 
-𝒟
- and consistency criteria 
-𝒞
-, it applies or learns a standardization)∙
- (2) Data Error Processing [11, 19, 36] refers to the two-stage process of detecting erroneous values and subsequently repairing them to restore data reliability. For)
+LLMs can also address data error processing, which involves detecting erroneous values and then correcting them to restore data reliability. In this corpus, these problems include HTTP error pages, navigation menus, footers, and advertising banners interleaved with the article body, as well as topically adjacent but irrelevant content such as suggested article previews or user comment threads. Because these problems often require contextual judgment rather than fixed pattern matching alone, LLM based methods are well suited to identifying and repairing them in noisy web text.
 
-and 
+In general, these tasks are implemented through prompt engineering, prompt based code synthesis, or agent style workflows that generate or execute cleaning steps automatically. 
 
-Data Error Processing. Given a data item, data error processing typically involves two stages: detecting errors and then correcting them. Common error types include typographical mistakes (typos), anomalous numeric values, and violations of data dependencies. Existing approaches to error processing can generally be grouped into four major categories.
+Another problem the LLM can solve is data integration, especially entity matching, which is to extract and align same real-word entities but with different names or structures. This is a common problem in data integration, and LLMs are well suited to solve it. This also supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates.
 
-❶ Prompt-Based End-to-End Error Processing. This approach relies on structured prompts that describe explicit error detection and correction instructions, organize p
+Entity matching methods are typically implemented through structured prompts that ask the llm to implement the matching logic directly. Some approaches strengthen this process with multi shots examples or batching multiple entity or record pairs to improve performance of the prompts. Others uses task specific fine-tuned models or orchestrate multiple AI models to handle the matching task.
 
-thus, we can justify that llm indeed can deal with these problem.
+LLMs are also widely used for data imputation, which is to fill in missing values from the surrounding context in a dataset. While this is useful for tasks that require restoring incomplete records, it does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text. In our setting, generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs. For example, the model may guess the preparator type from the victim or location of the incident, even though that information is not explicitly stated in the source text. This will cause the model to generate plausible but unsupported information that cannot be traced back to the source text. For our task, this is a form of hallucination, because the model is generating information that appears plausible but is not directly grounded in the source text.
 
- 3. it also provides "∙
- (1) Entity Matching [38, 32] refers to the task of deciding whether two records correspond to the same real-world entity, facilitating data alignment within a single dataset or across multiple " so it can do the annotation soruce tracing things we talked about. cite correctly.
-
-this is a nice touchup so that we can trace back the anootation from where that comefrom.
-
-
- 4. but it also have these prbolems:
- 1. ∙
- (3) Data Imputation and a. it is not what we want. we dont need to gues swaht is missing. b. it faces hallucintaion.
+This makes it necessary not only to reduce hallucination during generation, but also to evaluate systematically whether the resulting outputs remain grounded in the source text.
 
 ## Extraction and Summarization
 
