@@ -4,13 +4,25 @@ title: Extractive Summarization of Messy Text
 
 # Abstract
 
+TWO BIG THINGS:
+
+- Use the codebook to focus attention of the LLM: all you need is codebook attention
+- Use the turn-by-turn results to show where the errors are and document the cost of additional turns and annotations (so make explicit the human and machine trade).
+
 # Introduction
 
-A balanced and clean corpus is, of course, the ideal dataset for researchers to work with. However, in practice, especially when addressing downstream tasks using real-world data, researchers often must work with a messy and noisy text dataset. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods. 
+Needs an intro here to set up the problem: how do we use / re-use annotations of texts and corpora that were not originally gathered, organized or even annotated to the standards of modern LLM methodology standards?
 
-Solving this problem would enable other researchers to work with text that could be potentially useful for their research but is currently messy and not well-structured. It is also important to us because we work with a corpus on disappearance cases that is valuable and significant for human rights research.
+-->
+Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.
 
-We propose a multi-turn extractive summarization method that sequentially processes report documents for each victim, maintaining a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
+The goal would be to reconfigure or reuse the prior data collection and annotations to create a balanced and clean corpus is. In practice, especially addressing downstream tasks using real-world data, researchers often must work with a messy and noisy text dataset. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods.
+
+\emph{Humans can easily filter and extract around this noise and may have already done so to produce annotations}.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document). 
+
+Solving these problems enables other researchers to work with and re-use texts for their research but that are currently messy and not well-structured. This is important because we work with a corpus on disappearance cases that is valuable and significant for human rights research as well as serving training for the classification and prediction of future abduction cases.
+
+Our solution is a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
 
 ## Contributions
 
@@ -21,14 +33,24 @@ This work also demonstrates a better way of using LLMs to assist social science 
 
 Contribution to downstream tasks:
 - Fine-tuning: We can use the summaries to fine-tune the models to improve the performance of the models. (Shreyas)
-- Human rights research: The work can be used to help human rights researchers to analyze the text and extract the information they need. (Dr. Cuellar)
-- Human rights reporting: Code the future reports of possible kidnappings. (Dr. Cuellar)
+
+Human rights research relies on vast bodies of documentation—including court records, testimonies, NGO reports, forensic evidence, media archives, and government materials—that often exceed the capacity of traditional qualitative methods. Cleaned and well-organized corpora transform these fragmented materials into searchable datasets, enabling researchers and organizations to navigate complex documentation more efficiently and connect sources that would otherwise remain dispersed across institutions, languages, and formats.
+
+Once documentation is systematically organized, computational tools such as large language models (LLMs) can significantly expand analytical capacity. They assist with tasks such as entity extraction, document classification, timeline reconstruction, and cross-referencing events across large collections of records. Rather than replacing expert judgment, these tools reduce the time required for large-scale document review and allow human rights investigators to concentrate on verification, contextual interpretation, and legal analysis.
+
+Standardized documentation systems also strengthen methodological consistency across research projects. Human rights investigations are often collaborative and extend across long periods of time. Using common variables, metadata structures, and coding protocols allows multiple researchers and institutions to contribute to a shared body of evidence. This facilitates cumulative research, improves transparency, and ensures that documentation collected today remains usable for future investigations, historical analysis, and accountability processes.
+
+These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.
+
+Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.
 
 # Related Work
 
 ## Non-LLM Methods for Messy Text
 
 Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of llm models. Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.
+
+Note that we cannot use something like this because we only have a messy version of the text that the human coder saw initially.  So we do not know the visual layout of the original documents or what was lost in archiving the text to document and justify the annotations for each victim.
 
 Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone. 
 
@@ -61,6 +83,8 @@ This makes it necessary not only to reduce hallucination during generation, but 
 ## Extraction and Summarization
 
 Review the existing methods for dealing with extraction and summarization tasks with llms. Most of them are using cleaned, standardized, well-structured datasets, and there are not many proposed methods that are dealing with messy text.
+
+So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.    
 
 # Data
 
@@ -170,6 +194,10 @@ Show the cross model accuracy and hallucination evaluation results.
 
 The original dataset masked the victim's name, so it should be fine.
 
+Masking victim names in the dataset is an important measure to protect the privacy, dignity, and security of victims and their families. Cases involving enforced disappearance and other forms of violence often remain politically sensitive and may involve powerful actors, including criminal organizations or state agents. Publicly circulating identifiable personal information can expose victims’ relatives to intimidation, retaliation, or renewed stigmatization. By anonymizing names while preserving the relevant contextual data—such as dates, locations, and types of violations—the dataset allows researchers to analyze patterns of violence without placing individuals or families at additional risk.
+
+Anonymization also reflects broader ethical standards in human rights research and documentation, which prioritize the protection of victims over the unrestricted dissemination of personal information. Masking identities helps prevent the re-traumatization of families and respects their right to control how their loved ones’ stories are used and shared. At the same time, the dataset remains analytically valuable because the key variables needed to study trends, language, and patterns of violence are preserved, enabling rigorous research while maintaining responsible safeguards for those directly affected by the crimes being documented.
+
 ## Error Analysis
 
 Show some examples of where the methods did not generate a meaningful summary or classified the label incorrectly.
@@ -187,6 +215,12 @@ We found that hours of computational processing can approximate weeks of human c
 ### Downstream Tasks
 
 After generating the summaries, the researchers can use summaries to do fine-tuning, named entity recognition, etc.
+
+When developing new research projects using the UMN dataset, we are particularly interested in analyzing how violence is portrayed, described, or obscured through language in public reporting, especially in ways that prevent the systematic identification of human rights and international crimes. Our work focuses on identifying the use of euphemisms, ambiguous terminology, and narrative framing that mask patterns of violence and make it more difficult to establish the widespread or systematic nature of abuses—an essential requirement for proving international crimes before courts. By analyzing large corpora of media reports and related documentation, we aim to understand how linguistic practices can shape the visibility of violence and influence whether certain acts are recognized as human rights violations.
+
+One specific focus of our research using the UMN dataset concerns the terminology that emerged during Mexico’s so-called “War on Drugs,” declared by President Felipe Calderón in 2006. During this period, journalists increasingly used the term “levantón” (“big lift”) to describe events involving the deprivation of liberty followed by the disappearance of individuals whose fate and whereabouts remained unknown. Although some journalists now employ more accurate terminology, many reports still frame disappearances primarily as ordinary criminal acts rather than as serious human rights violations, often overlooking the possible role of the state through action, tolerance, or omission. Our research seeks to examine how such language contributes to the normalization or depoliticization of enforced disappearance in public discourse.
+
+Presenting disappearances as isolated crimes creates several analytical and legal problems. First, it reduces the event to a single act of deprivation of liberty rather than recognizing enforced disappearance as a continuous and ongoing crime that persists as long as the person’s fate remains unknown. Second, it obscures the multiple human rights violations involved, including violations of the rights to life, personal integrity, and juridical personality, and ignores the broader circle of victims affected by the disappearance. Finally, it conceals the possible involvement of the state, which is central to the legal definition of enforced disappearance. The use of terms like “levantón” is particularly problematic because it originates in the lexicon of organized crime and functions as a euphemism that masks what may in fact be enforced disappearance. Through systematic analysis of this language, our research seeks to reveal how linguistic framing can obscure patterns of violence that are essential for legal accountability and human rights documentation.
 
 # Conclusion and Future Work
 
