@@ -16,18 +16,21 @@
 
 \maketitle
 \begin{abstract}
-Some abstract here    
+% Some abstract here    
 
-TWO BIG THINGS:
+% TWO BIG THINGS:
 
-- Use the codebook to focus attention of the LLM: all you need is codebook attention
-- Use the turn-by-turn results to show where the errors are and document the cost of additional turns and annotations (so make explicit the human and machine trade).
+% - Use the codebook to focus attention of the LLM: all you need is codebook attention
+% - Use the turn-by-turn results to show where the errors are and document the cost of additional turns and annotations (so make explicit the human and machine trade).
+
+When working with real-world text, researchers often inherit corpora and annotations that preserve costly human judgment but were not collected, organized, or annotated for modern text-as-data workflows. This problem is especially common in social science domains where web-scraped documents are noisy, incomplete, or misaligned with the original unit of analysis.
+We discovered that all you need is codebook attention. This problem is solved with a codebook-guided turn-by-turn extractive summarization pipeline that reuses valuable annotations without requiring full reannotation. For each victim in a corpus of disappearance reports from Mexico, the model processes documents sequentially, extracts verbatim evidence spans for each codebook category, and updates a running structured summary to produce a clean and evidence-traceable document-level representation. Using the codebook as the task schema focuses model attention on the fields that matter for downstream classification and reconnects prior human annotations to contemporary language model workflows. We evaluate the resulting summaries by classifying them and comparing the predicted labels with human annotations across multiple open-source models. Because the pipeline records turn-by-turn outputs, it also identifies where errors enter the workflow and documents the marginal gains and costs of additional turns and annotations, making the human and machine trade explicit. Preliminary results suggest that hours of computation can approximate weeks of human coding effort while producing evidence-traceable summaries suitable for downstream human rights and event data research.
 
 \end{abstract}
 
 \section{Introduction}\label{introduction}
 
-Needs an intro here to set up the problem: how do we use / re-use annotations of texts and corpora that were not originally gathered, organized or even annotated to the standards of modern LLM methodology standards?
+% Needs an intro here to set up the problem: how do we use / re-use annotations of texts and corpora that were not originally gathered, organized or even annotated to the standards of modern LLM methodology standards?
 
 Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.
 
