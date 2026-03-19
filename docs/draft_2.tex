@@ -1,0 +1,495 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[margins=1in]{geometry}
+
+
+\title{Using Messy Text In  Future LLM Annotations.\footnote{This research was supported by NSF award OAC-2311142 and 
+used Delta at NCSA / University of Illinois through allocation CIS220162 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services \& Support (ACCESS) program, which is supported by NSF awards 2138259, 2138286, 2138307, 2137603, and 2138296. Any opinions, findings, and conclusions or recommendations expressed
+in this material are those of the author(s) and do not necessarily
+reflect the views of the National Science Foundation,  NCSA, or the
+affiliated university resource providers.}}
+
+\author{Patrick Brandt \\ School of Economic, Political and \\ Policy Sciences \\ University of Texas, Dallas\\ \email{pbrandt@utdallas.edu}
+\and Shreyas Meher \\ Erasmus School of Social and\\ Behavioural Sciences\\ Erasmus University \\
+%\\ Rotterdam, Netherlands \\
+\email{meher@essb.eur.nl}
+\and Paula Cuellar-Cuellar \\ Bass School of Arts, \\ Humanities and Technology \\ \email{email}  \\ University of Texas, Dallas\\
+\and Xingyaun Zhao \\ School of Economic, Political and \\ Policy Sciences \\ University of Texas, Dallas\\ \email{email}}
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+\begin{abstract}
+% Some abstract here    
+
+% TWO BIG THINGS:
+
+% - Use the codebook to focus attention of the LLM: all you need is codebook attention
+% - Use the turn-by-turn results to show where the errors are and document the cost of additional turns and annotations (so make explicit the human and machine trade).
+
+When working with real-world text, researchers often inherit corpora and annotations that preserve costly human judgment but were not collected, organized, or annotated for modern text-as-data workflows. This problem is especially common in social science domains where web-scraped documents are noisy, incomplete, or misaligned with the original unit of analysis.
+We discovered that all you need is codebook attention. This problem is solved with a codebook-guided turn-by-turn extractive summarization pipeline that reuses valuable annotations without requiring full reannotation. For each victim in a corpus of disappearance reports from Mexico, the model processes documents sequentially, extracts verbatim evidence spans for each codebook category, and updates a running structured summary to produce a clean and evidence-traceable document-level representation. Using the codebook as the task schema focuses model attention on the fields that matter for downstream classification and reconnects prior human annotations to contemporary language model workflows. We evaluate the resulting summaries by classifying them and comparing the predicted labels with human annotations across multiple open-source models. Because the pipeline records turn-by-turn outputs, it also identifies where errors enter the workflow and documents the marginal gains and costs of additional turns and annotations, making the human and machine trade explicit. Preliminary results suggest that hours of computation can approximate weeks of human coding effort while producing evidence-traceable summaries suitable for downstream human rights and event data research.
+
+\end{abstract}
+
+\section{Introduction}\label{introduction}
+
+% Needs an intro here to set up the problem: how do we use / re-use annotations of texts and corpora that were not originally gathered, organized or even annotated to the standards of modern LLM methodology standards?
+
+Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.
+
+The goal would be to reconfigure or reuse the prior data collection and annotations to create a balanced and clean corpus is. In practice, especially addressing downstream tasks using real-world data, researchers often must work with a messy and noisy text dataset. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods.
+
+\emph{Humans can easily filter and extract around this noise and may have already done so to produce annotations}.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document). 
+
+Solving these problems enables other researchers to work with and re-use texts for their research but that are currently messy and not well-structured. This is important because we work with a corpus on disappearance cases that is valuable and significant for human rights research as well as serving training for the classification and prediction of future abduction cases.
+
+Our solution is a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
+
+\subsection{Contributions}\label{contributions}
+
+Researchers may encounter a mismatch between collected data and the
+target unit of analysis. Since this work addresses this problem through
+LLM-based alignment, our work contributes a generalizable approach so
+that other source-task or annotation-task discrepancy can be resolved
+without re-collection using human coders that is expensive,
+time-consuming and vulnerable to knowledge loss. Researchers may also
+encounter the need to perform document level de-duplication and
+information extraction across sources reporting the same events. Our
+work addresses the case where multiple reports must be aggregated into
+unified data fields, it contributes an extractive AI approach so that
+redundant information across documents can be consolidated and traced
+back to the original sources without manual effort.
+
+This work also demonstrates a better way of using LLMs to assist social
+science research. It is known that LLMs are powerful tools but are also
+vulnerable to hallucination and other biases if not used carefully. We
+provided a framework that is more robust to hallucination and other
+biases by using a multi-turn stateful workflow framework that maintains
+context across operations. The more important part is that our framework
+allows tracking the source and evidence of the information extracted
+from the text, which bridges the gap between the annotations and the
+lost knowledge of the original coders.
+
+\medskip
+
+Contribution to downstream tasks: 
+
+- Fine-tuning: We can use the
+summaries to fine-tune the models to improve the performance of the
+models. (Shreyas)
+
+\medskip
+
+Human rights research relies on vast bodies of documentation—including court records, testimonies, NGO reports, forensic evidence, media archives, and government materials—that often exceed the capacity of traditional qualitative methods. Cleaned and well-organized corpora transform these fragmented materials into searchable datasets, enabling researchers and organizations to navigate complex documentation more efficiently and connect sources that would otherwise remain dispersed across institutions, languages, and formats.
+
+Once documentation is systematically organized, computational tools such as large language models (LLMs) can significantly expand analytical capacity. They assist with tasks such as entity extraction, document classification, timeline reconstruction, and cross-referencing events across large collections of records. Rather than replacing expert judgment, these tools reduce the time required for large-scale document review and allow human rights investigators to concentrate on verification, contextual interpretation, and legal analysis.
+
+Standardized documentation systems also strengthen methodological consistency across research projects. Human rights investigations are often collaborative and extend across long periods of time. Using common variables, metadata structures, and coding protocols allows multiple researchers and institutions to contribute to a shared body of evidence. This facilitates cumulative research, improves transparency, and ensures that documentation collected today remains usable for future investigations, historical analysis, and accountability processes.
+
+These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.
+
+Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.
+
+
+\section{Related Work}\label{related-work}
+
+\subsection{Non-LLM Methods for Messy
+Text}\label{non-llm-methods-for-messy-text}
+
+Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of LLM models.
+
+Note that we cannot use something like this because we only have a messy version of the text that the human coder saw initially.  So we do not know the visual layout of the original documents or what was lost in archiving the text to document and justify the annotations for each victim.
+
+Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.
+
+Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone. 
+
+Human labor represents the alternative approach, typically involving trained coders who read through raw scraped documents and manually remove irrelevant content, identify article boundaries, and flag ambiguous passages. While human judgment can handle contextual distinctions that pattern-matching cannot, the approach carries significant practical limitations. The volume of documents in a large web-scraped corpus makes manual cleaning prohibitively slow and expensive. When content is topically adjacent to the main article, such as related-article previews or editorially similar commentary, decisions about relevance depend on subtle contextual cues that different coders may read differently, leading to inconsistent outputs across the corpus. At scale, these costs and inconsistencies make human labor an impractical solution for large heterogeneous corpora.
+
+Both rule-based preprocessing and human labor are insufficient for handling the noisy corpus examined in this paper, as the volume, heterogeneity, and semantic complexity exceed what non-LLM methods can realistically manage.
+
+\subsection{LLM Methods for Messy
+Text}\label{llm-methods-for-messy-text}
+
+% LLMs, such as the ones that use the data annotation approach.
+
+Recent work suggests that LLMs are well suited to messy text beyond the limits of rule based methods because they can use contextual reasoning to distinguish relevant content from noise across heterogeneous sources. This literature includes both direct cleaning tasks and related annotation tasks, together showing that LLMs can support data preparation when rule based methods are too rigid for noisy text.
+
+LLM based work has also been applied to messy news text. For example, Multi-News+ uses LLMs to classify noisy news reports into categories, which makes it similar to our task in the basic sense that both use LLMs to separate useful text from noise. This line of work contributes to the literature by showing that LLMs can handle messy text and support data quality tasks.
+
+Other LLM based methods such as AutoLabel, LLMAnno, OpenLLMAnno, and CanDist address text annotation rather than direct text cleaning. Their task is slightly different from ours because they focus on assigning labels to text instances or entities, whereas our task is to identify and preserve relevant information within noisy documents. Still, this line of work is relevant because it shows that LLMs can make context sensitive judgments over heterogeneous text and support data preparation beyond rigid rule based methods.
+
+Beyond these annotation tasks, it is also shown that LLM methods are used not only for standardization and error processing, but also for data integration tasks such as entity matching, where the model determines whether a pair of data records corresponds to the same real-world entity.
+
+This shift of methodology paradigm matters for messy text because LLMs can use semantic reasoning to make decisions that depend on context rather than fixed patterns alone. For a corpus like ours, this means they can better handle differences across websites and distinguish article content from plausible but irrelevant surrounding text, making them a more suitable approach than non LLM methods for preparing the corpus for downstream analysis.
+
+Existing works show that LLMs can effectively perform various data preparation tasks for heterogeneous and imperfect data, including data standardization, error processing, and entity matching.
+
+LLMs can also perform the data standardization and error processing tasks that rule based preprocessing was originally meant to provide. In particular, data standardization transforms heterogeneous, inconsistent, or non conforming data into a unified representation that satisfies consistency requirements, such as converting differently structured scraped webpages into a consistent article centered representation. Because LLMs can infer these transformations from context rather than relying on site specific rules, they are better suited to heterogeneous web corpora collected from many different sources.
+
+LLMs can also address data error processing, which involves detecting erroneous values and then correcting them to restore data reliability. In this corpus, these problems include HTTP error pages, navigation menus, footers, and advertising banners interleaved with the article body, as well as topically adjacent but irrelevant content such as suggested article previews or user comment threads. Because these problems often require contextual judgment rather than fixed pattern matching alone, LLM based methods are well suited to identifying and repairing them in noisy web text.
+
+In general, these tasks are implemented through prompt engineering, prompt based code synthesis, or agent style workflows that generate or execute cleaning steps automatically. 
+
+Another problem the LLM can solve is data integration, especially entity matching, which is to extract and align same real-word entities but with different names or structures. This is a common problem in data integration, and LLMs are well suited to solve it. This also supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates.
+
+Entity matching methods are typically implemented through structured prompts that ask the llm to implement the matching logic directly. Some approaches strengthen this process with multi shots examples or batching multiple entity or record pairs to improve performance of the prompts. Others uses task specific fine-tuned models or orchestrate multiple AI models to handle the matching task.
+
+LLMs are also widely used for data imputation, which is to fill in missing values from the surrounding context in a dataset. While this is useful for tasks that require restoring incomplete records, it does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text. In our setting, generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs. For example, the model may guess the preparator type from the victim or location of the incident, even though that information is not explicitly stated in the source text. This will cause the model to generate plausible but unsupported information that cannot be traced back to the source text. For our task, this is a form of hallucination, because the model is generating information that appears plausible but is not directly grounded in the source text.
+
+This makes it necessary not only to reduce hallucination during generation, but also to evaluate systematically whether the resulting outputs remain grounded in the source text.
+
+\subsection{Extraction and
+Summarization}\label{extraction-and-summarization}
+
+Review the existing methods for dealing with extraction and
+summarization tasks with llms. Most of them are using cleaned,
+standardized, well-structured datasets, and there are not many proposed
+methods that are dealing with messy text.
+
+So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.    
+
+\section{Data}\label{data}
+
+\subsection{Data Source}\label{data-source}
+
+We are using the disappearance news reports in Mexico collected and
+annotated by UMN. (Dr.~Cuellar)
+
+Need to incorporate the language we agreed to use with Barbara Frey and Carrie Walling here.
+
+\subsection{Descriptive Statistics}\label{descriptive-statistics}
+
+Show the descriptive statistics of the dataset, such as number of the
+reports, victims, length of the text etc.
+
+\subsection{Challenges in the Data}\label{challenges-in-the-data}
+
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+
+The scraped corpus contains three categories of textual noise in the web scraping process: 
+\begin{description}
+    \item[HTTP error pages / missing pages:] target URL was unreachable
+    \item[Ancillary or obscured text on pages:] website with
+    extraneous information such as navigation menus, footers, and
+    advertising banners interleaved with the article body, obscuring the
+    relevant text.
+    \item[Irrelevant content:]  content that is
+topically adjacent but are substantially irrelevant, such as suggested
+article previews or user comment threads appended to the original
+report.
+\end{description}
+ 
+Each of these error types introduces noise that can mislead or
+degrade downstream text processing. Each error type has consequences for downstream tasks such as fine-tuning based on a noisy corpus.\footnote{Error pages yield no usable content, causing the model to process an empty or irrelevant document as if it were a valid report when the document or victim was linked to a set of annotations, which can establish a false connection
+between the the annotation and empty documents. Page elements such as
+navigation menus and footers inflate the input with structurally
+irrelevant text, increasing context length while contributing no article
+content.} When a model is fine-tuned on such documents, the training
+signal is distributed across the full input including the noise, making
+it difficult for the model to learn which spans are responsible for a
+given label. Distractive content such as suggested articles or comment
+threads poses a more subtle but more dangerous risk, as the text is
+topically connected to disappearance reporting and can cause the model
+to attribute information from unrelated cases to the victim under
+analysis, resulting in hallucinated or incorrectly sourced output.
+
+To address these noise sources, the authors attempted to rescrape
+the original URLs to obtain cleaner versions of the documents. However,
+a portion of the original URLs were no longer accessible at the time of
+rescraping. For those that remained available, the structural issues
+persisted, as the noise originates from the design of the source
+websites themselves rather than from the scraping process. Navigation
+menus, comment sections, and related article modules are integral parts
+of the page layout and are captured by any general-purpose scraper that
+retrieves the full page body.
+
+The authors also attempted rule-based preprocessing to remove known
+sources of noise, targeting HTML tags, residual markup, and other
+structural elements. While this reduced formatting noise, it could not
+reliably eliminate all types of errors such as navigation text or other
+irrelevant information, because each webpage were designed differently.
+As for related content such as suggested articles or comment threads
+which appear as valid plain text, are almost indistinguishable from
+article content by pattern-matching rules. Processing them requires
+substantive human hours and is not scalable. Approaches such as optical
+character recognition (OCR), which convert image-based documents to
+machine-readable text, are not applicable here, as the documents were
+already scraped as plain text. The noise in this corpus is not a
+accessibility problem but a content boundary or scope problem, and no
+rule-based or format-conversion method can reliably locate where the
+article body ends and extraneous content begins without semantic
+understanding of the text.
+
+\subsubsection{Ambiguity for
+Classification}\label{ambiguity-for-classification}
+
+A second category of challenge arises from the inherent ambiguity of the
+context described in the news text itself. Real-world entities and
+places do not belong to a single category by nature, and the language
+used to describe them reflects this multiplicity. For example, a bus
+route office in a residential area is simultaneously a commercial
+service facility and a place in close proximity to where the victim
+lived. The news report does not resolve this ambiguity, for its purpose
+is to report the event, not to decide how to classify the event. In this
+case, because the news text does not distinguish between these
+dimensions, both interpretations are equally supported by the available
+evidence. When the model and the human annotator arrive at different
+valid categories from the same text, the evaluation records a false
+negative even though neither answer is wrong. The disagreement
+originates in the indeterminacy of the source text, not in a failure of
+the model or the annotation.
+
+Evaluating against fine-grained categories that each case is expected to
+match a single label penalizes valid model outputs that approaches the
+text from a different but equally defensible understanding of the same
+text. To produce an evaluation that is less sensitive to this inherent
+ambiguity, the original categories were collapsed into broader groupings
+that reduce the number of cases where two valid answers fall into
+different classes.
+
+\section{Method}\label{method}
+
+DEFINE THE TASKS!  THEN HOW THEY ARE ACCOMPLISHED.
+
+This method addresses a unit of analysis mismatch between victim level annotations and document level source reports. The task is to reuse the existing codebook and human annotations by aligning them with the original texts, extracting source grounded evidence for each coded field, producing clean structured document level summaries, and updating those summaries across multiple reports while preserving traceability to the supporting spans. The following subsections explain how each of these tasks is implemented.
+
+\subsection{Task Definitions}\label{task-definitions}
+
+The task is to transform a set of messy, multi document
+news reports associated with a single victim into a structured, evidence
+traceable document level representation that supports reuse of the
+existing codebook and annotations.
+
+Another critical requirement is that the output text must be noise-free,
+so that any further LLM tasks can be meaningful. The text must combine
+extraction of verbatim spans with structured aggregation across
+documents, so that the resulting representation is both clean enough to
+serve as LLM input and anchored tightly enough to the source material to
+support reuse of the existing coded data and codebook definitions.
+
+
+\subsection{Model Setup}\label{model-setup}
+
+All LLM calls were executed using instruction tuned models served
+through vLLM. The default configuration uses the AWQ INT4 quantized Meta
+Llama 3.1 8B Instruct model, and cross model comparisons use Meta Llama
+3.1 70B Instruct, Gemma 3 12B IT, and Ministral 3 8B Instruct. We use
+deterministic decoding with temperature 0.0. Generation is capped at
+1024 tokens for summarization and 256 tokens for classification, and
+outputs are constrained to a fixed JSON schema to produce consistent
+structured fields for extracted spans and label predictions.
+
+\subsection{Unit of Analysis}\label{unit-of-analysis}
+
+On the dataset side, the original dataset was coded with the victim as
+the unit of analysis. To be specific, human coders annotated features
+about each kidnapping victim such as method of capture, who carried out
+the threats, how the person was captured etc. The annotations are
+structured around victim records.
+
+On the source data side, the original scraped reports were organized by
+documents. A single victim may appear across multiple documents, and
+those documents were collected by news source or origin, not by victim.
+However, the annotations were made at the victim level, not the document
+level, and the knowledge between the annotations and the source data is
+not realistically recoverable by human labor.
+
+On the downstream task side, the downstream tasks may include
+fine-tuning, annotation or classifications for other reports that domain
+experts might gathered, so the output must be organized and labeled in a
+way that can be directly consumed by an LLM or classifier operating on
+individual documents, document level preferably. However, the original
+annotations were not coded at the document level, so it is unclear which
+document should carry which annotation. For example, a victim's method
+of capture may be mentioned in one document while the identity of who
+carried out the threats appears in another, yet both were annotated at
+the victim level, without reference to a specific document. If
+victim-level annotations are simply propagated down to the document
+level, future LLM training tasks will receive incorrect signals, as each
+document would be labeled with information it does not necessarily
+contain.
+
+\subsection{Extraction vs
+Summarization}\label{extraction-vs-summarization}
+
+As stated above, another requirement for the dataset for this set of
+tasks is that the annotations from prior human coders remain connected
+to the source texts, so that the coded features can be traced back to
+the original documents and reused without re-annotation. Even though
+recreating the human annotation is almost impossible and unrealistic,
+with the help of LLMs, we now can extract the exact spans of the text
+where the decision of annotations were made and record them as evidence.
+This allows researchers to trace the source of the information rather
+than having an annotation to victim link without knowing where, how and
+why they were annotated that way.
+
+Given the above requirements, the process cannot rely on generative
+summarization alone, which might condenses and paraphrases and breaks
+the link to the original evidence.
+
+\subsection{Pipeline}\label{pipeline}
+
+The pipeline takes each victim's documents one at a time in sequence,
+extracting relevant spans, generating a label-structured summary
+anchored to those spans, and updating the summaries using previous
+summaries as context. This pipeline satisfies the task definition by
+producing document level outputs that are clean enough for downstream
+language model use while keeping each coded field traceable to evidence
+in the original documents.
+
+\subsubsection{Extraction of evidence}\label{extraction-of-evidence}
+
+In the first step of the pipeline, we extract evidence rather than only
+generating a paraphrased summary. For each input document, the model is
+instructed to return verbatim text spans for each item in the codebook
+schema, producing a structured evidence record keyed by label. This
+creates traceability because every coded field is paired with the exact
+source phrase that supports it, so downstream users can verify where the
+information came from in the original report. The evidence output is
+designed to demonstrate that the link between each annotation and its
+source text is preserved and can later be verified, and it also includes
+a character index that locates each span within the document text. This
+index records how many characters into the document the extracted span
+begins, so a future researcher can find the exact spot in the original
+text and confirm the evidence.
+
+\subsubsection{Summarization with Context and
+Evidence}\label{summarization-with-context-and-evidence}
+
+In the second step of the workflow, we generate a coherent summary while
+keeping it anchored to evidence and guided by the codebook schema. The
+model is given the document text together with the label definitions
+that specify the meaning of the labels and how the human coders would
+code the information, and it is also provided with the extracted span
+structure so that each sentence or clause of the summary can be linked
+back to the corresponding evidence. For example, the first sentence may
+be about the victim, and the second sentence may be about the method of
+capture, and the third sentence may be about who carried out the
+threats, instead of condensing the information into a single sentence
+where all the information is mixed together. This makes the summary
+different from vanilla summarization because it is not an unconstrained
+paraphrase of the document, rather, with the paragraph structured label
+by label, it will be easier for an LLM to pick up the right information.
+At this stage, summarization is performed at the level of a single
+document and is designed to be clean, structured, and directly usable
+for downstream models.
+
+\subsubsection{Updating Summary with
+state}\label{updating-summary-with-state}
+
+In a typical single request, an LLM is stateless, meaning that it does
+not retain information from earlier calls, but our workflow preserves
+memory by maintaining an explicit conversation state for each victim as
+their documents are processed. The workflow maintains an explicit
+conversation state for each victim that accumulates across documents as
+they are processed sequentially. The prompt instructs the model to check
+each new document against the existing summary and update only the
+fields where new information is found. If a document contains no
+relevant information, the runner keeps the previous summary unchanged
+rather than replacing it with the model's output. Each turn also records
+the output of that turn, preserving what was extracted and what summary
+was produced at that step for later inspection and reuse. When a
+document contains no relevant information, the workflow avoids replacing
+the existing running summary, so the accumulated context is not lost as
+the sequence progresses.
+
+\section{Evaluation and Results}\label{eval_results}
+
+Evaluation of summarization tasks compares the
+text summary with a gold standard reference text. Given the messy and noisy initial documents, it is difficult to
+use them as reference texts.  The prior work has human
+annotations classifying the information in the 
+summary text. The evaluation tests whether generated summaries reproduce
+the same labels as the human annotations, comparing a simple
+summarization baseline against the proposed method, across major model
+families, and across model sizes.
+
+\subsubsection{Human Gold Standard}\label{human-gold-standard}
+
+Many existing summarization evaluation methods require a gold standard reference text against which generated summaries can be compared using similarity metrics. Because the source documents in this dataset are themselves messy and noisy, they cannot serve as reliable reference texts, and there are no clean human-written reference summaries for this corpus. Should the research use these documents as reference texts, the output generated from original text will be heavily influenced by the noise, so that the difference between the result of original text and the result from cleaned summaries will be inflated, making the evaluation not reliable. However, the data set contains human annotations coded at the victim level, and these annotations are used as ground truth. Evaluation proceeds by classifying the generated summary text and comparing the resulting labels against the human annotations, testing whether the summaries preserve the same information that human coders recorded. 
+
+Another issue discussed above is that the original codebook contains fine-grained categories. One example is that the method of capture can be distinguished into general kidnappings and special type kidnappings such as Levantón. Without external context plugged in, or making the model fine-tuned on the specific context, it will be difficult for LLM models to distinguish between the two.
+
+The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation.
+
+\subsubsection{LLM as Evaluators}\label{llm-as-evaluators}
+
+Some eval methods are using LLMs as judges to evaluate, such as the ones
+that use the QA results from original text vs QA results from summary
+text.
+
+\subsubsection{Hallucination Evaluation
+Literature}\label{hallucination-evaluation-literature}
+
+Beyond evaluation on performance, the hallucination evaluation literature provides an important metric for LLMs in computational social science in a broader sense. The most relevant problem here is input conflicting hallucination, where generated content is not supported by the source text. This is the central risk for our task because the model is asked to extract and summarize information from noisy documents rather than answer open domain questions from background knowledge. However, given tha nature of our input text, the hallucination evaluation is not as straightforward as the ones in the literature.
+
+Recent literature generally groups evaluation methods into human evaluation, model based automatic evaluation, and rule based automatic evaluation. Human evaluation remains the most reliable because annotators can examine whether each generated claim is supported, unsupported, or irrelevant with respect to the source text. However, given the purpose of our task, the human evaluation does not solve the problem shared with human coder.
+
+Automatic methods then approximate this process in different ways. Large Language Models (LLMs) based methods use an evaluator model to judge factual consistency between the source and the output, sometimes with retrieved evidence, while rule based methods use structured comparisons such as question answering over the source and the summary, textual entailment style checks, named entity based comparisons, or source grounded reference contrasts.
+
+Hallucination evaluation matters in our project because the outcome of the proposed method is extractive summarization that should preserve the information from the source text while leaving out the noise. The generation part opens up the risk of hallucination, so evaluation of hallucination is necessary to ensure the quality of the output.
+
+This is not only a language quality issue but also critical for downstream tasks. In political science and computational social science setups, unsupported or even entirely fabricated generated details can change coded variables, weaken traceability, and distort substantive conclusions. A careful evaluation of hallucination therefore contributes to the field by making LLM based extraction more transparent, more reproducible, and more defensible as empirical evidence.
+
+%\section{Results}\label{results}
+
+\subsection{Baseline vs Proposed
+Method}\label{baseline-vs-proposed-method}
+
+Show the baseline simple summarization and the proposed method's
+accuracy and hallucination evaluation results.
+
+\subsection{Model Comparisons}\label{model-comparisons}
+
+Show the cross model accuracy and hallucination evaluation results.
+
+\section{Discussion}\label{discussion}
+
+\subsection{Ethics}\label{ethics}
+
+Masking victim names in the dataset is an important measure to protect the privacy, dignity, and security of victims and their families. Cases involving enforced disappearance and other forms of violence often remain politically sensitive and may involve powerful actors, including criminal organizations or state agents. Publicly circulating identifiable personal information can expose victims’ relatives to intimidation, retaliation, or renewed stigmatization. By anonymizing names while preserving the relevant contextual data—such as dates, locations, and types of violations—the dataset allows researchers to analyze patterns of violence without placing individuals or families at additional risk.
+
+Anonymization also reflects broader ethical standards in human rights research and documentation, which prioritize the protection of victims over the unrestricted dissemination of personal information. Masking identities helps prevent the re-traumatization of families and respects their right to control how their loved ones’ stories are used and shared. At the same time, the dataset remains analytically valuable because the key variables needed to study trends, language, and patterns of violence are preserved, enabling rigorous research while maintaining responsible safeguards for those directly affected by the crimes being documented.
+
+
+\subsection{Error Analysis}\label{error-analysis}
+
+Show some examples of where the methods did not generate a meaningful
+summary or classified the label incorrectly.
+
+\subsection{Limitations}\label{limitations}
+
+\subsection{Implications}\label{implications}
+
+\subsubsection{Compute Time vs Human
+Coding}\label{compute-time-vs-human-coding}
+
+We found that hours of computational processing can approximate weeks of
+human coding effort, and the results from the proposed method is good
+enough. This will save future researchers tons of human-hours.
+
+\subsubsection{Scalability to Other Messy
+Corpora}\label{scalability-to-other-messy-corpora}
+
+\subsubsection{Downstream Tasks}\label{downstream-tasks}
+
+When developing new research projects using the UMN dataset, we are particularly interested in analyzing how violence is portrayed, described, or obscured through language in public reporting, especially in ways that prevent the systematic identification of human rights and international crimes. Our work focuses on identifying the use of euphemisms, ambiguous terminology, and narrative framing that mask patterns of violence and make it more difficult to establish the widespread or systematic nature of abuses—an essential requirement for proving international crimes before courts. By analyzing large corpora of media reports and related documentation, we aim to understand how linguistic practices can shape the visibility of violence and influence whether certain acts are recognized as human rights violations.
+
+One specific focus of our research using the UMN dataset concerns the terminology that emerged during Mexico’s so-called “War on Drugs,” declared by President Felipe Calderón in 2006. During this period, journalists increasingly used the term “levantón” (“big lift”) to describe events involving the deprivation of liberty followed by the disappearance of individuals whose fate and whereabouts remained unknown. Although some journalists now employ more accurate terminology, many reports still frame disappearances primarily as ordinary criminal acts rather than as serious human rights violations, often overlooking the possible role of the state through action, tolerance, or omission. Our research seeks to examine how such language contributes to the normalization or depoliticization of enforced disappearance in public discourse.
+
+Presenting disappearances as isolated crimes creates several analytical and legal problems. First, it reduces the event to a single act of deprivation of liberty rather than recognizing enforced disappearance as a continuous and ongoing crime that persists as long as the person’s fate remains unknown. Second, it obscures the multiple human rights violations involved, including violations of the rights to life, personal integrity, and juridical personality, and ignores the broader circle of victims affected by the disappearance. Finally, it conceals the possible involvement of the state, which is central to the legal definition of enforced disappearance. The use of terms like “levantón” is particularly problematic because it originates in the lexicon of organized crime and functions as a euphemism that masks what may in fact be enforced disappearance. Through systematic analysis of this language, our research seeks to reveal how linguistic framing can obscure patterns of violence that are essential for legal accountability and human rights documentation.
+
+
+\section{Conclusion and Future Work}\label{conclusion-and-future-work}
+
+\section*{References}
+
+\appendix
+\section{Appendix}\label{appendix}
+
+
+\end{document}
