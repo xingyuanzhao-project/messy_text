@@ -229,7 +229,7 @@ def _collect_per_doc_summaries(
     Returns:
         List[str]: Ordered list of summary strings, one per document.
     """
-    return [result.get("summary") or "" for result in results]
+    return [str(result.get("summary") or "") for result in results]
 
 
 def _build_processor_config(

@@ -77,7 +77,7 @@ from tqdm.auto import tqdm
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # Set the YAML file to load before running this script.
-settings = "config/settings.yaml"
+settings = "config/settings_mistral.yaml"
 
 from src.processors import (  # noqa: E402
     AsyncMessyTextConversationOrchestrator,

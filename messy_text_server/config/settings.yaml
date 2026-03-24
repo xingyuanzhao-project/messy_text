@@ -7,38 +7,38 @@ paths:
   summary:
     input: "df_text_by_report.csv"
     output:
-      file: "df_text_by_report_conversation_by_label_summary.csv"
+      file: "results_down_sized/df_text_by_report_conversation_summary_less_label.csv"
       extend: False
   records:
     results:
       output:
-        file: "df_text_by_report_conversation_by_label_records_results.csv"
+        file: "results_down_sized/df_records_results.csv"
         extend: False
     states:
       output:
-        file: "df_text_by_report_conversation_by_label_records_states.csv"
+        file: "results_down_sized/df_records_states.csv"
         extend: False
     spans:
       output:
-        file: "df_text_by_report_conversation_by_label_records_spans.csv"
+        file: "results_down_sized/df_records_spans.csv"
         extend: False
   classification:
-    input: "df_text_by_report_conversation_by_label_summary.csv"
+    input: "results_down_sized/df_text_by_report_conversation_summary.csv"
     output:
-      file: "df_text_by_report_conversation_by_label_classification.csv"
+      file: "results_down_sized/df_text_by_report_conversation_classification.csv"
       extend: False
   eval:
-    input: "df_text_by_report_conversation_by_label_classification.csv"
+    input: "results_down_sized/df_text_by_report_conversation_classification.csv"
     output:
-      file: "df_text_by_report_conversation_by_label_evaluation.csv"
+      file: "results_down_sized/df_text_by_report_conversation_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 
 async:
   enabled: True
   max_retries: 5
-  max_concurrent_rows: 25
-  max_concurrent_llm_calls: 25
+  max_concurrent_rows: 15
+  max_concurrent_llm_calls: 50
 
 processing:
   temperature: 0.0
@@ -55,9 +55,9 @@ evaluation:
   benchmarks:
     enable_geval_summarization: False
     enable_geval_hallucination: False
-    enable_summac_zs: False
-    enable_summac_conv: False
-    enable_default_metrics: True
+    enable_summac_zs: True
+    enable_summac_conv: True
+    enable_default_metrics: False
 
     summac_settings:
       device: "cuda"

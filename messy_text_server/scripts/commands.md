@@ -47,7 +47,8 @@ rm -rf venv
 python -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+source venv/bin/activate
+python -m pip install -r requirements.txt
 pip freeze
 ```
 
@@ -92,19 +93,39 @@ python --version
 module load cuda
 ls ~/.cache/huggingface/hub/
 du -sh ~/.cache/huggingface/hub/*
+/scratch/bbov/xzhao16/messy_text_server/venv/bin/pip show vllm
 
 vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 49152
+vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 \
+  --quantization awq \
+  --tensor-parallel-size 4 \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --max-model-len 49152 \
+  --gpu-memory-utilization 0.90
 
 vllm serve gaunernst/gemma-3-12b-it-int4-awq --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --config_format mistral --load_format mistral --port 8000 --host 0.0.0.0 --max-model-len 49152
 
-ls ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/
-nano ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/b25037543e9394b818fdfca67ab2a00ecc7dd641/config.json
-vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
-  --quantization awq \
-  --port 8000 \
-  --host 0.0.0.0 \
-  --max-model-len 49152
+# ls ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/
+# nano ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-7B-Instruct-AWQ/snapshots/b25037543e9394b818fdfca67ab2a00ecc7dd641/config.json
+# vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
+#   --quantization awq \
+#   --port 8000 \
+#   --host 0.0.0.0 \
+#   --max-model-len 49152
+# /scratch/bbov/xzhao16/messy_text_server/venv/bin/vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
+#   --quantization awq \
+#   --rope-scaling '{"type":"yarn","factor":4.0,"original_max_position_embeddings":32768}' \
+#   --port 8000 \
+#   --host 0.0.0.0 \
+#   --max-model-len 49152
+# /scratch/bbov/xzhao16/messy_text_server/venv/bin/vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
+#   --quantization awq \
+#   --rope-scaling '{"rope_type":"yarn","factor":1.5,"original_max_position_embeddings":32768}' \
+#   --port 8000 \
+#   --host 0.0.0.0 \
+#   --max-model-len 49152
 
 vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve openai/gpt-oss-20b --async-scheduling --port 8000 --host 0.0.0.0 --max-model-len 49152
@@ -129,12 +150,16 @@ source venv/bin/activate
 
 python scripts/run_summary.py
 python scripts/run_summary_conversation.py
-python scripts/run_summary_conversation_by_label.py
-python scripts/run_classification.py
-python scripts/run_evaluation.py
+python scripts/run_summary_conversation_gemma.py
+python scripts/run_summary_conversation_mistral.py
+# python scripts/run_summary_conversation_qwen.py
 
-python scripts/run_summary_conversation.py && python scripts/run_classification.py && python scripts/run_evaluation.py
-python scripts/run_classification.py && python scripts/run_evaluation.py
+# python scripts/run_summary_conversation_by_label.py
+# sleep 3600 && python scripts/run_summary_conversation_by_label.py
+# python scripts/run_classification.py
+# python scripts/run_evaluation.py
+
+
 ```
 
 ### Check Status

@@ -180303,3 +180303,96 @@ OUTPUT:
 2026-03-02 00:18:34,145 - ERROR - Label extraction failed for vic_grupo_social: Request timed out.
 2026-03-02 00:18:34,328 - ERROR - Label extraction failed for proced_contacto2: Request timed out.
 2026-03-02 00:18:34,976 - ERROR - Label extraction failed for perp_tipo1: Request timed out.
+2026-03-23 08:50:48,549 - INFO - ==================================================
+2026-03-23 08:50:48,549 - INFO - PRE-FLIGHT CHECKS (Conversation Mode)
+2026-03-23 08:50:48,549 - INFO - ==================================================
+2026-03-23 08:50:48,598 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15963/16376 MB used | Utilization: 33%
+2026-03-23 08:50:50,998 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-23 08:50:53,660 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-23 08:50:53,660 - INFO - Pre-flight checks PASSED
+2026-03-23 08:50:53,660 - INFO - ==================================================
+2026-03-23 08:50:53,660 - INFO - Using ASYNC victim-level conversation processing.
+2026-03-23 10:31:08,228 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:32:10,703 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:28,294 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:28,706 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:47,135 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:50,766 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:57,557 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:33:58,338 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:04,395 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:14,798 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:26,367 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:30,794 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:33,646 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:48,172 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:34:53,626 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:35:09,330 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:36:58,503 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:37:09,768 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:37:35,421 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 10:37:39,342 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:31:22,775 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:32:25,985 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:33:43,696 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:33:44,271 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:02,685 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:06,103 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:12,438 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:14,410 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:20,224 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:30,838 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:41,550 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:45,704 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:34:49,130 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:35:02,504 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:35:08,417 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:35:24,020 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:37:13,393 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:37:25,749 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:37:51,267 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 11:37:54,725 - ERROR - Summarization (conversation) failed: Request timed out.
+2026-03-23 13:00:24,911 - INFO - ==================================================
+2026-03-23 13:00:24,911 - INFO - PRE-FLIGHT CHECKS (Conversation Mode)
+2026-03-23 13:00:24,911 - INFO - ==================================================
+2026-03-23 13:00:24,967 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15927/16376 MB used | Utilization: 100%
+2026-03-23 13:00:27,379 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-23 13:00:29,353 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-23 13:00:29,353 - INFO - Pre-flight checks PASSED
+2026-03-23 13:00:29,353 - INFO - ==================================================
+2026-03-23 13:00:29,355 - INFO - Using ASYNC victim-level conversation processing.
+2026-03-23 13:47:24,896 - INFO - Output saved to df_text_by_report_conversation_summary_less_label).csv (2229 rows)
+2026-03-23 13:47:24,921 - INFO - Results records saved to df_text_by_report_conversation_by_label_records_results.csv (190 rows)
+2026-03-23 13:47:24,930 - INFO - State records saved to df_text_by_report_conversation_by_label_records_states.csv (50 rows)
+2026-03-23 13:47:24,942 - INFO - Span records saved to df_text_by_report_conversation_by_label_records_spans.csv (1019 rows)
+2026-03-23 13:50:37,735 - INFO - ==================================================
+2026-03-23 13:50:37,735 - INFO - PRE-FLIGHT CHECKS (Conversation Mode)
+2026-03-23 13:50:37,736 - INFO - ==================================================
+2026-03-23 13:50:37,783 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15820/16376 MB used | Utilization: 0%
+2026-03-23 13:50:40,164 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-23 13:50:40,912 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-23 13:50:40,912 - INFO - Pre-flight checks PASSED
+2026-03-23 13:50:40,912 - INFO - ==================================================
+2026-03-23 13:50:40,912 - INFO - Using ASYNC victim-level conversation processing.
+2026-03-23 15:41:11,340 - INFO - ==================================================
+2026-03-23 15:41:11,340 - INFO - PRE-FLIGHT CHECKS (Conversation Mode)
+2026-03-23 15:41:11,340 - INFO - ==================================================
+2026-03-23 15:41:11,382 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15855/16376 MB used | Utilization: 7%
+2026-03-23 15:41:13,661 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-23 15:41:15,668 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-23 15:41:15,668 - INFO - Pre-flight checks PASSED
+2026-03-23 15:41:15,668 - INFO - ==================================================
+2026-03-23 15:41:15,668 - INFO - Using ASYNC victim-level conversation processing.
+2026-03-23 16:29:05,494 - INFO - ==================================================
+2026-03-23 16:29:05,494 - INFO - PRE-FLIGHT CHECKS (Conversation Mode)
+2026-03-23 16:29:05,494 - INFO - ==================================================
+2026-03-23 16:29:05,532 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15853/16376 MB used | Utilization: 34%
+2026-03-23 16:29:07,806 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-23 16:29:08,340 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-23 16:29:08,340 - INFO - Pre-flight checks PASSED
+2026-03-23 16:29:08,340 - INFO - ==================================================
+2026-03-23 16:29:08,340 - INFO - Using ASYNC victim-level conversation processing.
+2026-03-23 16:34:47,834 - INFO - Output saved to results_down_sized/df_text_by_report_conversation_summary_less_label.csv (2229 rows)
+2026-03-23 16:34:47,836 - INFO - Results records saved to results_down_sized\df_text_by_report_conversation_by_label_records_results 2.csv (27 rows)
+2026-03-23 16:34:47,845 - INFO - State records saved to results_down_sized\df_text_by_report_conversation_by_label_records_states.csv (10 rows)
+2026-03-23 16:34:47,848 - INFO - Span records saved to results_down_sized\df_text_by_report_conversation_by_label_records_spans.csv (119 rows)

@@ -143,14 +143,22 @@ LLMs are also widely used for data imputation, which is to fill in missing value
 This makes it necessary not only to reduce hallucination during generation, but also to evaluate systematically whether the resulting outputs remain grounded in the source text.
 
 \subsection{Extraction and
-Summarization}\label{extraction-and-summarization}
+Generation}\label{extraction-and-summarization}
 
-Review the existing methods for dealing with extraction and
-summarization tasks with llms. Most of them are using cleaned,
-standardized, well-structured datasets, and there are not many proposed
-methods that are dealing with messy text.
+The literature closest to our task is the approaches that use language models for extraction, summarization, and annotation. These studies show that LLMs can identify salient information in text, reorganize it into structured outputs, and apply task definitions or coding schemes to heterogeneous inputs. In that sense, they establish that the core operations required here are feasible.
 
-So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.    
+At the same time, most of this neighboring work assumes cleaner and more standardized inputs than the corpus examined in this paper. Many methods operate on texts that already have stable document boundaries, clearer annotation targets, or outputs defined at the same level as the input text. Our setting differs because the corpus is messy, the source reports are organized by document, the legacy annotations are organized by victim, and the earlier human decisions that linked evidence to coded fields were never formally preserved. As a result, existing extraction and summarization methods do not directly solve the problem of reusing inherited annotations while maintaining traceability to source evidence.
+
+This creates a specific methodological choice for the paper. Pure cleaning is not enough because it does not recover the missing link between earlier annotations and the source text, while unconstrained generation is not enough because paraphrase can weaken grounding and traceability. The task instead requires a hybrid design that extracts source grounded evidence from messy documents and uses that evidence to produce clean structured summaries for downstream use. This conclusion provides the hinge between the broad related work review and the data and method sections that follow.
+
+% So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.    
+
+On one side, the earlier annotations preserve costly human judgment about the cases and are too valuable to discard. On the other side, they were not produced in the form that current extraction and summarization workflows require, since they are tied to victims rather than to exact spans in documents and depend on earlier cleaning decisions that were never formally recorded. A full reconstruction would require rebuilding the annotation process from the beginning and recovering decisions that now remain only implicitly in the completed data.
+
+That option is not realistic in this project. Reannotation would require time, funding, and domain expertise that are no longer available at the necessary scale, while leaving the legacy annotations untouched would preserve the same gap between old coding work and modern LLM inputs. The methodological problem is therefore to design a workflow that recovers traceable evidence from messy text, produces clean summaries for downstream use, and reuses prior annotations without pretending that the original human process can be recreated.
+
+Taken together, the related work shows that this task is feasible with LLMs, but not through conventional cleaning methods or unconstrained generation alone. Non LLM methods cannot reliably resolve the messy structure of this corpus, while most existing extraction and summarization approaches assume cleaner and more standardized inputs than the ones available here. We therefore choose a combined approach that uses LLMs to extract source grounded evidence and produce clean structured summaries, so that prior annotations can be reused without full reannotation and downstream tasks can operate on text that is both traceable and usable.
+
 
 \section{Data}\label{data}
 
@@ -253,7 +261,7 @@ different classes.
 
 \section{Method}\label{method}
 
-DEFINE THE TASKS!  THEN HOW THEY ARE ACCOMPLISHED.
+% DEFINE THE TASKS!  THEN HOW THEY ARE ACCOMPLISHED.
 
 This method addresses a unit of analysis mismatch between victim level annotations and document level source reports. The task is to reuse the existing codebook and human annotations by aligning them with the original texts, extracting source grounded evidence for each coded field, producing clean structured document level summaries, and updating those summaries across multiple reports while preserving traceability to the supporting spans. The following subsections explain how each of these tasks is implemented.
 
@@ -418,9 +426,9 @@ The second issue about the fine-grained categories is that some of the source te
 
 \subsubsection{LLM as Evaluators}\label{llm-as-evaluators}
 
-Some eval methods are using LLMs as judges to evaluate, such as the ones
-that use the QA results from original text vs QA results from summary
-text.
+Recent work has proposed LLM-as-judge evaluators for summarization that compare a generated summary directly against its source text rather than against a human reference summary. SummaC treats factual consistency as a source grounding problem and uses natural language inference over smaller units of the source and the summary to estimate whether the content of the summary is supported by the original document. G-Eval uses a large language model as a judge and asks it to score generated output through structured prompts and intermediate reasoning steps. These methods are useful because they move evaluation away from surface similarity and toward the question of whether a summary remains faithful to the source.
+
+In our setting, however, these methods are difficult to use in a meaningful way because the source reports are themselves messy, noisy, and often mixed with irrelevant but topically related material. A source to summary consistency score may therefore reward a system for preserving noise, or penalize a cleaned and focused summary for leaving out distractive content that should not be carried forward. For that reason, these evaluator scores alone cannot answer the main question of this paper. The more informative comparison is between directly generated summarization from the messy reports and the structured extractive summary from the proposed method, because this shows whether the structured extractive pipeline preserves the information needed for downstream coding better than a simpler generative baseline under the actual conditions of this corpus.
 
 \subsubsection{Hallucination Evaluation
 Literature}\label{hallucination-evaluation-literature}
@@ -463,17 +471,19 @@ summary or classified the label incorrectly.
 
 \subsection{Limitations}\label{limitations}
 
+One limitation of this study is how performance is evaluated against a codebook where categories are not always sharply separable in the source text. Some reports contain descriptions that can reasonably support more than one label, so disagreement between the model output and the human annotation does not always mean that the summary failed to preserve the relevant information. In these cases, lower accuracy can partly reflect ambiguity in the source material and overlap in the taxonomy, especially for labels where valid interpretations remain close to one another. We mitigate part of this problem by merging some label options, but that adjustment also reduces category detail and makes the comparison less a direct reproduction of the original coding scheme. Even though the proposed workflow is not a full reconstruction of the original coding scheme, it is still a practical way to reconnect prior annotations to the source texts and recover traceable evidence for downstream use.
+
 \subsection{Implications}\label{implications}
 
 \subsubsection{Compute Time vs Human
 Coding}\label{compute-time-vs-human-coding}
 
-We found that hours of computational processing can approximate weeks of
-human coding effort, and the results from the proposed method is good
-enough. This will save future researchers tons of human-hours.
+An important implication of the proposed workflow is that it changes the cost structure of working with inherited annotations. Recreating the earlier coding process would require retraining coders, rereading multiple reports for each victim, and reconstructing decisions that were never formally preserved, whereas the pipeline can process the same material in hours while recording each turn of evidence extraction and summary updating. The gain is therefore not only speed, but a different use of scarce expert labor. Instead of spending weeks on repetitive document cleaning, reconciliation, and aggregation, researchers can direct human effort toward validating difficult cases, resolving ambiguous categories, and interpreting substantive patterns in the data, while the repetitive parts of the task are taken care of by the LLMs. For projects that inherit valuable but imperfectly organized annotations, this makes reuse of prior coding work far more feasible than full manual reconstruction.
 
 \subsubsection{Scalability to Other Messy
 Corpora}\label{scalability-to-other-messy-corpora}
+
+A broader value of the proposed method lies in the type of problem itaddresses rather than in the specific corpus used here. Many research projects inherit messy text and annotation collections in which reports are organized for one purpose, annotations were created for another, and the link between coded variables and supporting evidence was never formally retained. In such settings, the transferable contribution is the workflow design itself the codebook-guided extraction, evidence-linked summaries, and stateful updating across multiple documents. This portability is possible because the workflow is designed to be configurable rather than hardcoded. Separate configuration files and taxonomies can define the local labels, extraction targets, and field structure for a new corpus while leaving the underlying pipeline logic unchanged. Adapting the method to a new corpus would therefore require changing the task schema and prompts to fit the local annotation system, but not redesigning the full logic of the pipeline. This suggests that the approach can generalize to other legacy corpora where researchers need to recover usable and traceable structured text from noisy materials without repeating the original annotation process from the beginning.
 
 \subsubsection{Downstream Tasks}\label{downstream-tasks}
 
@@ -485,6 +495,10 @@ Presenting disappearances as isolated crimes creates several analytical and lega
 
 
 \section{Conclusion and Future Work}\label{conclusion-and-future-work}
+
+The central obstacle in working with inherited messy text is not noise alone, but the broken connection between prior human coding and the source evidence on which that coding depended. The proposed codebook-guided extractive summarization workflow addresses that gap by producing clean, evidence-linked summaries that remain traceable to the original reports and usable for downstream language model tasks. It offers a practical way to preserve and reactivate costly human judgment that would otherwise remain trapped inside legacy annotations, while shifting scarce expert labor away from repetitive reconstruction and toward validation, interpretation, and substantive analysis.
+
+Future work can build on this recovered representation as research infrastructure for organizing text datasets by a schema driven by codebook definitions for cumulative human rights research, future investigations, historical reconstruction, and accountability over time. In that role, it can help sustain shared evidence across long term collaborative projects and make structured documentation more usable for local organizations, independent researchers, victims, and affected communities.
 
 \section*{References}
 

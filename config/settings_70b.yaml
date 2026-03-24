@@ -1,5 +1,5 @@
 model:
-  name: "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4"
+  name: "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4"
   api_base: "http://localhost:8000/v1"
   api_key: "dummy"
 
@@ -7,30 +7,30 @@ paths:
   summary:
     input: "df_text_by_report.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_summary_less_label.csv"
+      file: "results_down_sized/70b/df_text_by_report_conversation_summary_less_label.csv"
       extend: False
   records:
     results:
       output:
-        file: "results_down_sized/df_records_results.csv"
+        file: "results_down_sized/70b/df_records_results.csv"
         extend: False
     states:
       output:
-        file: "results_down_sized/df_records_states.csv"
+        file: "results_down_sized/70b/df_records_states.csv"
         extend: False
     spans:
       output:
-        file: "results_down_sized/df_records_spans.csv"
+        file: "results_down_sized/70b/df_records_spans.csv"
         extend: False
   classification:
-    input: "results_down_sized/df_text_by_report_conversation_summary.csv"
+    input: "results_down_sized/70b/df_text_by_report_conversation_summary.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_classification.csv"
+      file: "results_down_sized/70b/df_text_by_report_conversation_classification.csv"
       extend: False
   eval:
-    input: "results_down_sized/df_text_by_report_conversation_classification.csv"
+    input: "results_down_sized/70b/df_text_by_report_conversation_classification.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_evaluation.csv"
+      file: "results_down_sized/70b/df_text_by_report_conversation_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 

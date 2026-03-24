@@ -22,7 +22,8 @@ This script implements a multi-turn, victim-level summarization pipeline:
 Configuration
 -------------
 
-The script reads settings from config/settings.yaml and respects the
+The script reads settings from the file path stored in the module-level
+`settings` variable (default: config/settings.yaml) and respects the
 following keys:
 
     model:
@@ -74,6 +75,9 @@ from tqdm.asyncio import tqdm as tqdm_async
 from tqdm.auto import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+# Set the YAML file to load before running this script.
+settings = "config/settings.yaml"
 
 from src.processors import (  # noqa: E402
     AsyncMessyTextConversationOrchestrator,
@@ -475,17 +479,17 @@ def main() -> None:
         5. Writes the resulting DataFrame to the configured output path.
     """
     # Step 1: Load configuration
-    with open("config/settings.yaml", "r", encoding="utf-8") as f:
-        settings = yaml.safe_load(f)
+    with open(settings, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
     
-    logger = setup_logger(log_file=settings["logging"]["file"])
+    logger = setup_logger(log_file=config["logging"]["file"])
     
     # Load prompt configuration
-    prompts_path = settings["paths"].get("prompts", "config/prompts.json")
+    prompts_path = config["paths"].get("prompts", "config/prompts.json")
     with open(prompts_path, "r", encoding="utf-8") as f:
         prompts = json.load(f)
 
-    processing_cfg = settings.get("processing", {})
+    processing_cfg = config.get("processing", {})
     conversation_cfg = processing_cfg.get("conversation", {}) or {}
     conversation_enabled = conversation_cfg.get("enabled", False)
 
@@ -497,7 +501,7 @@ def main() -> None:
         return
 
     # Step 2: Load data (conversation = summary-style processing)
-    summary_paths = settings["paths"]["summary"]
+    summary_paths = config["paths"]["summary"]
     input_path = summary_paths["input"]
     df_text = pd.read_csv(input_path, encoding="utf-8")
 
@@ -510,8 +514,8 @@ def main() -> None:
 
     # Step 3: Pre-flight checks (GPU + vLLM server)
     sync_client = OpenAI(
-        base_url=settings["model"]["api_base"],
-        api_key=settings["model"]["api_key"],
+        base_url=config["model"]["api_base"],
+        api_key=config["model"]["api_key"],
     )
 
     logger.info("=" * 50)
@@ -525,7 +529,7 @@ def main() -> None:
 
     vllm_ok, available_models, test_result = check_vllm_server(
         sync_client,
-        settings["model"]["name"],
+        config["model"]["name"],
         logger,
     )
 
@@ -537,21 +541,21 @@ def main() -> None:
     logger.info("=" * 50)
 
     # Step 4: Select processing mode (async vs sync)
-    async_enabled = settings.get("async", {}).get("enabled", True)
+    async_enabled = config.get("async", {}).get("enabled", True)
 
     if async_enabled:
         logger.info("Using ASYNC victim-level conversation processing.")
-        max_retries = settings["async"].get("max_retries", 2)
+        max_retries = config["async"].get("max_retries", 2)
         async_client = AsyncOpenAI(
-            base_url=settings["model"]["api_base"],
-            api_key=settings["model"]["api_key"],
+            base_url=config["model"]["api_base"],
+            api_key=config["model"]["api_key"],
             max_retries=max_retries,
         )
         processed_df, victim_states = asyncio.run(
             _process_dataframe_conversation_async(
                 df=df_text,
                 async_client=async_client,
-                config=settings,
+                config=config,
                 prompts=prompts,
                 logger=logger,
             )
@@ -561,13 +565,13 @@ def main() -> None:
         processed_df, victim_states = _process_dataframe_conversation_sync(
             df=df_text,
             sync_client=sync_client,
-            config=settings,
+            config=config,
             prompts=prompts,
             logger=logger,
         )
 
     # Step 5: Save output
-    model_name = settings["model"]["name"]
+    model_name = config["model"]["name"]
     processed_df["model"] = model_name
     if "summary_all_context" in processed_df.columns:
         processed_df["summary_all_context"].replace(
@@ -576,7 +580,7 @@ def main() -> None:
             inplace=True,
         )
 
-    summary_output_paths = settings["paths"]["summary"]["output"]
+    summary_output_paths = config["paths"]["summary"]["output"]
     output_path = summary_output_paths["file"]
     extend_mode = summary_output_paths.get("extend", False)
 
@@ -598,7 +602,7 @@ def main() -> None:
         logger.info(f"Output saved to {output_path} ({len(processed_df)} rows)")
 
     # Step 6: Persist conversation records (results, states, spans) if configured
-    records_cfg = settings["paths"].get("records", {})
+    records_cfg = config["paths"].get("records", {})
     if victim_states and records_cfg:
         results_rows = []
         states_rows = []

@@ -1,12 +1,11 @@
 pandas==2.3.3
 PyYAML==6.0.3
-openai>=1.0.0
+openai>=1.99.1
 tqdm==4.67.1
 psutil==7.1.2
 pydantic==2.12.3
 deepeval==3.7.4
-summac==0.0.4
-vllm>=0.6.0
+vllm==0.12.0
 pyairports @ git+https://github.com/NICTA/pyairports.git
 scikit-learn==1.7.2
 nltk

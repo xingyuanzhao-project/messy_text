@@ -2042,7 +2042,8 @@ class TextLabelsSummaryProcessor(TextLabelsSummaryLogicMixin):
         Returns:
             ProcessorResult: Structured result with info_found and summary.
         """
-        non_empty = [s for s in per_doc_summaries if s and s.strip()]
+        coerced = [str(s) if not isinstance(s, str) else s for s in per_doc_summaries if s is not None]
+        non_empty = [s for s in coerced if s and s.strip()]
         if not non_empty:
             return ProcessorResult(
                 task_name="label_synthesis",
@@ -2233,7 +2234,8 @@ class AsyncTextLabelsSummaryProcessor(TextLabelsSummaryLogicMixin):
         Returns:
             ProcessorResult: Structured result with info_found and summary.
         """
-        non_empty = [s for s in per_doc_summaries if s and s.strip()]
+        coerced = [str(s) if not isinstance(s, str) else s for s in per_doc_summaries if s is not None]
+        non_empty = [s for s in coerced if s and s.strip()]
         if not non_empty:
             return ProcessorResult(
                 task_name="label_synthesis",
