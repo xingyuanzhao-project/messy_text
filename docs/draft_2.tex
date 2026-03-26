@@ -171,8 +171,50 @@ Need to incorporate the language we agreed to use with Barbara Frey and Carrie W
 
 \subsection{Descriptive Statistics}\label{descriptive-statistics}
 
-Show the descriptive statistics of the dataset, such as number of the
-reports, victims, length of the text etc.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/document_count_distribution_by_victim.png}
+    \caption{Distribution of document counts per victim.}
+    \label{fig:document_count_distribution}
+    \end{figure}
+    
+    \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/text_length_distribution_by_report.png}
+    \caption{Distribution of text length per report.}
+    \label{fig:text_length_distribution}
+    \end{figure}
+    
+
+The corpus contains 575 victims and 2,229 source reports. The number of documents associated with each victim varies considerably, with a median of 3 and a mean of 4, ranging from a single document to as many as 16. Most victims have between one and three associated reports, while a smaller number are covered by ten or more, as shown in Figure~\ref{fig:document_count_distribution}. Report length also varies widely across the corpus, with a median of approximately 5,500 characters and a mean of approximately 7,100, but the distribution has a long right tail, with individual reports reaching over 130,000 characters as shown in Figure~\ref{fig:text_length_distribution}. These distributions indicate that both the coverage per victim and the length of individual reports are uneven, which directly encouraged the multi-turn processing pipeline described in the method section. When concatenating the reports for each victim, the total length of the concatenated text will be too long for most LLMs to easily process, which is why we need to use the multi-turn processing pipeline so that corpora can be naturally processed document by document as smaller units.
+
+Not all victims in the corpus have annotations for every coded field. The codebook used by the original human coders instructed them to enter 999 when no information was available in the news articles, and as a result many labels carry high rates of missing values across the 575 victims. The degree of missing values varies substantially from one label to another, depending on whether the coder was able to find the information in the news articles for the given victim.
+
+The codebook itself is extensive, spanning seven sections that cover victim demographics, circumstances of capture, outcome of the disappearance, perpetrator characteristics, judicial proceedings, and observational comments, with several dozen substantive coded variables in total. Of these, a substantial portion records free text descriptions, dates, or geographic identifiers that cannot be used directly in a classification-based evaluation. Among the categorical fields that remain, many encode details that are specific to a narrow research domain, such as the identity of individual organized crime groups or the type of judicial sentence. For this study, we select a subset of categorical labels that have relatively low rates of missing values and that capture information relevant to a broad audience rather than to a single specialized subfield.
+
+Three labels meet these criteria. Desenlace records the outcome of the disappearance as reported in the press. Of the 575 victims, 393 have an annotation for this field, and the distribution across its seven original categories is heavily concentrated: 254 victims are recorded as still disappeared and 91 as found dead, while the remaining five categories, including liberation by captors or authorities, found alive, self-liberation, and found without specification of condition, each contain fewer than 25 cases as shown in Figure~\ref{fig:desenlace_distribution}. Captura tipo records the type of place where the victim was captured, using place categories from the HURIDOCS micro-thesaurus. This field has 243 annotated victims and eight original categories, with the two most frequent being means and routes of transport and places of connection at 90 cases and places related to the victim such as the home or workplace at 81, while the remaining six categories range from 1 to 28 cases as shown in Figure~\ref{fig:captura_tipo_distribution}. Vic grupo social records the social group to which the victim belongs. This field has 273 annotated victims and ten original categories, with the most frequent being people who work in service industries at 95 cases, followed by civil servants at 49 and students at 45, and smaller counts for professionals, activists, people associated with politics, organized crime, land workers, and others as shown in Figure~\ref{fig:vic_grupo_social_distribution}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/desenlace_distribution_by_victim_before_merging.png}
+\caption{Distribution of desenlace categories per victim before merging.}
+\label{fig:desenlace_distribution}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/captura_tipo_distribution_by_victim_before_merging.png}
+\caption{Distribution of captura tipo categories per victim before merging.}
+\label{fig:captura_tipo_distribution}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/vic_grupo_social_distribution_by_victim_before_merging.png}
+\caption{Distribution of vic grupo social categories per victim before merging.}
+\label{fig:vic_grupo_social_distribution}
+\end{figure}
 
 \subsection{Challenges in the Data}\label{challenges-in-the-data}
 
@@ -422,7 +464,30 @@ Many existing summarization evaluation methods require a gold standard reference
 
 Another issue discussed above is that the original codebook contains fine-grained categories. One example is that the method of capture can be distinguished into general kidnappings and special type kidnappings such as Levantón. Without external context plugged in, or making the model fine-tuned on the specific context, it will be difficult for LLM models to distinguish between the two.
 
-The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation.
+The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation. The detailed distribution of the collapsed categories is shown in Figure~\ref{fig:desenlace_distribution_after}, Figure~\ref{fig:captura_tipo_distribution_after}, and Figure~\ref{fig:vic_grupo_social_distribution_after}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/desenlace_distribution_by_victim_after_merging.png}
+\caption{Distribution of desenlace categories per victim after merging.}
+\label{fig:desenlace_distribution_after}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/captura_tipo_distribution_by_victim_after_merging.png}
+\caption{Distribution of captura tipo categories per victim after merging.}
+\label{fig:captura_tipo_distribution_after}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/vic_grupo_social_distribution_by_victim_after_merging.png}
+\caption{Distribution of vic grupo social categories per victim after merging.}
+\label{fig:vic_grupo_social_distribution_after}
+\end{figure}
+
+Another issue of the human annotations is the lost documents. Many of the decisions were made when the human coders were able to access more documents than we currently can fetch, either from their sources or from the internet. This means that some of the annotations are not supported by the documents that are available to us. To address this issue, we need to select the annotations that are supported by the documents that are available to us. This is also critical for the goal of this project, which is to relink the annotations to the source text and make them usable for downstream tasks.
 
 \subsubsection{LLM as Evaluators}\label{llm-as-evaluators}
 
@@ -443,17 +508,135 @@ Hallucination evaluation matters in our project because the outcome of the propo
 
 This is not only a language quality issue but also critical for downstream tasks. In political science and computational social science setups, unsupported or even entirely fabricated generated details can change coded variables, weaken traceability, and distort substantive conclusions. A careful evaluation of hallucination therefore contributes to the field by making LLM based extraction more transparent, more reproducible, and more defensible as empirical evidence.
 
-%\section{Results}\label{results}
+\section{Results}\label{results}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_captura_tipo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_desenlace.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_vic_grupo_social.png}
+\end{minipage}
+\caption{Classification metrics by label across models (collapsed categories). Left: captura tipo. Center: desenlace. Right: vic grupo social.}
+\label{fig:metrics_by_label}
+\end{figure}
 
 \subsection{Baseline vs Proposed
 Method}\label{baseline-vs-proposed-method}
 
-Show the baseline simple summarization and the proposed method's
-accuracy and hallucination evaluation results.
+The baseline for this evaluation is a simple summarization approach that generates a direct summary of each victim's documents without codebook guidance or structured extraction. The proposed method instead uses the codebook schema to guide extraction and produces label-structured summaries anchored to verbatim evidence spans. Each panel in Figure~\ref{fig:metrics_by_label} compares these two approaches on one of the three selected labels, reporting the classification accuracy of the simple summarization baseline, the extractive summarization method, and the difference between them. Across all three labels and all three models, the proposed method consistently outperforms the baseline, with every difference value being positive. The improvement is largest for outcome, where extractive accuracy reaches 0.80 to 0.84 compared to 0.46 to 0.61 for the baseline, yielding gains between +0.19 and +0.38. Social group shows similarly substantial gains, rising from a baseline range of 0.33 to 0.43 to an extractive range of 0.61 to 0.67. Type of place of capture remains the most difficult label for all models, with extractive accuracy between 0.36 and 0.40, but even here the proposed method improves over the baseline by +0.09 to +0.15. These results indicate that codebook-guided extraction produces summaries that preserve the information needed for downstream classification more reliably than unconstrained summarization across all labels evaluated.
 
 \subsection{Model Comparisons}\label{model-comparisons}
 
-Show the cross model accuracy and hallucination evaluation results.
+Figure~\ref{fig:metrics_by_label} also allows a cross-model comparison, since each panel shows all three models side by side on the same label. All three models follow the same pattern: the proposed extractive method outperforms the simple summarization baseline on every label, and no model fails to benefit from the structured workflow. At the same time, the models differ in where they show the largest gains. Gemma 12B achieves its strongest improvement on social group, rising from 0.33 to 0.67 for a gain of +0.34, while Ministral 8B shows its largest gain on outcome, rising from 0.46 to 0.84 for a gain of +0.38. Llama 8B falls between the two, with its largest gain also on outcome at +0.32. For type of place of capture, all three models remain below 0.40 even with extractive summarization, confirming that this is the most difficult label to classify regardless of which model is used. The consistency of the improvement across all three model families suggests that the performance gain originates in the workflow design rather than in the capability of any single model.
+
+The three models also span a range of parameter counts, with Llama 3.1 8B and Ministral 3 8B at 8 billion parameters and Gemma 3 12B at 12 billion. Despite this difference, Gemma does not uniformly outperform the two smaller models. Ministral 8B achieves the highest extractive accuracy on outcome at 0.84 and on type of place of capture at 0.40, while Llama 8B and Ministral 8B both reach 0.61 on social group compared to 0.67 for Gemma. The 4 billion parameter gap does not produce a consistent advantage on any label, which suggests that within the 8B to 12B range the proposed workflow provides comparable benefits regardless of model size.
+
+
+
+\subsection{Annotation to Documents Mapping}\label{annotation-to-documents-mapping}
+
+Beyond classification accuracy, a central question for this pipeline is whether the original human annotations can be traced back to evidence in the available source documents and, where they cannot, whether the constraint is the state of the archive rather than the quality of extraction.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/less_labels_multi_models/cumulative_support_curve.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/less_labels_multi_models/support_ceiling_by_annotation_availability.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/less_labels_multi_models/turns_to_full_support.png}
+\end{minipage}
+\caption{Annotation to documents mapping for collapsed categories using multiple models. Left: cumulative support curve across turns. Center: support ceiling by annotation availability. Right: number of turns to full support.}
+\label{fig:matching_less_labels}
+\end{figure}
+
+Each figure in this section contains three panels that measure the extent to which human annotations can be supported given the source documents that remain available. The cumulative support curve on the left tracks the percentage of victim-model pairs that have reached a given support threshold at each turn, where a turn corresponds to processing one additional document from the victim's record. The support ceiling panel in the center shows how many annotated labels each victim carries and whether all source documents for that victim can still be retrieved or whether only a subset remains accessible. The turns to support panel on the right records the turn at which each pair first reaches its support threshold, revealing how many documents the pipeline must process before evidence for the annotations is recovered to the threshold.
+
+Figure~\ref{fig:matching_less_labels} reports these three measures for the three selected labels across all three models. Of all victim-model pairs, 16 percent reach full support, meaning every annotated label for that victim is grounded in extracted evidence, while 44 percent reach at least 60 percent support. The support ceiling panel reveals that 381 of the 427 annotated victims retain full document coverage for these selected labels, while the remaining 46 have only partial coverage because some of the documents the original coders consulted are no longer be retrievable. This 11 percent partial-coverage rate is an early indication that the lost documents problem constrains the pipeline even on the best-covered labels, since annotations that were based on missing sources cannot be supported regardless of extraction quality. Among the pairs that do reach their threshold, the large majority arrive at turn zero or turn one, indicating that the first one or two documents already contain most of the recoverable evidence.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/all_labels_one_model/cumulative_support_curve.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/all_labels_one_model/support_ceiling_by_annotation_availability.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{plots/evaluation/matching/all_labels_one_model/turns_to_full_support.png}
+\end{minipage}
+\caption{Annotation to documents mapping for all labels using a single model. Left: cumulative support curve across turns. Center: support ceiling by annotation availability. Right: number of turns to full support.}
+\label{fig:matching_all_labels}
+\end{figure}
+
+The three selected labels were chosen for their low missing rates and their broad relevance, but the full codebook contains many more coded fields. Expanding the evaluation to extra categorical labels to include 15 labels in total to tests whether the pipeline can trace annotations that carry higher missing rates and that encode more specialized details. This is a harder test because full support now requires every annotated field for a victim to be grounded in the available text.
+
+Figure~\ref{fig:matching_all_labels} reports the same three measures for the expanded label set using a single model. Full support drops to approximately 8 percent, which is expected given that every annotated label must now be matched simultaneously. At lower thresholds the pipeline still recovers evidence for a substantial share of annotations: 71 percent of pairs reach at least 10 percent support and 53 percent reach at least 25 percent. The critical constraint is visible in the support ceiling panel, where only 234 of the 453 annotated victims retain full document coverage, falling from 89 percent in the three-label setting to 52 percent when all labels are considered. The remaining 219 victims have only partial coverage because news articles that were available to the original human coders are no longer be retrievable from their sources or from the internet. This is the direct quantification of the lost documents problem introduced in the evaluation design that the pipeline can only process the documents that remain in the accessible archive, and any annotation that depended on a source that has since disappeared sets a hard ceiling on the support that can be recovered. The turn-by-turn recording that the pipeline produces makes this ceiling visible and locatable. For the annotations that can be traced, most pairs reach their threshold within the first two documents. For those that cannot be fully traced, the recording identifies precisely where the evidence trail ends, producing a concrete inventory of what the pipeline recovers and what remains beyond reach due to the state of the archive. This inventory is the practical contribution of the tracing dimension: rather than treating missing support as an unquantified limitation, the pipeline distinguishes recoverable annotations from structurally unrecoverable ones and documents the boundary between them.
+
+
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{llp{7cm}r}
+    \hline
+    victim\_id & label\_key & span & offset \\
+    \hline
+    Veracruz\_J J R R & desenlace & ``Hasta la fecha, sigue en la b\'{u}squeda, se ha convertido en detective\dots'' & 2480 \\
+    Veracruz\_J J R R & vic\_grupo\_social & ``Carmelo estudiaba arquitectura en una escuela privada de dise\~{n}o. Su c\'{i}rculo de amigos era muy grande\dots'' & 2691 \\
+    N.L.\_Fabi\'{a}n H V & desenlace & ``En el expediente no hay registros del plagio ni testimonios.'' & 2585 \\
+    Veracruz\_Mar\'{i}a Victoria C T & captura\_tipo & ``Seg\'{u}n Lorena, su madre y hermano fueron sustra\'{i}dos de un taxi entre la calle 13 y avenida 11, frente al DIF Municipal, el pasado 17 de abril.'' & 1254 \\
+    N.L.\_Fabi\'{a}n H V & captura\_tipo & ``Los perseguidores sustrajeron al empresario del veh\'{i}culo siniestrado y se lo llevaron con rumbo desconocido en otra unidad, un Audi.'' & 4109 \\
+    \hline
+    \end{tabular}
+    \caption{Sample extracted spans per codebook field. Each span is a verbatim excerpt from the source document; the offset records the character position where the span begins in the original text.}
+    \label{tab:spans_example}
+    \end{table}
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{clllp{7.5cm}}
+    \hline
+    turn & doc\_id & info\_found & labels found & summary (excerpt) \\
+    \hline
+    0 & \_1 & FALSE & --- & (no summary produced) \\
+    1 & \_2 & TRUE & desenlace, vic\_grupo\_social & ``Cuatro personas originarias de Sinaloa desaparecieron\dots\ fueron secuestrados por polic\'{i}as preventivos\dots\ y entregados a un c\'{a}rtel\dots'' \\
+    2 & \_6 & FALSE & --- & (previous summary preserved unchanged) \\
+    3 & \_8 & TRUE & desenlace, vic\_grupo\_social, captura\_tipo & ``\dots siete j\'{o}venes detenidos por polic\'{i}as locales y entregados a Los Zetas\dots\ la polic\'{i}a local colaboraba con el crimen organizado\dots'' \\
+    \hline
+    \end{tabular}
+    \caption{Summary evolution across four turns for Coahuila\_Ezequiel C T. Turns~0 and~2 process noisy documents that yield no information; the pipeline preserves the previous summary unchanged. Turns~1 and~3 extract new evidence and update the running summary.}
+    \label{tab:summary_turns_example}
+    \end{table}
+
+Tables~\ref{tab:spans_example} and~\ref{tab:summary_turns_example} show abbreviated examples from the full pipeline output for two of its recorded artifacts. Table~\ref{tab:spans_example} presents a sample of extracted spans. Each row records the victim identifier, the codebook field that the span addresses, the verbatim passage extracted from the source document, and the character offset where that passage begins in the original text. Table~\ref{tab:summary_turns_example} presents the turn-by-turn processing trace for a single victim across four documents. Each row records the turn index, the document identifier, whether relevant information was found in that document, which codebook labels were identified, and an excerpt of the running summary at that point. Both tables are abbreviated selections from a larger output that the pipeline produces for every victim in the corpus.
+
+In Table~\ref{tab:summary_turns_example}, the pipeline processes four documents sequentially for one victim. At turns zero and two, the documents contain no relevant information for the victim. These are the noisy, irrelevant, or damaged pages that are common in web-scraped corpora, such as error pages, log in pages, or unrelated articles scraped alongside the target content. When the pipeline encounters such documents, it preserves the existing summary unchanged rather than letting irrelevant content dilute or degrade the evidence already collected. At turns one and three, the pipeline finds relevant information and updates the running summary accordingly. The set of supported codebook labels grows from two at turn one, where the pipeline identifies outcome and social group, to three at turn three, where it additionally identifies type of place of capture. This progressive enrichment shows that evidence for different codebook fields can be distributed across multiple documents and that the stateful design accumulates labels as informative documents are encountered. In Table~\ref{tab:spans_example}, the character offset for each extracted span records the exact position in the source document where the evidence begins. A researcher can return to the original text at the recorded offset and verify that the extracted passage appears at that location, making each piece of evidence independently checkable against the source.
+
+The combination of verbatim spans, character offsets, and turn-by-turn processing traces means the pipeline output is auditable at the level of individual evidence claims. A researcher can follow the chain from a codebook label to the extracted passage that supports it to its character position in the source document to the specific processing turn that produced it. At the aggregate level, the support coverage analysis identifies which annotations fall within reach of the available archive and which are structurally unrecoverable because of the lost documents problem. At the instance level, the extracted spans and turn traces document precisely what was recovered and where the evidence trail ends. Together, these two dimensions produce a complete account of the annotation-to-document mapping: the pipeline does not only classify but records the evidence path for each annotation it can trace and flags the structural reason for each one it cannot.
 
 \section{Discussion}\label{discussion}
 
@@ -466,8 +649,11 @@ Anonymization also reflects broader ethical standards in human rights research a
 
 \subsection{Error Analysis}\label{error-analysis}
 
-Show some examples of where the methods did not generate a meaningful
-summary or classified the label incorrectly.
+Three identifiable sources of error affect the pipeline at different stages. The first is document-level noise from error pages, navigation menus, advertising banners, and topically adjacent but irrelevant content that pervade the web-scraped corpus. As established in the related work, LLM-based data standardization and error processing can handle such noise through contextual extraction and generation rather than rule-based methods. The pipeline applies this principle by using the codebook schema to focus extraction on relevant fields, so that noisy content is filtered during the extraction step itself rather than requiring a separate preprocessing stage.
+
+The second source is missing evidence from the lost documents problem. When source articles consulted by the original coders are no longer retrievable, annotations that depended on those sources cannot be grounded regardless of extraction quality. The pipeline addresses this by recording which annotations remain unsupported after all available documents have been processed and by distinguishing structural absence of the source from the archive from extraction failure through the support ceiling and turn-by-turn recording. This makes the gap attributable and quantifiable rather than hidden within the overall accuracy figures.
+
+The third and likely largest source of error is ambiguity in the categorization of certain texts. Some labels have options that overlap in meaning or that require contextual judgments the source text does not resolve unambiguously. When a report can reasonably support more than one category, the human coder and the model may arrive at different but defensible assignments, and this disagreement registers as a classification error even though the summary correctly preserved the relevant information. These failure modes being knowable and separable itself is a contribution to methodological transparency in computational social science, because it lets researchers make informed choices about when and how to use the output.
 
 \subsection{Limitations}\label{limitations}
 

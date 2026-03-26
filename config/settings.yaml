@@ -23,14 +23,14 @@ paths:
         file: "results_down_sized/df_records_spans.csv"
         extend: False
   classification:
-    input: "results_down_sized/df_text_by_report_conversation_summary.csv"
+    input: "results_down_sized/df_text_by_report_conversation_summary_less_label_consolidated.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_classification.csv"
-      extend: False
+      file: "results_down_sized/df_text_by_report_conversation_classification_consolidated.csv"
+      extend: True
   eval:
-    input: "results_down_sized/df_text_by_report_conversation_classification.csv"
+    input: "results_down_sized/df_text_by_report_conversation_classification_consolidated.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_evaluation.csv"
+      file: "results_down_sized/df_text_by_report_conversation_evaluation_consolidated.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 

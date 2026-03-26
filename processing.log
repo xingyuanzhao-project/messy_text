@@ -180396,3 +180396,18 @@ OUTPUT:
 2026-03-23 16:34:47,836 - INFO - Results records saved to results_down_sized\df_text_by_report_conversation_by_label_records_results 2.csv (27 rows)
 2026-03-23 16:34:47,845 - INFO - State records saved to results_down_sized\df_text_by_report_conversation_by_label_records_states.csv (10 rows)
 2026-03-23 16:34:47,848 - INFO - Span records saved to results_down_sized\df_text_by_report_conversation_by_label_records_spans.csv (119 rows)
+2026-03-24 22:56:54,722 - INFO - ==================================================
+2026-03-24 22:56:54,722 - INFO - PRE-FLIGHT CHECKS (Classification-only)
+2026-03-24 22:56:54,722 - INFO - ==================================================
+2026-03-24 22:56:54,781 - INFO - GPU 0: NVIDIA GeForce RTX 4090 Laptop GPU | Memory: 15988/16376 MB used | Utilization: 0%
+2026-03-24 22:56:57,148 - INFO - vLLM available model: hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4
+2026-03-24 22:56:58,450 - INFO - vLLM test request successful: 1+1 = 2
+2026-03-24 22:56:58,450 - INFO - Pre-flight checks PASSED
+2026-03-24 22:56:58,451 - INFO - ==================================================
+2026-03-24 22:56:58,451 - INFO - Using ASYNC classification mode.
+2026-03-24 22:56:58,680 - INFO - Starting async classification with 15 concurrent rows.
+2026-03-24 22:56:58,680 - INFO - Starting async classification with 15 concurrent rows.
+2026-03-24 23:21:37,886 - INFO - Classification complete. Processed 2229 rows.
+2026-03-24 23:21:37,886 - INFO - Classification complete. Processed 2229 rows.
+2026-03-24 23:21:39,191 - INFO - Output saved to results_down_sized/df_text_by_report_conversation_classification_consolidated.csv (6687 rows)
+2026-03-24 23:21:39,191 - INFO - Output saved to results_down_sized/df_text_by_report_conversation_classification_consolidated.csv (6687 rows)

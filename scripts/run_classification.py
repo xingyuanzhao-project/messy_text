@@ -349,6 +349,11 @@ def main() -> None:
     classification_paths = settings["paths"]["classification"]
     df_text = pd.read_csv(classification_paths["input"], encoding="utf-8")
 
+    model_name = settings["model"]["name"]
+    mask = df_text["model"] == model_name
+    df_to_classify = df_text[mask].copy()
+    df_passthrough = df_text[~mask].copy()
+
     # Pre-flight checks using a synchronous client
     sync_client = OpenAI(
         base_url=settings["model"]["api_base"],
@@ -392,7 +397,7 @@ def main() -> None:
 
         processed_df = asyncio.run(
             _process_dataframe_classification_async(
-                df=df_text,
+                df=df_to_classify,
                 vllm_client=async_client,
                 model_name=settings["model"]["name"],
                 prompts_config=prompts_config,
@@ -411,7 +416,7 @@ def main() -> None:
     else:
         logger.info("Using SYNC classification mode.")
         processed_df = _process_dataframe_classification_sync(
-            df=df_text,
+            df=df_to_classify,
             vllm_client=sync_client,
             model_name=settings["model"]["name"],
             prompts_config=prompts_config,
@@ -428,8 +433,8 @@ def main() -> None:
             ),
         )
 
-    model_name = settings["model"]["name"]
-    processed_df["model"] = model_name
+    processed_df["model_classification"] = model_name
+    processed_df = pd.concat([processed_df, df_passthrough], ignore_index=True)
 
     # Normalize "no information" markers to empty strings like run_processing.py
     processed_df.replace(
@@ -445,7 +450,7 @@ def main() -> None:
     if extend_mode and Path(output_path).exists():
         existing_df = pd.read_csv(output_path, encoding="utf-8")
         rows_before = len(existing_df)
-        existing_df = existing_df[existing_df["model"] != model_name]
+        existing_df = existing_df[existing_df["model_classification"] != model_name]
         if len(existing_df) < rows_before:
             logger.info(
                 f"Overwriting {rows_before - len(existing_df)} existing rows for model '{model_name}'"

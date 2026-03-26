@@ -64,6 +64,7 @@ remain unchanged.
 
 import asyncio
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -578,6 +579,12 @@ def main() -> None:
             ["No information", "No relevant information found"],
             "",
             inplace=True,
+        )
+
+    _SURROGATE_RE = re.compile(r'[\ud800-\udfff]')
+    for col in processed_df.select_dtypes(include="object").columns:
+        processed_df[col] = processed_df[col].apply(
+            lambda x: _SURROGATE_RE.sub('', x) if isinstance(x, str) else x
         )
 
     summary_output_paths = config["paths"]["summary"]["output"]

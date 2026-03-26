@@ -73,10 +73,8 @@ huggingface-cli download gaunernst/gemma-3-12b-it-int4-awq
 huggingface-cli download mistralai/Ministral-3-8B-Instruct-2512
 huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ
 huggingface-cli download openai/gpt-oss-20b
-
-huggingface-cli download hugging-quants/gemma-2-27b-it-AWQ
-
 huggingface-cli download hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+# huggingface-cli download hugging-quants/gemma-2-27b-it-AWQ
 huggingface-cli download pytorch/gemma-3-27b-it-AWQ-INT4
 huggingface-cli download stelterlab/Mistral-Small-24B-Instruct-2501-AWQ
 
@@ -149,9 +147,10 @@ module load cuda
 source venv/bin/activate
 
 python scripts/run_summary.py
-python scripts/run_summary_conversation.py
+python scripts/run_summary_conversation_llama.py
 python scripts/run_summary_conversation_gemma.py
 python scripts/run_summary_conversation_mistral.py
+python scripts/run_summary_conversation_gptoss.py
 # python scripts/run_summary_conversation_qwen.py
 
 # python scripts/run_summary_conversation_by_label.py

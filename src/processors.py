@@ -16,13 +16,13 @@ class ProcessorResult:
     Generic result container object for a single LLM-backed processor call.
 
     This object is intentionally task-agnostic: it can represent summary,
-    classification, or any future task that uses the guided_json interface.
+    classification, or any future task that uses the response_format interface.
 
     Attributes:
         task_name: Logical name of the task, e.g. "summary", "classification".
         model_name: Identifier of the model that produced this result.
         declared_fields: Schema of expected output fields, taken from the
-            guided_json properties (field name -> property spec).
+            response_format schema properties (field name -> property spec).
         values: Parsed values for the declared_fields, extracted from the
             model's JSON output.
         input_text: Raw text sent to the model (messages[0].content).
@@ -92,6 +92,8 @@ class ProcessorResult:
         output_struct: Optional[Dict[str, Any]] = None
         try:
             output_text = response.choices[0].message.content
+            if output_text:
+                output_text = re.sub(r'[\ud800-\udfff]', '', output_text)
             try:
                 repaired_out = repair_json(output_text)
                 _parsed = json.loads(repaired_out)
@@ -119,18 +121,19 @@ class ProcessorResult:
         except Exception as exc:  # noqa: BLE001
             error_messages.append(f"Failed to extract output_text: {exc}")
 
-        # Determine declared fields from guided_json schema if available.
+        # Determine declared fields from response_format schema if available.
         declared_fields: Dict[str, Any] = {}
         try:
             guided = (
-                request_kwargs.get("extra_body", {})
-                .get("guided_json", {})
+                request_kwargs.get("response_format", {})
+                .get("json_schema", {})
+                .get("schema", {})
                 .get("properties", {})
             )
             if isinstance(guided, dict):
                 declared_fields = guided
         except Exception as exc:  # noqa: BLE001
-            error_messages.append(f"Failed to read guided_json properties: {exc}")
+            error_messages.append(f"Failed to read response_format properties: {exc}")
 
         # Extract values for the declared fields from the parsed output.
         values: Dict[str, Any] = {}
@@ -301,14 +304,17 @@ class MessyTextLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_summary'],
-            "extra_body": {"guided_json": {
-                "type": "object", 
-                "properties": {
-                    "info_found": {"type": "string"}, 
-                    "relevant_context": {"type": "array"}, 
-                    "summary": {"type": "string"}
-                }, 
-                "required": ["info_found", "relevant_context", "summary"]
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "summary",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "info_found": {"type": "string"},
+                        "relevant_context": {"type": "array"},
+                        "summary": {"type": "string"}
+                    },
+                    "required": ["info_found", "relevant_context", "summary"]
+                }
             }}
         }
 
@@ -421,28 +427,31 @@ class MessyTextLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_summary'],
-            "extra_body": {"guided_json": {
-                "type": "object",
-                "properties": {
-                    "info_found": {"type": "string"},
-                    "relevant_context": {"type": "array"},
-                    "summary_by_item": {
-                        "type": "object",
-                        "description": "Per-label extractive spans for traceback",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "span": {"type": "string"}
-                                },
-                                "required": ["span"]
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "conversation_summary",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "info_found": {"type": "string"},
+                        "relevant_context": {"type": "array"},
+                        "summary_by_item": {
+                            "type": "object",
+                            "description": "Per-label extractive spans for traceback",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "span": {"type": "string"}
+                                    },
+                                    "required": ["span"]
+                                }
                             }
-                        }
+                        },
+                        "summary": {"type": "string"}
                     },
-                    "summary": {"type": "string"}
-                },
-                "required": ["info_found", "relevant_context", "summary_by_item", "summary"]
+                    "required": ["info_found", "relevant_context", "summary_by_item", "summary"]
+                }
             }}
         }
 
@@ -513,13 +522,16 @@ class MessyTextLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_classification'],
-            "extra_body": {"guided_json": {
-                "type": "object", 
-                "properties": {
-                    "evidence": {"type": "string"}, 
-                    "result": {"type": "string"}
-                }, 
-                "required": ["evidence", "result"]
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "classification",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "evidence": {"type": "string"},
+                        "result": {"type": "string"}
+                    },
+                    "required": ["evidence", "result"]
+                }
             }}
         }
 
@@ -1423,23 +1435,26 @@ class LabelExtractorLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_summary'],
-            "extra_body": {"guided_json": {
-                "type": "object",
-                "properties": {
-                    "info_found": {"type": "string"},
-                    "spans": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "span": {"type": "string"}
-                            },
-                            "required": ["span"]
-                        }
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "label_extract",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "info_found": {"type": "string"},
+                        "spans": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "span": {"type": "string"}
+                                },
+                                "required": ["span"]
+                            }
+                        },
+                        "confidence_score": {"type": "string"}
                     },
-                    "confidence_score": {"type": "string"}
-                },
-                "required": ["info_found", "spans", "confidence_score"]
+                    "required": ["info_found", "spans", "confidence_score"]
+                }
             }}
         }
 
@@ -1810,26 +1825,29 @@ class TextLabelsSummaryLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_summary'],
-            "extra_body": {"guided_json": {
-                "type": "object",
-                "properties": {
-                    "info_found": {"type": "string"},
-                    "spans_by_item": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "span": {"type": "string"}
-                                },
-                                "required": ["span"]
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "label_summary",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "info_found": {"type": "string"},
+                        "spans_by_item": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "span": {"type": "string"}
+                                    },
+                                    "required": ["span"]
+                                }
                             }
-                        }
+                        },
+                        "summary": {"type": "string"}
                     },
-                    "summary": {"type": "string"}
-                },
-                "required": ["info_found", "spans_by_item", "summary"]
+                    "required": ["info_found", "spans_by_item", "summary"]
+                }
             }}
         }
 
@@ -1897,13 +1915,16 @@ class TextLabelsSummaryLogicMixin:
             "messages": [{'role': 'user', 'content': prompt_content}],
             "temperature": self.config['processing']['temperature'],
             "max_tokens": self.config['processing']['max_tokens_summary'],
-            "extra_body": {"guided_json": {
-                "type": "object",
-                "properties": {
-                    "info_found": {"type": "string"},
-                    "summary": {"type": "string"}
-                },
-                "required": ["info_found", "summary"]
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "label_synthesis",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "info_found": {"type": "string"},
+                        "summary": {"type": "string"}
+                    },
+                    "required": ["info_found", "summary"]
+                }
             }}
         }
 

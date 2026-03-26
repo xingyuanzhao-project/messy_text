@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
@@ -131,6 +132,11 @@ def _write_csv_with_extend(
     rows for the current model.
     """
     new_df = _expand_values(pd.DataFrame(list(rows)))
+    _SURROGATE_RE = re.compile(r'[\ud800-\udfff]')
+    for col in new_df.select_dtypes(include="object").columns:
+        new_df[col] = new_df[col].apply(
+            lambda x: _SURROGATE_RE.sub('', x) if isinstance(x, str) else x
+        )
     if extend and path.exists():
         existing_df = pd.read_csv(path, encoding="utf-8")
         existing_df = _expand_values(existing_df)

@@ -1,0 +1,10 @@
+model,label,rows,Accuracy
+gaunernst/gemma-3-12b-it-int4-awq,vic_grupo_social,399,0.6741854636591479
+gaunernst/gemma-3-12b-it-int4-awq,captura_tipo,399,0.37593984962406013
+gaunernst/gemma-3-12b-it-int4-awq,desenlace,399,0.7994987468671679
+hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4,vic_grupo_social,368,0.6114130434782609
+hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4,captura_tipo,368,0.36141304347826086
+hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4,desenlace,368,0.7989130434782609
+mistralai/Ministral-3-8B-Instruct-2512,vic_grupo_social,368,0.6141304347826086
+mistralai/Ministral-3-8B-Instruct-2512,captura_tipo,368,0.4048913043478261
+mistralai/Ministral-3-8B-Instruct-2512,desenlace,368,0.8396739130434783

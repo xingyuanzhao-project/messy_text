@@ -23,10 +23,10 @@ paths:
         file: "results_down_sized/df_records_spans.csv"
         extend: False
   classification:
-    input: "results_down_sized/df_text_by_report_conversation_summary.csv"
+    input: "results_down_sized/df_text_by_report_conversation_summary_less_label_consolidated.csv"
     output:
       file: "results_down_sized/df_text_by_report_conversation_classification.csv"
-      extend: False
+      extend: True
   eval:
     input: "results_down_sized/df_text_by_report_conversation_classification.csv"
     output:
