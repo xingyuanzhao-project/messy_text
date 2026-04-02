@@ -40,8 +40,8 @@ python --version
 ```bash
 cd /scratch/bbov/xzhao16/messy_text_server/
 module purge
-module load cray-python/3.11.7
-module avail cuda
+# module load cray-python/3.11.7
+# module avail cuda
 module load cuda/12.8
 rm -rf venv
 python -m venv venv
@@ -125,7 +125,7 @@ vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --con
 #   --host 0.0.0.0 \
 #   --max-model-len 49152
 
-vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
+# vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve openai/gpt-oss-20b --async-scheduling --port 8000 --host 0.0.0.0 --max-model-len 49152
 
 vllm serve hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4 \

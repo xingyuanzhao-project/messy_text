@@ -1,5 +1,5 @@
 model:
-  name: "Qwen/Qwen2.5-7B-Instruct-AWQ"
+  name: "openai/gpt-oss-20b"
   api_base: "http://localhost:8000/v1"
   api_key: "dummy"
 

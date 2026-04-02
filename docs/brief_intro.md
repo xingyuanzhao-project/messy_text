@@ -1,0 +1,5 @@
+Title: Extractive Summarization of Messy Text
+Workflow:
+We developed a multi turn LLM workflow to process messy text into structured, evidence traceable outputs for downstream analysis. The first LLM task is extractive evidence finding, where the model reads each messy report and pulls out the exact text spans relevant to each codebook category. The second task is codebook guided summarization, where the model turns those extracted spans into a clean, label structured summary instead of a freeform paraphrase. The third task is stateful updating across turns, where the LLM processes additional documents sequentially and updates the running summary only when new relevant information appears. The final task is downstream classification and evaluation across models. 
+
+This research matters because the LLM workflow makes messy legacy annotation and codebooks usable for scalable social science research while keeping each result connected to source evidence.

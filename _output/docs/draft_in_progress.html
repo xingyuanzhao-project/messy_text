@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>draft_in_progress</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="draft_in_progress_files/libs/clipboard/clipboard.min.js"></script>
+<script src="draft_in_progress_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="draft_in_progress_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="draft_in_progress_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="draft_in_progress_files/libs/quarto-html/popper.min.js"></script>
+<script src="draft_in_progress_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="draft_in_progress_files/libs/quarto-html/anchor.min.js"></script>
+<link href="draft_in_progress_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="draft_in_progress_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="draft_in_progress_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="draft_in_progress_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="draft_in_progress_files/libs/bootstrap/bootstrap-a74871fe4945b66d259aafc266475145.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#using-messy-text-in-future-llm-annotations" id="toc-using-messy-text-in-future-llm-annotations" class="nav-link active" data-scroll-target="#using-messy-text-in-future-llm-annotations">Using Messy Text In Future LLM Annotations</a>
+  <ul class="collapse">
+  <li><a href="#abstract" id="toc-abstract" class="nav-link" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#contributions" id="toc-contributions" class="nav-link" data-scroll-target="#contributions">Contributions</a></li>
+  </ul></li>
+  <li><a href="#related-work" id="toc-related-work" class="nav-link" data-scroll-target="#related-work">Related Work</a>
+  <ul class="collapse">
+  <li><a href="#non-llm-methods-for-messy-text" id="toc-non-llm-methods-for-messy-text" class="nav-link" data-scroll-target="#non-llm-methods-for-messy-text">Non-LLM Methods for Messy Text</a></li>
+  <li><a href="#llm-methods-for-messy-text" id="toc-llm-methods-for-messy-text" class="nav-link" data-scroll-target="#llm-methods-for-messy-text">LLM Methods for Messy Text</a></li>
+  <li><a href="#extraction-and-summarization" id="toc-extraction-and-summarization" class="nav-link" data-scroll-target="#extraction-and-summarization">Extraction and Summarization</a></li>
+  </ul></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a>
+  <ul class="collapse">
+  <li><a href="#data-source" id="toc-data-source" class="nav-link" data-scroll-target="#data-source">Data Source</a></li>
+  <li><a href="#challenges-in-the-data" id="toc-challenges-in-the-data" class="nav-link" data-scroll-target="#challenges-in-the-data">Challenges in the Data</a></li>
+  </ul></li>
+  <li><a href="#method" id="toc-method" class="nav-link" data-scroll-target="#method">Method</a>
+  <ul class="collapse">
+  <li><a href="#task-definitions" id="toc-task-definitions" class="nav-link" data-scroll-target="#task-definitions">Task Definitions</a></li>
+  <li><a href="#model-setup" id="toc-model-setup" class="nav-link" data-scroll-target="#model-setup">Model Setup</a></li>
+  <li><a href="#unit-of-analysis" id="toc-unit-of-analysis" class="nav-link" data-scroll-target="#unit-of-analysis">Unit of Analysis</a></li>
+  <li><a href="#extraction-vs-summarization" id="toc-extraction-vs-summarization" class="nav-link" data-scroll-target="#extraction-vs-summarization">Extraction vs Summarization</a></li>
+  <li><a href="#pipeline" id="toc-pipeline" class="nav-link" data-scroll-target="#pipeline">Pipeline</a></li>
+  </ul></li>
+  <li><a href="#evaluation-and-results" id="toc-evaluation-and-results" class="nav-link" data-scroll-target="#evaluation-and-results">Evaluation and Results</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a>
+  <ul class="collapse">
+  <li><a href="#ethics" id="toc-ethics" class="nav-link" data-scroll-target="#ethics">Ethics</a></li>
+  <li><a href="#implications" id="toc-implications" class="nav-link" data-scroll-target="#implications">Implications</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="draft_in_progress.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content"><div class="quarto-title-block"><div class="quarto-title-tools-only"><h1></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+
+
+
+
+<section id="using-messy-text-in-future-llm-annotations" class="level1">
+<h1>Using Messy Text In Future LLM Annotations</h1>
+<p>Patrick Brandt, Shreyas Meher, Paula Cuellar-Cuellar, Xingyaun Zhao</p>
+<p><strong>This paper is a work in progress and is being shared for review in its current incomplete form. This research is supported by NSF funding. The argument, analysis, and results are still under revision, and this draft should not be treated as a final version of the paper.</strong></p>
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>When working with real-world text, researchers often inherit corpora and annotations that preserve costly human judgment but were not collected, organized, or annotated for modern text-as-data workflows. This problem is especially common in social science domains where web-scraped documents are noisy, incomplete, or misaligned with the original unit of analysis. We discovered that all you need is codebook attention. This problem is solved with a codebook-guided turn-by-turn extractive summarization pipeline that reuses valuable annotations without requiring full reannotation. For each victim in a corpus of disappearance reports from Mexico, the model processes documents sequentially, extracts verbatim evidence spans for each codebook category, and updates a running structured summary to produce a clean and evidence-traceable document-level representation. Using the codebook as the task schema focuses model attention on the fields that matter for downstream classification and reconnects prior human annotations to contemporary language model workflows. We evaluate the resulting summaries by classifying them and comparing the predicted labels with human annotations across multiple open-source models. Because the pipeline records turn-by-turn outputs, it also identifies where errors enter the workflow and documents the marginal gains and costs of additional turns and annotations, making the human and machine trade explicit. Preliminary results suggest that hours of computation can approximate weeks of human coding effort while producing evidence-traceable summaries suitable for downstream human rights and event data research.</p>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.</p>
+<p>In practice, especially addressing downstream tasks using real-world data, researchers often must work with a messy and noisy text dataset. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods.</p>
+<p><em>Humans can easily filter and extract around this noise and may have already done so to produce annotations</em>. But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document).</p>
+<p>Solving these problems enables other researchers to work with and re-use texts for their research but that are currently messy and not well-structured. This is important because we work with a corpus on disappearance cases that is valuable and significant for human rights research as well as serving training for the classification and prediction of future abduction cases.</p>
+<p>Our solution is a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim). This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.</p>
+<section id="contributions" class="level3">
+<h3 class="anchored" data-anchor-id="contributions">Contributions</h3>
+<p>Researchers may encounter a mismatch between collected data and the target unit of analysis. Since this work addresses this problem through LLM-based alignment, our work contributes a generalizable approach so that other source-task or annotation-task discrepancy can be resolved without re-collection using human coders that is expensive, time-consuming and vulnerable to knowledge loss. Researchers may also encounter the need to perform document level de-duplication and information extraction across sources reporting the same events. Our work addresses the case where multiple reports must be aggregated into unified data fields, it contributes an extractive AI approach so that redundant information across documents can be consolidated and traced back to the original sources without manual effort.</p>
+<p>This work also demonstrates a better way of using LLMs to assist social science research. It is known that LLMs are powerful tools but are also vulnerable to hallucination and other biases if not used carefully. We provided a framework that is more robust to hallucination and other biases by using a multi-turn stateful workflow framework that maintains context across operations. The more important part is that our framework allows tracking the source and evidence of the information extracted from the text, which bridges the gap between the annotations and the lost knowledge of the original coders.</p>
+<p>Human rights research relies on vast bodies of documentation—including court records, testimonies, NGO reports, forensic evidence, media archives, and government materials—that often exceed the capacity of traditional qualitative methods. Cleaned and well-organized corpora transform these fragmented materials into searchable datasets, enabling researchers and organizations to navigate complex documentation more efficiently and connect sources that would otherwise remain dispersed across institutions, languages, and formats.</p>
+<p>Once documentation is systematically organized, computational tools such as large language models (LLMs) can significantly expand analytical capacity. They assist with tasks such as entity extraction, document classification, timeline reconstruction, and cross-referencing events across large collections of records. Rather than replacing expert judgment, these tools reduce the time required for large-scale document review and allow human rights investigators to concentrate on verification, contextual interpretation, and legal analysis.</p>
+<p>Standardized documentation systems also strengthen methodological consistency across research projects. Human rights investigations are often collaborative and extend across long periods of time. Using common variables, metadata structures, and coding protocols allows multiple researchers and institutions to contribute to a shared body of evidence. This facilitates cumulative research, improves transparency, and ensures that documentation collected today remains usable for future investigations, historical analysis, and accountability processes.</p>
+<p>These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.</p>
+<p>Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.</p>
+</section>
+</section>
+<section id="related-work" class="level2">
+<h2 class="anchored" data-anchor-id="related-work">Related Work</h2>
+<section id="non-llm-methods-for-messy-text" class="level3">
+<h3 class="anchored" data-anchor-id="non-llm-methods-for-messy-text">Non-LLM Methods for Messy Text</h3>
+<p>Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of LLM models.</p>
+<p>Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.</p>
+<p>Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone.</p>
+<p>Human labor represents the alternative approach, typically involving trained coders who read through raw scraped documents and manually remove irrelevant content, identify article boundaries, and flag ambiguous passages. While human judgment can handle contextual distinctions that pattern-matching cannot, the approach carries significant practical limitations. The volume of documents in a large web-scraped corpus makes manual cleaning prohibitively slow and expensive. When content is topically adjacent to the main article, such as related-article previews or editorially similar commentary, decisions about relevance depend on subtle contextual cues that different coders may read differently, leading to inconsistent outputs across the corpus. At scale, these costs and inconsistencies make human labor an impractical solution for large heterogeneous corpora.</p>
+<p>Both rule-based preprocessing and human labor are insufficient for handling the noisy corpus examined in this paper, as the volume, heterogeneity, and semantic complexity exceed what non-LLM methods can realistically manage.</p>
+</section>
+<section id="llm-methods-for-messy-text" class="level3">
+<h3 class="anchored" data-anchor-id="llm-methods-for-messy-text">LLM Methods for Messy Text</h3>
+<p>Recent work on LLM based data preparation argues that large language models can perform data cleaning beyond the limits of rule based methods. LLM methods are used not only for standardization and error processing, but also for data integration tasks such as entity matching, where the model determines whether a pair of data records corresponds to the same real-world entity.</p>
+<p>This shift of methodology paradigm matters for messy text because LLMs can use semantic reasoning to make decisions that depend on context rather than fixed patterns alone. For a corpus like ours, this means they can better handle differences across websites and distinguish article content from plausible but irrelevant surrounding text, making them a more suitable approach than non LLM methods for preparing the corpus for downstream analysis.</p>
+<p>Existing works show that LLMs can effectively perform various data preparation tasks for heterogeneous and imperfect data, including data standardization, error processing, and entity matching.</p>
+<p>LLMs can also perform the data standardization and error processing tasks that rule based preprocessing was originally meant to provide. In particular, data standardization transforms heterogeneous, inconsistent, or non conforming data into a unified representation that satisfies consistency requirements, such as converting differently structured scraped webpages into a consistent article centered representation. Because LLMs can infer these transformations from context rather than relying on site specific rules, they are better suited to heterogeneous web corpora collected from many different sources.</p>
+<p>LLMs can also address data error processing, which involves detecting erroneous values and then correcting them to restore data reliability. In this corpus, these problems include HTTP error pages, navigation menus, footers, and advertising banners interleaved with the article body, as well as topically adjacent but irrelevant content such as suggested article previews or user comment threads. Because these problems often require contextual judgment rather than fixed pattern matching alone, LLM based methods are well suited to identifying and repairing them in noisy web text.</p>
+<p>In general, these tasks are implemented through prompt engineering, prompt based code synthesis, or agent style workflows that generate or execute cleaning steps automatically.</p>
+<p>Another problem the LLM can solve is data integration, especially entity matching, which is to extract and align same real-word entities but with different names or structures. This is a common problem in data integration, and LLMs are well suited to solve it. This also supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates.</p>
+<p>Entity matching methods are typically implemented through structured prompts that ask the llm to implement the matching logic directly. Some approaches strengthen this process with multi shots examples or batching multiple entity or record pairs to improve performance of the prompts. Others uses task specific fine-tuned models or orchestrate multiple AI models to handle the matching task.</p>
+<p>LLMs are also widely used for data imputation, which is to fill in missing values from the surrounding context in a dataset. While this is useful for tasks that require restoring incomplete records, it does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text. In our setting, generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs. For example, the model may guess the preparator type from the victim or location of the incident, even though that information is not explicitly stated in the source text. This will cause the model to generate plausible but unsupported information that cannot be traced back to the source text. For our task, this is a form of hallucination, because the model is generating information that appears plausible but is not directly grounded in the source text.</p>
+<p>This makes it necessary not only to reduce hallucination during generation, but also to evaluate systematically whether the resulting outputs remain grounded in the source text.</p>
+</section>
+<section id="extraction-and-summarization" class="level3">
+<h3 class="anchored" data-anchor-id="extraction-and-summarization">Extraction and Summarization</h3>
+<p>So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.</p>
+</section>
+</section>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<section id="data-source" class="level3">
+<h3 class="anchored" data-anchor-id="data-source">Data Source</h3>
+<p>We are using the disappearance news reports in Mexico collected and annotated by UMN.</p>
+</section>
+<section id="challenges-in-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="challenges-in-the-data">Challenges in the Data</h3>
+<section id="scraped-file-errors" class="level4">
+<h4 class="anchored" data-anchor-id="scraped-file-errors">Scraped File Errors</h4>
+<p>The scraped corpus contains three categories of textual noise in the web scraping process: - HTTP error pages / missing pages: target URL was unreachable - Ancillary or obscured text on pages: website with extraneous information such as navigation menus, footers, and advertising banners interleaved with the article body, obscuring the relevant text. - Irrelevant content: content that is topically adjacent but are substantially irrelevant, such as suggested article previews or user comment threads appended to the original report.</p>
+<p>Each of these error types introduces noise that can mislead or degrade downstream text processing. Each error type has consequences for downstream tasks such as fine-tuning based on a noisy corpus.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> When a model is fine-tuned on such documents, the training signal is distributed across the full input including the noise, making it difficult for the model to learn which spans are responsible for a given label. Distractive content such as suggested articles or comment threads poses a more subtle but more dangerous risk, as the text is topically connected to disappearance reporting and can cause the model to attribute information from unrelated cases to the victim under analysis, resulting in hallucinated or incorrectly sourced output.</p>
+<p>To address these noise sources, the authors attempted to rescrape the original URLs to obtain cleaner versions of the documents. However, a portion of the original URLs were no longer accessible at the time of rescraping. For those that remained available, the structural issues persisted, as the noise originates from the design of the source websites themselves rather than from the scraping process. Navigation menus, comment sections, and related article modules are integral parts of the page layout and are captured by any general-purpose scraper that retrieves the full page body.</p>
+<p>The authors also attempted rule-based preprocessing to remove known sources of noise, targeting HTML tags, residual markup, and other structural elements. While this reduced formatting noise, it could not reliably eliminate all types of errors such as navigation text or other irrelevant information, because each webpage were designed differently. As for related content such as suggested articles or comment threads which appear as valid plain text, are almost indistinguishable from article content by pattern-matching rules. Processing them requires substantive human hours and is not scalable. Approaches such as optical character recognition (OCR), which convert image-based documents to machine-readable text, are not applicable here, as the documents were already scraped as plain text. The noise in this corpus is not a accessibility problem but a content boundary or scope problem, and no rule-based or format-conversion method can reliably locate where the article body ends and extraneous content begins without semantic understanding of the text.</p>
+</section>
+<section id="ambiguity-for-classification" class="level4">
+<h4 class="anchored" data-anchor-id="ambiguity-for-classification">Ambiguity for Classification</h4>
+<p>A second category of challenge arises from the inherent ambiguity of the context described in the news text itself. Real-world entities and places do not belong to a single category by nature, and the language used to describe them reflects this multiplicity. For example, a bus route office in a residential area is simultaneously a commercial service facility and a place in close proximity to where the victim lived. The news report does not resolve this ambiguity, for its purpose is to report the event, not to decide how to classify the event. In this case, because the news text does not distinguish between these dimensions, both interpretations are equally supported by the available evidence. When the model and the human annotator arrive at different valid categories from the same text, the evaluation records a false negative even though neither answer is wrong. The disagreement originates in the indeterminacy of the source text, not in a failure of the model or the annotation.</p>
+<p>Evaluating against fine-grained categories that each case is expected to match a single label penalizes valid model outputs that approaches the text from a different but equally defensible understanding of the same text. To produce an evaluation that is less sensitive to this inherent ambiguity, the original categories were collapsed into broader groupings that reduce the number of cases where two valid answers fall into different classes.</p>
+</section>
+</section>
+</section>
+<section id="method" class="level2">
+<h2 class="anchored" data-anchor-id="method">Method</h2>
+<section id="task-definitions" class="level3">
+<h3 class="anchored" data-anchor-id="task-definitions">Task Definitions</h3>
+<p>The task is to transform a set of messy, multi document news reports associated with a single victim into a structured, evidence traceable document level representation that supports reuse of the existing codebook and annotations.</p>
+<p>Another critical requirement is that the output text must be noise-free, so that any further LLM tasks can be meaningful. The text must combine extraction of verbatim spans with structured aggregation across documents, so that the resulting representation is both clean enough to serve as LLM input and anchored tightly enough to the source material to support reuse of the existing coded data and codebook definitions.</p>
+</section>
+<section id="model-setup" class="level3">
+<h3 class="anchored" data-anchor-id="model-setup">Model Setup</h3>
+<p>All LLM calls were executed using instruction tuned models served through vLLM. The default configuration uses the AWQ INT4 quantized Meta Llama 3.1 8B Instruct model, and cross model comparisons use Meta Llama 3.1 70B Instruct, Gemma 3 12B IT, and Ministral 3 8B Instruct. We use deterministic decoding with temperature 0.0. Generation is capped at 1024 tokens for summarization and 256 tokens for classification, and outputs are constrained to a fixed JSON schema to produce consistent structured fields for extracted spans and label predictions.</p>
+</section>
+<section id="unit-of-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="unit-of-analysis">Unit of Analysis</h3>
+<p>On the dataset side, the original dataset was coded with the victim as the unit of analysis. To be specific, human coders annotated features about each kidnapping victim such as method of capture, who carried out the threats, how the person was captured etc. The annotations are structured around victim records.</p>
+<p>On the source data side, the original scraped reports were organized by documents. A single victim may appear across multiple documents, and those documents were collected by news source or origin, not by victim. However, the annotations were made at the victim level, not the document level, and the knowledge between the annotations and the source data is not realistically recoverable by human labor.</p>
+<p>On the downstream task side, the downstream tasks may include fine-tuning, annotation or classifications for other reports that domain experts might gathered, so the output must be organized and labeled in a way that can be directly consumed by an LLM or classifier operating on individual documents, document level preferably. However, the original annotations were not coded at the document level, so it is unclear which document should carry which annotation. For example, a victim’s method of capture may be mentioned in one document while the identity of who carried out the threats appears in another, yet both were annotated at the victim level, without reference to a specific document. If victim-level annotations are simply propagated down to the document level, future LLM training tasks will receive incorrect signals, as each document would be labeled with information it does not necessarily contain.</p>
+</section>
+<section id="extraction-vs-summarization" class="level3">
+<h3 class="anchored" data-anchor-id="extraction-vs-summarization">Extraction vs Summarization</h3>
+<p>As stated above, another requirement for the dataset for this set of tasks is that the annotations from prior human coders remain connected to the source texts, so that the coded features can be traced back to the original documents and reused without re-annotation. Even though recreating the human annotation is almost impossible and unrealistic, with the help of LLMs, we now can extract the exact spans of the text where the decision of annotations were made and record them as evidence. This allows researchers to trace the source of the information rather than having an annotation to victim link without knowing where, how and why they were annotated that way.</p>
+<p>Given the above requirements, the process cannot rely on generative summarization alone, which might condenses and paraphrases and breaks the link to the original evidence.</p>
+</section>
+<section id="pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline">Pipeline</h3>
+<p>The pipeline takes each victim’s documents one at a time in sequence, extracting relevant spans, generating a label-structured summary anchored to those spans, and updating the summaries using previous summaries as context. This pipeline satisfies the task definition by producing document level outputs that are clean enough for downstream language model use while keeping each coded field traceable to evidence in the original documents.</p>
+<section id="extraction-of-evidence" class="level4">
+<h4 class="anchored" data-anchor-id="extraction-of-evidence">Extraction of evidence</h4>
+<p>In the first step of the pipeline, we extract evidence rather than only generating a paraphrased summary. For each input document, the model is instructed to return verbatim text spans for each item in the codebook schema, producing a structured evidence record keyed by label. This creates traceability because every coded field is paired with the exact source phrase that supports it, so downstream users can verify where the information came from in the original report. The evidence output is designed to demonstrate that the link between each annotation and its source text is preserved and can later be verified, and it also includes a character index that locates each span within the document text. This index records how many characters into the document the extracted span begins, so a future researcher can find the exact spot in the original text and confirm the evidence.</p>
+</section>
+<section id="summarization-with-context-and-evidence" class="level4">
+<h4 class="anchored" data-anchor-id="summarization-with-context-and-evidence">Summarization with Context and Evidence</h4>
+<p>In the second step of the workflow, we generate a coherent summary while keeping it anchored to evidence and guided by the codebook schema. The model is given the document text together with the label definitions that specify the meaning of the labels and how the human coders would code the information, and it is also provided with the extracted span structure so that each sentence or clause of the summary can be linked back to the corresponding evidence. For example, the first sentence may be about the victim, and the second sentence may be about the method of capture, and the third sentence may be about who carried out the threats, instead of condensing the information into a single sentence where all the information is mixed together. This makes the summary different from vanilla summarization because it is not an unconstrained paraphrase of the document, rather, with the paragraph structured label by label, it will be easier for an LLM to pick up the right information. At this stage, summarization is performed at the level of a single document and is designed to be clean, structured, and directly usable for downstream models.</p>
+</section>
+<section id="updating-summary-with-state" class="level4">
+<h4 class="anchored" data-anchor-id="updating-summary-with-state">Updating Summary with state</h4>
+<p>In a typical single request, an LLM is stateless, meaning that it does not retain information from earlier calls, but our workflow preserves memory by maintaining an explicit conversation state for each victim as their documents are processed. The workflow maintains an explicit conversation state for each victim that accumulates across documents as they are processed sequentially. The prompt instructs the model to check each new document against the existing summary and update only the fields where new information is found. If a document contains no relevant information, the runner keeps the previous summary unchanged rather than replacing it with the model’s output. Each turn also records the output of that turn, preserving what was extracted and what summary was produced at that step for later inspection and reuse. When a document contains no relevant information, the workflow avoids replacing the existing running summary, so the accumulated context is not lost as the sequence progresses.</p>
+</section>
+</section>
+</section>
+<section id="evaluation-and-results" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-and-results">Evaluation and Results</h2>
+<p>Evaluation of summarization tasks compares the text summary with a gold standard reference text. Given the messy and noisy initial documents, it is difficult to use them as reference texts. The prior work has human annotations classifying the information in the summary text. The evaluation tests whether generated summaries reproduce the same labels as the human annotations, comparing a simple summarization baseline against the proposed method, across major model families, and across model sizes.</p>
+<section id="human-gold-standard" class="level4">
+<h4 class="anchored" data-anchor-id="human-gold-standard">Human Gold Standard</h4>
+<p>Many existing summarization evaluation methods require a gold standard reference text against which generated summaries can be compared using similarity metrics. Because the source documents in this dataset are themselves messy and noisy, they cannot serve as reliable reference texts, and there are no clean human-written reference summaries for this corpus. Should the research use these documents as reference texts, the output generated from original text will be heavily influenced by the noise, so that the difference between the result of original text and the result from cleaned summaries will be inflated, making the evaluation not reliable. However, the data set contains human annotations coded at the victim level, and these annotations are used as ground truth. Evaluation proceeds by classifying the generated summary text and comparing the resulting labels against the human annotations, testing whether the summaries preserve the same information that human coders recorded.</p>
+<p>Another issue discussed above is that the original codebook contains fine-grained categories. One example is that the method of capture can be distinguished into general kidnappings and special type kidnappings such as Levantón. Without external context plugged in, or making the model fine-tuned on the specific context, it will be difficult for LLM models to distinguish between the two.</p>
+<p>The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation.</p>
+</section>
+<section id="preliminary-results" class="level4">
+<h4 class="anchored" data-anchor-id="preliminary-results">Preliminary Results</h4>
+<p>The current results indicate that the proposed conversational extractive workflow improves performance over the simple generative baseline on a substantial share of the evaluated labels, with the strongest gains appearing in categories that benefit from cross document accumulation and evidence tracking. The clearest improvements appear in perpetrator and legal procedure fields. For the field on who carried out the threats, accuracy rises from 0.44 to 0.79, precision rises from 0.07 to 0.21, and recall rises from 0.11 to 0.28. For the field on the type of sentence against perpetrators or detained individuals, accuracy rises from 0.76 to 0.95, and the field on the type of tribunal or court improves from 0.56 to 0.76. The method also improves the field on which authority responded to the contact from 0.16 to 0.36 in accuracy, the field on the type of place from which the victim disappeared from 0.25 to 0.49, the field on treatment during captivity from 0.64 to 0.80, and the field on whether the victim belonged to a distinct social group from 0.39 to 0.49. These gains are consistent with the claim that a multi turn stateful workflow is especially useful when relevant information is distributed across several reports and must be preserved by item rather than condensed into a single freeform summary.</p>
+<p>At the same time, the gains are not uniform across all labels. Some categories show weaker performance or declines under the current setup, including the field on the involvement of civil society in the case, where accuracy falls from 0.40 to 0.26, the field on the method of capture and the language used to describe the disappearance, where accuracy falls from 0.42 to 0.27, and the field on the outcome of the disappearance, where accuracy falls from 0.54 to 0.39. Other fields remain only modestly improved in recall even when accuracy rises. Taken together, these preliminary results suggest that the proposed method is promising but label dependent. It appears to work best for fields that require aggregating scattered evidence across documents, while categories with higher ambiguity or weaker textual cues remain harder to recover reliably. These findings are still preliminary, and broader cross model comparisons and additional evaluation remain ongoing.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<section id="ethics" class="level3">
+<h3 class="anchored" data-anchor-id="ethics">Ethics</h3>
+<p>Masking victim names in the dataset is an important measure to protect the privacy, dignity, and security of victims and their families. Cases involving enforced disappearance and other forms of violence often remain politically sensitive and may involve powerful actors, including criminal organizations or state agents. Publicly circulating identifiable personal information can expose victims’ relatives to intimidation, retaliation, or renewed stigmatization. By anonymizing names while preserving the relevant contextual data—such as dates, locations, and types of violations—the dataset allows researchers to analyze patterns of violence without placing individuals or families at additional risk.</p>
+<p>Anonymization also reflects broader ethical standards in human rights research and documentation, which prioritize the protection of victims over the unrestricted dissemination of personal information. Masking identities helps prevent the re-traumatization of families and respects their right to control how their loved ones’ stories are used and shared. At the same time, the dataset remains analytically valuable because the key variables needed to study trends, language, and patterns of violence are preserved, enabling rigorous research while maintaining responsible safeguards for those directly affected by the crimes being documented.</p>
+</section>
+<section id="implications" class="level3">
+<h3 class="anchored" data-anchor-id="implications">Implications</h3>
+<section id="compute-time-vs-human-coding" class="level4">
+<h4 class="anchored" data-anchor-id="compute-time-vs-human-coding">Compute Time vs Human Coding</h4>
+<p>We found that hours of computational processing can approximate weeks of human coding effort, and the results from the proposed method is good enough. This will save future researchers tons of human-hours.</p>
+</section>
+<section id="downstream-tasks" class="level4">
+<h4 class="anchored" data-anchor-id="downstream-tasks">Downstream Tasks</h4>
+<p>When developing new research projects using the UMN dataset, we are particularly interested in analyzing how violence is portrayed, described, or obscured through language in public reporting, especially in ways that prevent the systematic identification of human rights and international crimes. Our work focuses on identifying the use of euphemisms, ambiguous terminology, and narrative framing that mask patterns of violence and make it more difficult to establish the widespread or systematic nature of abuses—an essential requirement for proving international crimes before courts. By analyzing large corpora of media reports and related documentation, we aim to understand how linguistic practices can shape the visibility of violence and influence whether certain acts are recognized as human rights violations.</p>
+<p>One specific focus of our research using the UMN dataset concerns the terminology that emerged during Mexico’s so-called “War on Drugs,” declared by President Felipe Calderón in 2006. During this period, journalists increasingly used the term “levantón” (“big lift”) to describe events involving the deprivation of liberty followed by the disappearance of individuals whose fate and whereabouts remained unknown. Although some journalists now employ more accurate terminology, many reports still frame disappearances primarily as ordinary criminal acts rather than as serious human rights violations, often overlooking the possible role of the state through action, tolerance, or omission. Our research seeks to examine how such language contributes to the normalization or depoliticization of enforced disappearance in public discourse.</p>
+<p>Presenting disappearances as isolated crimes creates several analytical and legal problems. First, it reduces the event to a single act of deprivation of liberty rather than recognizing enforced disappearance as a continuous and ongoing crime that persists as long as the person’s fate remains unknown. Second, it obscures the multiple human rights violations involved, including violations of the rights to life, personal integrity, and juridical personality, and ignores the broader circle of victims affected by the disappearance. Finally, it conceals the possible involvement of the state, which is central to the legal definition of enforced disappearance. The use of terms like “levantón” is particularly problematic because it originates in the lexicon of organized crime and functions as a euphemism that masks what may in fact be enforced disappearance. Through systematic analysis of this language, our research seeks to reveal how linguistic framing can obscure patterns of violence that are essential for legal accountability and human rights documentation.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<p>Stuhler, Oscar, Cat Dang Ton, and Etienne Ollion. 2025. “From Codebooks to Promptbooks: Extracting Information from Text with Generative Large Language Models.” <em>Sociological Methods &amp; Research</em> 54(3): 794-848. https://doi.org/10.1177/00491241251336794.</p>
+<p>Than, Nga, Leanne Fan, Tina Law, Laura K. Nelson, and Leslie McCall. 2025. “Updating “The Future of Coding”: Qualitative Coding with Generative Large Language Models.” <em>Sociological Methods &amp; Research</em> 54(3): 849-888. https://doi.org/10.1177/00491241251339188.</p>
+<p>Zhou, Wei, Jun Zhou, Haoyu Wang, Zhenghao Li, Qikang He, Shaokun Han, Guoliang Li, Xuanhe Zhou, Yeye He, Chunwei Liu, Zirui Tang, Bin Wang, Shen Tang, Kai Zuo, Yuyu Luo, Zhenzhe Zheng, Conghui He, Jingren Zhou, and Fan Wu. 2026. “Can LLMs Clean Up Your Mess? A Survey of Application-Ready Data Preparation with LLMs.” <em>arXiv</em> 2601.17058. https://arxiv.org/abs/2601.17058.</p>
+<!-- -->
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Error pages yield no usable content, causing the model to process an empty or irrelevant document as if it were a valid report when the document or victim was linked to a set of annotations, which can establish a false connection between the the annotation and empty documents. Page elements such as navigation menus and footers inflate the input with structurally irrelevant text, increasing context length while contributing no article content.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Using Messy Text In Future LLM Annotations</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Patrick Brandt, Shreyas Meher, Paula Cuellar-Cuellar, Xingyaun Zhao</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>**This paper is a work in progress and is being shared for review in its current incomplete form. This research is supported by NSF funding. The argument, analysis, and results are still under revision, and this draft should not be treated as a final version of the paper.**</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abstract</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>When working with real-world text, researchers often inherit corpora and annotations that preserve costly human judgment but were not collected, organized, or annotated for modern text-as-data workflows. This problem is especially common in social science domains where web-scraped documents are noisy, incomplete, or misaligned with the original unit of analysis. We discovered that all you need is codebook attention. This problem is solved with a codebook-guided turn-by-turn extractive summarization pipeline that reuses valuable annotations without requiring full reannotation. For each victim in a corpus of disappearance reports from Mexico, the model processes documents sequentially, extracts verbatim evidence spans for each codebook category, and updates a running structured summary to produce a clean and evidence-traceable document-level representation. Using the codebook as the task schema focuses model attention on the fields that matter for downstream classification and reconnects prior human annotations to contemporary language model workflows. We evaluate the resulting summaries by classifying them and comparing the predicted labels with human annotations across multiple open-source models. Because the pipeline records turn-by-turn outputs, it also identifies where errors enter the workflow and documents the marginal gains and costs of additional turns and annotations, making the human and machine trade explicit. Preliminary results suggest that hours of computation can approximate weeks of human coding effort while producing evidence-traceable summaries suitable for downstream human rights and event data research.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>In practice, especially addressing downstream tasks using real-world data, researchers often must work with a messy and noisy text dataset. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods.</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>*Humans can easily filter and extract around this noise and may have already done so to produce annotations*.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document).</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Solving these problems enables other researchers to work with and re-use texts for their research but that are currently messy and not well-structured. This is important because we work with a corpus on disappearance cases that is valuable and significant for human rights research as well as serving training for the classification and prediction of future abduction cases.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>Our solution is a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### Contributions</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Researchers may encounter a mismatch between collected data and the target unit of analysis. Since this work addresses this problem through LLM-based alignment, our work contributes a generalizable approach so that other source-task or annotation-task discrepancy can be resolved without re-collection using human coders that is expensive, time-consuming and vulnerable to knowledge loss. Researchers may also encounter the need to perform document level de-duplication and information extraction across sources reporting the same events. Our work addresses the case where multiple reports must be aggregated into unified data fields, it contributes an extractive AI approach so that redundant information across documents can be consolidated and traced back to the original sources without manual effort.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>This work also demonstrates a better way of using LLMs to assist social science research. It is known that LLMs are powerful tools but are also vulnerable to hallucination and other biases if not used carefully. We provided a framework that is more robust to hallucination and other biases by using a multi-turn stateful workflow framework that maintains context across operations. The more important part is that our framework allows tracking the source and evidence of the information extracted from the text, which bridges the gap between the annotations and the lost knowledge of the original coders.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>Human rights research relies on vast bodies of documentation—including court records, testimonies, NGO reports, forensic evidence, media archives, and government materials—that often exceed the capacity of traditional qualitative methods. Cleaned and well-organized corpora transform these fragmented materials into searchable datasets, enabling researchers and organizations to navigate complex documentation more efficiently and connect sources that would otherwise remain dispersed across institutions, languages, and formats.</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>Once documentation is systematically organized, computational tools such as large language models (LLMs) can significantly expand analytical capacity. They assist with tasks such as entity extraction, document classification, timeline reconstruction, and cross-referencing events across large collections of records. Rather than replacing expert judgment, these tools reduce the time required for large-scale document review and allow human rights investigators to concentrate on verification, contextual interpretation, and legal analysis.</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>Standardized documentation systems also strengthen methodological consistency across research projects. Human rights investigations are often collaborative and extend across long periods of time. Using common variables, metadata structures, and coding protocols allows multiple researchers and institutions to contribute to a shared body of evidence. This facilitates cumulative research, improves transparency, and ensures that documentation collected today remains usable for future investigations, historical analysis, and accountability processes.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related Work</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Non-LLM Methods for Messy Text</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material is a problem that has a lot of needs to be addressed before the invention of LLM models.</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>Typically, researchers uses rule-based preprocessing, manual data cleaning, or a combination of both to clean and organize raw text data.</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>Rule-based methods represent the most common preprocessing approach for noisy text. These methods apply fixed text operations such as regular expression matching, HTML tag stripping, stopword removal, and pattern-based filtering to remove structural artifacts from scraped documents. Although they are computationally inexpensive and easy to implement, their effectiveness is constrained by the heterogeneity of web content. Because each source website uses a different page layout, a rule set calibrated to one domain does not generalize reliably to others, and there is no guarantee that the same pattern will identify the same type of noise across sources. More critically, rule-based approaches cannot handle semantically related but contextually irrelevant content, such as suggested article previews or reader comment threads, which appear as valid natural language text and are indistinguishable from article content by pattern-matching alone.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>Human labor represents the alternative approach, typically involving trained coders who read through raw scraped documents and manually remove irrelevant content, identify article boundaries, and flag ambiguous passages. While human judgment can handle contextual distinctions that pattern-matching cannot, the approach carries significant practical limitations. The volume of documents in a large web-scraped corpus makes manual cleaning prohibitively slow and expensive. When content is topically adjacent to the main article, such as related-article previews or editorially similar commentary, decisions about relevance depend on subtle contextual cues that different coders may read differently, leading to inconsistent outputs across the corpus. At scale, these costs and inconsistencies make human labor an impractical solution for large heterogeneous corpora.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Both rule-based preprocessing and human labor are insufficient for handling the noisy corpus examined in this paper, as the volume, heterogeneity, and semantic complexity exceed what non-LLM methods can realistically manage.</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu">### LLM Methods for Messy Text</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>Recent work on LLM based data preparation argues that large language models can perform data cleaning beyond the limits of rule based methods. LLM methods are used not only for standardization and error processing, but also for data integration tasks such as entity matching, where the model determines whether a pair of data records corresponds to the same real-world entity.</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>This shift of methodology paradigm matters for messy text because LLMs can use semantic reasoning to make decisions that depend on context rather than fixed patterns alone. For a corpus like ours, this means they can better handle differences across websites and distinguish article content from plausible but irrelevant surrounding text, making them a more suitable approach than non LLM methods for preparing the corpus for downstream analysis.</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>Existing works show that LLMs can effectively perform various data preparation tasks for heterogeneous and imperfect data, including data standardization, error processing, and entity matching.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>LLMs can also perform the data standardization and error processing tasks that rule based preprocessing was originally meant to provide. In particular, data standardization transforms heterogeneous, inconsistent, or non conforming data into a unified representation that satisfies consistency requirements, such as converting differently structured scraped webpages into a consistent article centered representation. Because LLMs can infer these transformations from context rather than relying on site specific rules, they are better suited to heterogeneous web corpora collected from many different sources.</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>LLMs can also address data error processing, which involves detecting erroneous values and then correcting them to restore data reliability. In this corpus, these problems include HTTP error pages, navigation menus, footers, and advertising banners interleaved with the article body, as well as topically adjacent but irrelevant content such as suggested article previews or user comment threads. Because these problems often require contextual judgment rather than fixed pattern matching alone, LLM based methods are well suited to identifying and repairing them in noisy web text.</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>In general, these tasks are implemented through prompt engineering, prompt based code synthesis, or agent style workflows that generate or execute cleaning steps automatically.</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>Another problem the LLM can solve is data integration, especially entity matching, which is to extract and align same real-word entities but with different names or structures. This is a common problem in data integration, and LLMs are well suited to solve it. This also supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates.</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>Entity matching methods are typically implemented through structured prompts that ask the llm to implement the matching logic directly. Some approaches strengthen this process with multi shots examples or batching multiple entity or record pairs to improve performance of the prompts. Others uses task specific fine-tuned models or orchestrate multiple AI models to handle the matching task.</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>LLMs are also widely used for data imputation, which is to fill in missing values from the surrounding context in a dataset. While this is useful for tasks that require restoring incomplete records, it does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text. In our setting, generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs. For example, the model may guess the preparator type from the victim or location of the incident, even though that information is not explicitly stated in the source text. This will cause the model to generate plausible but unsupported information that cannot be traced back to the source text. For our task, this is a form of hallucination, because the model is generating information that appears plausible but is not directly grounded in the source text.</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>This makes it necessary not only to reduce hallucination during generation, but also to evaluate systematically whether the resulting outputs remain grounded in the source text.</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="fu">### Extraction and Summarization</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>So we face a dilemma and a budget constraint: we do not have the budget or expertise to redo the earlier annotations as needed (by spans or image segmentation) and do not have the access to the same expertise as before to filter and clean the data.</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Source</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>We are using the disappearance news reports in Mexico collected and annotated by UMN.</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="fu">### Challenges in the Data</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Scraped File Errors</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>The scraped corpus contains three categories of textual noise in the web scraping process:</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>HTTP error pages / missing pages: target URL was unreachable</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ancillary or obscured text on pages: website with extraneous information such as navigation menus, footers, and advertising banners interleaved with the article body, obscuring the relevant text.</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Irrelevant content: content that is topically adjacent but are substantially irrelevant, such as suggested article previews or user comment threads appended to the original report.</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>Each of these error types introduces noise that can mislead or degrade downstream text processing. Each error type has consequences for downstream tasks such as fine-tuning based on a noisy corpus.<span class="ot">[^1]</span> When a model is fine-tuned on such documents, the training signal is distributed across the full input including the noise, making it difficult for the model to learn which spans are responsible for a given label. Distractive content such as suggested articles or comment threads poses a more subtle but more dangerous risk, as the text is topically connected to disappearance reporting and can cause the model to attribute information from unrelated cases to the victim under analysis, resulting in hallucinated or incorrectly sourced output.</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>To address these noise sources, the authors attempted to rescrape the original URLs to obtain cleaner versions of the documents. However, a portion of the original URLs were no longer accessible at the time of rescraping. For those that remained available, the structural issues persisted, as the noise originates from the design of the source websites themselves rather than from the scraping process. Navigation menus, comment sections, and related article modules are integral parts of the page layout and are captured by any general-purpose scraper that retrieves the full page body.</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>The authors also attempted rule-based preprocessing to remove known sources of noise, targeting HTML tags, residual markup, and other structural elements. While this reduced formatting noise, it could not reliably eliminate all types of errors such as navigation text or other irrelevant information, because each webpage were designed differently. As for related content such as suggested articles or comment threads which appear as valid plain text, are almost indistinguishable from article content by pattern-matching rules. Processing them requires substantive human hours and is not scalable. Approaches such as optical character recognition (OCR), which convert image-based documents to machine-readable text, are not applicable here, as the documents were already scraped as plain text. The noise in this corpus is not a accessibility problem but a content boundary or scope problem, and no rule-based or format-conversion method can reliably locate where the article body ends and extraneous content begins without semantic understanding of the text.</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Ambiguity for Classification</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>A second category of challenge arises from the inherent ambiguity of the context described in the news text itself. Real-world entities and places do not belong to a single category by nature, and the language used to describe them reflects this multiplicity. For example, a bus route office in a residential area is simultaneously a commercial service facility and a place in close proximity to where the victim lived. The news report does not resolve this ambiguity, for its purpose is to report the event, not to decide how to classify the event. In this case, because the news text does not distinguish between these dimensions, both interpretations are equally supported by the available evidence. When the model and the human annotator arrive at different valid categories from the same text, the evaluation records a false negative even though neither answer is wrong. The disagreement originates in the indeterminacy of the source text, not in a failure of the model or the annotation.</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>Evaluating against fine-grained categories that each case is expected to match a single label penalizes valid model outputs that approaches the text from a different but equally defensible understanding of the same text. To produce an evaluation that is less sensitive to this inherent ambiguity, the original categories were collapsed into broader groupings that reduce the number of cases where two valid answers fall into different classes.</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="fu">## Method</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="fu">### Task Definitions</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>The task is to transform a set of messy, multi document news reports associated with a single victim into a structured, evidence traceable document level representation that supports reuse of the existing codebook and annotations.</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>Another critical requirement is that the output text must be noise-free, so that any further LLM tasks can be meaningful. The text must combine extraction of verbatim spans with structured aggregation across documents, so that the resulting representation is both clean enough to serve as LLM input and anchored tightly enough to the source material to support reuse of the existing coded data and codebook definitions.</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model Setup</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>All LLM calls were executed using instruction tuned models served through vLLM. The default configuration uses the AWQ INT4 quantized Meta Llama 3.1 8B Instruct model, and cross model comparisons use Meta Llama 3.1 70B Instruct, Gemma 3 12B IT, and Ministral 3 8B Instruct. We use deterministic decoding with temperature 0.0. Generation is capped at 1024 tokens for summarization and 256 tokens for classification, and outputs are constrained to a fixed JSON schema to produce consistent structured fields for extracted spans and label predictions.</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Unit of Analysis</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>On the dataset side, the original dataset was coded with the victim as the unit of analysis. To be specific, human coders annotated features about each kidnapping victim such as method of capture, who carried out the threats, how the person was captured etc. The annotations are structured around victim records.</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>On the source data side, the original scraped reports were organized by documents. A single victim may appear across multiple documents, and those documents were collected by news source or origin, not by victim. However, the annotations were made at the victim level, not the document level, and the knowledge between the annotations and the source data is not realistically recoverable by human labor.</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>On the downstream task side, the downstream tasks may include fine-tuning, annotation or classifications for other reports that domain experts might gathered, so the output must be organized and labeled in a way that can be directly consumed by an LLM or classifier operating on individual documents, document level preferably. However, the original annotations were not coded at the document level, so it is unclear which document should carry which annotation. For example, a victim's method of capture may be mentioned in one document while the identity of who carried out the threats appears in another, yet both were annotated at the victim level, without reference to a specific document. If victim-level annotations are simply propagated down to the document level, future LLM training tasks will receive incorrect signals, as each document would be labeled with information it does not necessarily contain.</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Extraction vs Summarization</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>As stated above, another requirement for the dataset for this set of tasks is that the annotations from prior human coders remain connected to the source texts, so that the coded features can be traced back to the original documents and reused without re-annotation. Even though recreating the human annotation is almost impossible and unrealistic, with the help of LLMs, we now can extract the exact spans of the text where the decision of annotations were made and record them as evidence. This allows researchers to trace the source of the information rather than having an annotation to victim link without knowing where, how and why they were annotated that way.</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>Given the above requirements, the process cannot rely on generative summarization alone, which might condenses and paraphrases and breaks the link to the original evidence.</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pipeline</span></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>The pipeline takes each victim's documents one at a time in sequence, extracting relevant spans, generating a label-structured summary anchored to those spans, and updating the summaries using previous summaries as context. This pipeline satisfies the task definition by producing document level outputs that are clean enough for downstream language model use while keeping each coded field traceable to evidence in the original documents.</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Extraction of evidence</span></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>In the first step of the pipeline, we extract evidence rather than only generating a paraphrased summary. For each input document, the model is instructed to return verbatim text spans for each item in the codebook schema, producing a structured evidence record keyed by label. This creates traceability because every coded field is paired with the exact source phrase that supports it, so downstream users can verify where the information came from in the original report. The evidence output is designed to demonstrate that the link between each annotation and its source text is preserved and can later be verified, and it also includes a character index that locates each span within the document text. This index records how many characters into the document the extracted span begins, so a future researcher can find the exact spot in the original text and confirm the evidence.</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Summarization with Context and Evidence</span></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>In the second step of the workflow, we generate a coherent summary while keeping it anchored to evidence and guided by the codebook schema. The model is given the document text together with the label definitions that specify the meaning of the labels and how the human coders would code the information, and it is also provided with the extracted span structure so that each sentence or clause of the summary can be linked back to the corresponding evidence. For example, the first sentence may be about the victim, and the second sentence may be about the method of capture, and the third sentence may be about who carried out the threats, instead of condensing the information into a single sentence where all the information is mixed together. This makes the summary different from vanilla summarization because it is not an unconstrained paraphrase of the document, rather, with the paragraph structured label by label, it will be easier for an LLM to pick up the right information. At this stage, summarization is performed at the level of a single document and is designed to be clean, structured, and directly usable for downstream models.</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Updating Summary with state</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>In a typical single request, an LLM is stateless, meaning that it does not retain information from earlier calls, but our workflow preserves memory by maintaining an explicit conversation state for each victim as their documents are processed. The workflow maintains an explicit conversation state for each victim that accumulates across documents as they are processed sequentially. The prompt instructs the model to check each new document against the existing summary and update only the fields where new information is found. If a document contains no relevant information, the runner keeps the previous summary unchanged rather than replacing it with the model's output. Each turn also records the output of that turn, preserving what was extracted and what summary was produced at that step for later inspection and reuse. When a document contains no relevant information, the workflow avoids replacing the existing running summary, so the accumulated context is not lost as the sequence progresses.</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation and Results</span></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>Evaluation of summarization tasks compares the text summary with a gold standard reference text. Given the messy and noisy initial documents, it is difficult to use them as reference texts.  The prior work has human annotations classifying the information in the summary text. The evaluation tests whether generated summaries reproduce the same labels as the human annotations, comparing a simple summarization baseline against the proposed method, across major model families, and across model sizes.</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Human Gold Standard</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>Many existing summarization evaluation methods require a gold standard reference text against which generated summaries can be compared using similarity metrics. Because the source documents in this dataset are themselves messy and noisy, they cannot serve as reliable reference texts, and there are no clean human-written reference summaries for this corpus. Should the research use these documents as reference texts, the output generated from original text will be heavily influenced by the noise, so that the difference between the result of original text and the result from cleaned summaries will be inflated, making the evaluation not reliable. However, the data set contains human annotations coded at the victim level, and these annotations are used as ground truth. Evaluation proceeds by classifying the generated summary text and comparing the resulting labels against the human annotations, testing whether the summaries preserve the same information that human coders recorded.</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>Another issue discussed above is that the original codebook contains fine-grained categories. One example is that the method of capture can be distinguished into general kidnappings and special type kidnappings such as Levantón. Without external context plugged in, or making the model fine-tuned on the specific context, it will be difficult for LLM models to distinguish between the two.</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation.</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Preliminary Results</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>The current results indicate that the proposed conversational extractive workflow improves performance over the simple generative baseline on a substantial share of the evaluated labels, with the strongest gains appearing in categories that benefit from cross document accumulation and evidence tracking. The clearest improvements appear in perpetrator and legal procedure fields. For the field on who carried out the threats, accuracy rises from 0.44 to 0.79, precision rises from 0.07 to 0.21, and recall rises from 0.11 to 0.28. For the field on the type of sentence against perpetrators or detained individuals, accuracy rises from 0.76 to 0.95, and the field on the type of tribunal or court improves from 0.56 to 0.76. The method also improves the field on which authority responded to the contact from 0.16 to 0.36 in accuracy, the field on the type of place from which the victim disappeared from 0.25 to 0.49, the field on treatment during captivity from 0.64 to 0.80, and the field on whether the victim belonged to a distinct social group from 0.39 to 0.49. These gains are consistent with the claim that a multi turn stateful workflow is especially useful when relevant information is distributed across several reports and must be preserved by item rather than condensed into a single freeform summary.</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>At the same time, the gains are not uniform across all labels. Some categories show weaker performance or declines under the current setup, including the field on the involvement of civil society in the case, where accuracy falls from 0.40 to 0.26, the field on the method of capture and the language used to describe the disappearance, where accuracy falls from 0.42 to 0.27, and the field on the outcome of the disappearance, where accuracy falls from 0.54 to 0.39. Other fields remain only modestly improved in recall even when accuracy rises. Taken together, these preliminary results suggest that the proposed method is promising but label dependent. It appears to work best for fields that require aggregating scattered evidence across documents, while categories with higher ambiguity or weaker textual cues remain harder to recover reliably. These findings are still preliminary, and broader cross model comparisons and additional evaluation remain ongoing.</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="fu">## Discussion</span></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ethics</span></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>Masking victim names in the dataset is an important measure to protect the privacy, dignity, and security of victims and their families. Cases involving enforced disappearance and other forms of violence often remain politically sensitive and may involve powerful actors, including criminal organizations or state agents. Publicly circulating identifiable personal information can expose victims’ relatives to intimidation, retaliation, or renewed stigmatization. By anonymizing names while preserving the relevant contextual data—such as dates, locations, and types of violations—the dataset allows researchers to analyze patterns of violence without placing individuals or families at additional risk.</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>Anonymization also reflects broader ethical standards in human rights research and documentation, which prioritize the protection of victims over the unrestricted dissemination of personal information. Masking identities helps prevent the re-traumatization of families and respects their right to control how their loved ones’ stories are used and shared. At the same time, the dataset remains analytically valuable because the key variables needed to study trends, language, and patterns of violence are preserved, enabling rigorous research while maintaining responsible safeguards for those directly affected by the crimes being documented.</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implications</span></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Compute Time vs Human Coding</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>We found that hours of computational processing can approximate weeks of human coding effort, and the results from the proposed method is good enough. This will save future researchers tons of human-hours.</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Downstream Tasks</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>When developing new research projects using the UMN dataset, we are particularly interested in analyzing how violence is portrayed, described, or obscured through language in public reporting, especially in ways that prevent the systematic identification of human rights and international crimes. Our work focuses on identifying the use of euphemisms, ambiguous terminology, and narrative framing that mask patterns of violence and make it more difficult to establish the widespread or systematic nature of abuses—an essential requirement for proving international crimes before courts. By analyzing large corpora of media reports and related documentation, we aim to understand how linguistic practices can shape the visibility of violence and influence whether certain acts are recognized as human rights violations.</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>One specific focus of our research using the UMN dataset concerns the terminology that emerged during Mexico’s so-called “War on Drugs,” declared by President Felipe Calderón in 2006. During this period, journalists increasingly used the term “levantón” (“big lift”) to describe events involving the deprivation of liberty followed by the disappearance of individuals whose fate and whereabouts remained unknown. Although some journalists now employ more accurate terminology, many reports still frame disappearances primarily as ordinary criminal acts rather than as serious human rights violations, often overlooking the possible role of the state through action, tolerance, or omission. Our research seeks to examine how such language contributes to the normalization or depoliticization of enforced disappearance in public discourse.</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>Presenting disappearances as isolated crimes creates several analytical and legal problems. First, it reduces the event to a single act of deprivation of liberty rather than recognizing enforced disappearance as a continuous and ongoing crime that persists as long as the person’s fate remains unknown. Second, it obscures the multiple human rights violations involved, including violations of the rights to life, personal integrity, and juridical personality, and ignores the broader circle of victims affected by the disappearance. Finally, it conceals the possible involvement of the state, which is central to the legal definition of enforced disappearance. The use of terms like “levantón” is particularly problematic because it originates in the lexicon of organized crime and functions as a euphemism that masks what may in fact be enforced disappearance. Through systematic analysis of this language, our research seeks to reveal how linguistic framing can obscure patterns of violence that are essential for legal accountability and human rights documentation.</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>Stuhler, Oscar, Cat Dang Ton, and Etienne Ollion. 2025. "From Codebooks to Promptbooks: Extracting Information from Text with Generative Large Language Models." *Sociological Methods &amp; Research* 54(3): 794-848. https://doi.org/10.1177/00491241251336794.</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>Than, Nga, Leanne Fan, Tina Law, Laura K. Nelson, and Leslie McCall. 2025. "Updating “The Future of Coding”: Qualitative Coding with Generative Large Language Models." *Sociological Methods &amp; Research* 54(3): 849-888. https://doi.org/10.1177/00491241251339188.</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>Zhou, Wei, Jun Zhou, Haoyu Wang, Zhenghao Li, Qikang He, Shaokun Han, Guoliang Li, Xuanhe Zhou, Yeye He, Chunwei Liu, Zirui Tang, Bin Wang, Shen Tang, Kai Zuo, Yuyu Luo, Zhenzhe Zheng, Conghui He, Jingren Zhou, and Fan Wu. 2026. "Can LLMs Clean Up Your Mess? A Survey of Application-Ready Data Preparation with LLMs." *arXiv* 2601.17058. https://arxiv.org/abs/2601.17058.</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="ot">[^1]: </span>Error pages yield no usable content, causing the model to process an empty or irrelevant document as if it were a valid report when the document or victim was linked to a set of annotations, which can establish a false connection between the the annotation and empty documents. Page elements such as navigation menus and footers inflate the input with structurally irrelevant text, increasing context length while contributing no article content.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

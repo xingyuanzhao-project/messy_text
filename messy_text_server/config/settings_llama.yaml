@@ -7,30 +7,37 @@ paths:
   summary:
     input: "df_text_by_report.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_summary_less_label.csv"
+      file: "results_down_sized/llama/df_text_by_report_conversation_summary_less_label.csv"
       extend: False
   records:
     results:
       output:
-        file: "results_down_sized/df_records_results.csv"
+        file: "results_down_sized/llama/df_records_results.csv"
         extend: False
     states:
       output:
-        file: "results_down_sized/df_records_states.csv"
+        file: "results_down_sized/llama/df_records_states.csv"
         extend: False
     spans:
       output:
-        file: "results_down_sized/df_records_spans.csv"
+        file: "results_down_sized/llama/df_records_spans.csv"
         extend: False
   classification:
+<<<<<<< Updated upstream:messy_text_server/config/settings.yaml
     input: "results_down_sized/df_text_by_report_conversation_summary_less_label_consolidated.csv"
     output:
       file: "results_down_sized/df_text_by_report_conversation_classification.csv"
       extend: True
-  eval:
-    input: "results_down_sized/df_text_by_report_conversation_classification.csv"
+=======
+    input: "results_down_sized/llama/df_text_by_report_conversation_summary.csv"
     output:
-      file: "results_down_sized/df_text_by_report_conversation_evaluation.csv"
+      file: "results_down_sized/llama/df_text_by_report_conversation_classification.csv"
+      extend: False
+>>>>>>> Stashed changes:messy_text_server/config/settings_llama.yaml
+  eval:
+    input: "results_down_sized/llama/df_text_by_report_conversation_classification.csv"
+    output:
+      file: "results_down_sized/llama/df_text_by_report_conversation_evaluation.csv"
   taxonomy: "config/taxonomy.json"
   prompts: "config/prompts.json"
 
