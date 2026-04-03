@@ -1037,12 +1037,19 @@ line: 337-338
 
 Dunivin, Zackary. 2024. "Scalable Qualitative Coding with LLMs: Chain-of-Thought Reasoning Matches Human Performance in Some Hermeneutic Tasks." [bib:Dunivin2024](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2401.15170)
 - **summary: a paper on scalable qualitative coding with LLMs.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` and `Method` to support structured, codebook-guided LLM coding workflows that aim to preserve field-level interpretability instead of relying on unconstrained summarization.
 - locations:
 \subsection{Extraction and
 Summarization}\label{extraction-and-summarization}
-all paragraphs. methodological approach closest to this draft.
-line: 149-164
+paragraphs on extraction and summarization as a structured alternative to free-form generation.
+line: 152-164
+\subsection{Task Definitions}\label{task-definitions}
+paragraphs on transforming messy multi-document text into structured, evidence-traceable outputs.
+line: 320-330
+\subsubsection{Summarization with Context and
+Evidence}\label{summarization-with-context-and-evidence}
+paragraph on label-structured summarization guided by codebook fields.
+line: 421-437
 
 Egami, Naoki, Musashi Hinck, Brandon Stewart, and Hanying Wei. 2023. "Using Imperfect Surrogates for Downstream Inference: Design-Based Supervised Learning for Social Science Applications of Large Language Models." [bib:Egami_etal2023](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2306.04746)
 - summary: a paper on using imperfect surrogates and design-based supervised learning with large language models.
@@ -1050,12 +1057,18 @@ Egami, Naoki, Musashi Hinck, Brandon Stewart, and Hanying Wei. 2023. "Using Impe
 
 Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei. 2024. "Using Large Language Model Annotations for the Social Sciences: A General Framework of Using Predicted Variables in Downstream Analyses." [bib:Egami_etal2024](../references/literature_review/extracted_all_citations.bib) [url](https://naokiegami.com/paper/dsl_ss.pdf)
 - **summary: a working paper on using LLM annotations for the social sciences.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work`, `Method`, and `Evaluation` to frame the paper as a workflow that turns LLM-generated structured text into inputs for downstream social science coding and comparison against human annotations.
 - locations:
 \subsection{Extraction and
 Summarization}\label{extraction-and-summarization}
-all paragraphs. methodological approach closest to this draft.
-line: 149-164
+paragraphs on reusing inherited annotations through extraction and summarization rather than re-annotation.
+line: 152-164
+\section{Method}\label{method}
+paragraphs on aligning old annotations with new structured outputs.
+line: 316-330
+\section{Evaluation and Results}\label{eval_results}
+paragraph on comparing labels recovered from generated summaries against human annotations.
+line: 460-471
 
 Gerganov, Georgi. 2024. "Llama.cpp: Inference of Meta's LLaMA Model (and Others) in Pure C/C++." [bib:Gerganov2024](../references/literature_review/extracted_all_citations.bib) [url](https://github.com/ggerganov/llama.cpp)
 - summary: llama.cpp, inference of Meta LLaMA and related models in C or C++.
@@ -1147,11 +1160,14 @@ line: 139
 
 Lin, Chin-Yew. 2004. "ROUGE: A Package for Automatic Evaluation of Summaries." *Annual Meeting of the Association for Computational Linguistics*. [bib:Lin2004b](../references/literature_review/extracted_all_citations.bib) [url](https://www.semanticscholar.org/paper/60b05f32c32519a809f21642ef1eb3eaf3848008)
 - **summary: a paper on ROUGE for automatic evaluation of summaries.**
-- **usage in draft:**
+- **usage in draft:** use in `Evaluation and Results` and `LLM as Evaluators` to contrast standard reference-based summarization evaluation with the paper's choice to evaluate downstream label preservation instead.
 - locations:
+\section{Evaluation and Results}\label{eval_results}
+paragraph on why ordinary summary-to-reference evaluation is not a good fit for this corpus.
+line: 460-471
 \subsubsection{LLM as Evaluators}\label{llm-as-evaluators}
-paragraph on evaluation methods for summarization.
-line: 501-505
+paragraph on evaluation methods for summarization used as a contrast case.
+line: 503-505
 
 Madhavan, Jayant, P. Bernstein, and E. Rahm. 2001. "Generic Schema Matching with Cupid." *Very Large Data Bases Conference*. [bib:Madhavan_etal2001b](../references/literature_review/extracted_all_citations.bib) [url](https://www.semanticscholar.org/paper/7ff9bf4d58358fc008b059028a3e33919d12b335)
 - summary: a paper on generic schema matching with Cupid.
@@ -1200,12 +1216,15 @@ Tejashvi14. 2021. "“Tour & travels customer churn prediction,”." *www.kaggle
 
 Hameed, Mazhar, and Felix Naumann. 2020. "“Data preparation: A survey of commercial tools,”." *SIGMOD Rec.*. [bib:Hameed_Naumann2020b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/3444831.3444835)
 - **summary: a SIGMOD Record survey of commercial data preparation tools.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` and `Data` to support the claim that conventional preprocessing systems exist, but they do not by themselves solve the semantic boundary problems in this corpus.
 - locations:
 \subsection{Non-LLM Methods for Messy
 Text}\label{non-llm-methods-for-messy-text}
-all paragraphs. foundational reference for non-LLM data cleaning approaches.
-line: 103-116
+paragraphs on conventional preprocessing and manual cleaning for messy text.
+line: 110-116
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraph on why rescraping and rule-based preprocessing still leave meaningful noise in place.
+line: 268-283
 
 Deng, Xiang, Huan Sun, Alyssa Lees, You Wu, and Cong Yu. 2020. "“TURL: table understanding through representation learning,”." *Proc. VLDB Endow.*. [bib:Deng_etal2020b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arxiv.2006.14806)
 - summary: a VLDB paper on TURL and table understanding through representation learning.
@@ -1213,12 +1232,12 @@ Deng, Xiang, Huan Sun, Alyssa Lees, You Wu, and Cong Yu. 2020. "“TURL: table u
 
 Little, Roderick J., and Donald B. Rubin. 2019. "Statistical Analysis with Missing Data , 3rd ed." [bib:Little_Rubin2019b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.2307/2289883)
 - **summary: a book titled Statistical Analysis with Missing Data, third edition.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` to distinguish classic missing-data and imputation problems from this paper's goal of preserving only source-grounded evidence rather than filling in absent information.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
-paragraph on data imputation. foundational reference on missing data.
-line: 145
+paragraph on why data imputation is conceptually different from the task in this paper.
+line: 145-147
 
 Schubert, Erich, Jörg Sander, Martin Ester, Hans-Peter Kriegel, and Xiaowei Xu. 2017. "“DBSCAN revisited, revisited: Why and how you should (still) use DBSCAN,”." *ACM Trans. Database Syst.*. [bib:Schubert_etal2017b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/3068335)
 - summary: an ACM TODS article revisiting DBSCAN.
@@ -1247,12 +1266,21 @@ Bilenko, Mikhail. 2003. "“Duplicate detection, record linkage, and identity un
 
 Rahm, E., and H. Do. 2000. "Data Cleaning: Problems and Current Approaches.." [bib:Rahm_Do2000b](../references/literature_review/extracted_all_citations.bib) [url](https://www.semanticscholar.org/paper/6a62c0f05abe0516dc4cf2af5bcc8c2583a6db92)
 - **summary: a paper on data cleaning problems and current approaches.**
-- **usage in draft:**
+- **usage in draft:** use in `Introduction`, `Related Work`, `Data`, and `Error Analysis` to support the general problem of noisy heterogeneous data and the limits of traditional preprocessing on messy web text.
 - locations:
+\section{Introduction}\label{introduction}
+paragraph on messy and noisy texts created by scraping, parsing, and poor document structure.
+line: 49
 \subsection{Non-LLM Methods for Messy
 Text}\label{non-llm-methods-for-messy-text}
-all paragraphs. foundational reference for non-LLM data cleaning approaches.
-line: 103-116
+paragraphs on rule-based preprocessing and manual cleaning limits.
+line: 110-116
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraphs on failed rescraping and rule-based preprocessing.
+line: 258-283
+\subsection{Error Analysis}\label{error-analysis}
+paragraph on document-level noise and why it must be handled during extraction.
+line: 661-662
 
 Zhou, Xuanhe, Junxuan He, Wei Zhou, Haodong Chen, Zirui Tang, Haoyu Zhao, Xin Tong, Guoliang Li, Youmin Chen, Jun Zhou, Zhaojun Sun, Binyuan Hui, Shuo Wang, Conghui He, Zhiyuan Liu, Jingren Zhou, and Fan Wu. 2025. "“A survey of LLM x DATA,”." *CoRR*. [bib:Zhou_etal2025b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.31224/3663)
 - summary: a CoRR entry surveying LLM and data.
@@ -1329,11 +1357,11 @@ Thomas., Davidson. 2024. "Start Generating: harnessing Generative Artificial Int
 
 Dubey, Abhimanyu, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, et al.. 2024. "The Llama 3 Herd of Models." [bib:Dubey2024b](../references/literature_review/extracted_all_citations.bib) [url](http://arxiv.org/abs/2407.21783)
 - **summary: a paper titled The Llama 3 Herd of Models.**
-- **usage in draft:**
+- **usage in draft:** use in `Model Setup` to document the Llama family models used for the default configuration and cross-model comparisons.
 - locations:
 \subsection{Model Setup}\label{model-setup}
-model specifications.
-line: 337-338
+model specifications for Llama 3.1 8B and 70B.
+line: 335-338
 
 William., Gamson. 1992. "Talking Politics." [bib:Gamson1992](../references/literature_review/extracted_all_citations.bib) [url](https://www.cambridge.org/us/universitypress/subjects/sociology/political-sociology/talking-politics)
 - summary: a book titled Talking Politics.
@@ -1366,11 +1394,18 @@ T., Kojima. 2022. "Large Language Models are Zero-Shot Reasoners.." *Proceedings
 
 H., Krippendorff Klaus. 2012. "Content Analysis: An Introduction to Its Methodology." [bib:Krippendorff2012](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.2307/2288384)
 - **summary: a book on content analysis methodology.**
-- **usage in draft:**
+- **usage in draft:** use in `Method` to justify codebook-guided extraction as a structured content-analysis style workflow, and use in `Data` and `Evaluation` when discussing ambiguity and disagreement in category assignment.
 - locations:
 \section{Method}\label{method}
 codebook-guided extractive summarization approach.
-line: 316-342
+line: 316-330
+\subsubsection{Ambiguity for
+Classification}\label{ambiguity-for-classification}
+paragraphs on valid coder or model disagreement caused by ambiguous source text.
+line: 288-310
+\subsubsection{Human Gold Standard}\label{human-gold-standard}
+paragraph on why disagreement with a single human label does not always imply failure.
+line: 473-476
 
 Law, Tina. 2022. "Parsing the Language of Rebellion: Impacts of the 1960s Black-Led Urban Uprisings on American Political and Legal Discourse." [bib:Law2022](../references/literature_review/extracted_all_citations.bib)
 - summary: a doctoral dissertation on parsing the language of rebellion and 1960s Black-led urban uprisings.
@@ -1386,19 +1421,26 @@ Christoper, Manning. 1999. "Foundations of Statistical Natural Language Processi
 
 Mesnard, Thomas, Cassidy Hardin, Robert Dadashi, Surya Bhupatiraju, Shreya Pathak, Laurent Sifre, Morgane Rivière, et al.. 2024. "Gemma: Open Models Based on Gemini Research and Technology." [bib:Mesnard2024](../references/literature_review/extracted_all_citations.bib) [url](http://arxiv.org/abs/2403.08295)
 - **summary: a report on Gemma open models based on Gemini research and technology.**
-- **usage in draft:**
+- **usage in draft:** use in `Model Setup` to document the Gemma model family used in the cross-model comparison.
 - locations:
 \subsection{Model Setup}\label{model-setup}
-model specifications.
-line: 337-338
+model specifications for Gemma.
+line: 335-338
 
 Cliodhna, O’Connor. 2020. "Intercoder Reliability in Qualitative Research: debates and Practical Guidelines.." *International Journal of Qualitative Methods*. [bib:OConnor2020](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1177/1609406919899220)
 - **summary: a paper on intercoder reliability in qualitative research.**
-- **usage in draft:**
+- **usage in draft:** use in `Data`, `Evaluation`, and `Limitations` to support the claim that some disagreements arise from interpretive ambiguity in the source text rather than simple model failure.
 - locations:
+\subsubsection{Ambiguity for
+Classification}\label{ambiguity-for-classification}
+paragraphs on equally defensible category assignments from the same source text.
+line: 288-310
 \subsubsection{Human Gold Standard}\label{human-gold-standard}
-relevant to annotation quality and evaluation methodology.
-line: 469-499
+paragraph on ambiguity, collapsed categories, and limits of agreement-based evaluation.
+line: 469-476
+\subsection{Limitations}\label{limitations}
+paragraph on disagreement between model output and human annotation under ambiguous category boundaries.
+line: 669-670
 
 OpenAI. 2023. "GPT-4 Technical Report." [bib:OpenAI2023](../references/literature_review/extracted_all_citations.bib) [url](https://cdn.openai.com/papers/gpt-4.pdf)
 - summary: GPT-4 technical report material.
@@ -1430,12 +1472,16 @@ Zhang, Xiang, J. Zhao, and Yann LeCun. 2015. "Character-level Convolutional Netw
 
 Yao, Shunyu, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao. 2022. "ReAct: Synergizing Reasoning and Acting in Language Models." *International Conference on Learning Representations*. [bib:Yao_etal2022](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2210.03629)
 - **summary: a paper on synergizing reasoning and acting in language models.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` to support the discussion of prompt-based and agent-style workflows, and use in `Method` when describing a multi-step stateful pipeline that updates outputs across turns.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 paragraph on prompt engineering, code synthesis, and agent-style workflows.
 line: 139
+\subsubsection{Updating Summary with
+state}\label{updating-summary-with-state}
+paragraphs on preserving state across sequential document-processing turns.
+line: 442-456
 
 Touvron, Hugo, Louis Martin, Kevin R. Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Niko-lay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, D. Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, J. Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, A. Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel M. Kloumann, A. Korenev, Punit Singh Koura, M. Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, X. Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, J. Reizenstein, Rashi Rungta, Kalyan Saladi, A. Schelten, Ruan Silva, Eric Michael Smith, R. Subramanian, Xia Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zhengxu Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, M. Kambadur, Sharan Narang, Aur'elien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023. "Llama 2: Open Foundation and Fine-Tuned Chat Models." *arXiv.org*. [bib:Touvron_etal2023b](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2307.09288)
 - **summary: a paper on Llama 2 open foundation and fine-tuned chat models.**
@@ -1456,12 +1502,12 @@ line: 145
 
 Ding, Zhicheng, Jiahao Tian, Zhenkai Wang, Jinman Zhao, and Siyang Li. 2024. "Data Imputation using Large Language Model to Accelerate Recommendation System." [bib:Ding_etal2024d](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2407.10078)
 - **summary: a paper on data imputation using a large language model to accelerate a recommendation system.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` as an example of LLM-based imputation that the paper explicitly excludes because imputation would weaken grounding and traceability to the original text.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
-paragraph on data imputation. discussed as not fitting the task purpose.
-line: 145
+paragraph on data imputation as a different objective from evidence-preserving extraction.
+line: 145-147
 
 Omidvartehrani, Soroush, and Davood Rafiei. 2025. "LDI: Localized Data Imputation for Text-Rich Tables." [bib:Omidvartehrani_Rafiei2025b](../references/literature_review/extracted_all_citations.bib) [arXiv](https://arxiv.org/abs/2506.16616)
 - **summary: a paper on localized data imputation for text-rich tables.**
@@ -1519,12 +1565,15 @@ Stoltz, Dustin S., and Marshall A. Taylor. 2019. "Concept Mover’s Distance: me
 
 Alizadeh, Meysam, M. Kubli, Zeynab Samei, Shirin Dehghani, M. Zahedivafa, Juan Diego Bermeo, M. Korobeynikova, and Fabrizio Gilardi. 2023. "Open-source LLMs for text annotation: a practical guide for model setting and fine-tuning." *Journal of Computational Social Science*. [bib:Alizadeh_etal2023](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1007/s42001-024-00345-9)
 - **summary: a practical guide on open-source LLMs for text annotation and fine-tuning.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` to situate the paper beside recent LLM annotation studies, and use in `Model Setup` as a nearby precedent for practical open-source model selection and configuration.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 paragraph on LLM-based text annotation methods.
-line: 127
+line: 127-128
+\subsection{Model Setup}\label{model-setup}
+paragraph on open-source instruction-tuned models and deterministic settings.
+line: 335-342
 
 Carley, Kathleen. 1994. "Extracting Culture through Textual Analysis." [bib:Carley1994](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1016/0304-422X(94)90011-6)
 - summary: a cited work with incomplete metadata in the local bib entry.
@@ -1621,12 +1670,18 @@ MOHR, JOHN W., and VINCENT DUQUENNE. 1997. "The duality of culture and practice:
 
 Hernández, Mauricio A., and S. Stolfo. 1998. "Real-world Data is Dirty: Data Cleansing and The Merge/Purge Problem." *Data mining and knowledge discovery*. [bib:Hernndez_Stolfo1998b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1023/A:1009761603038)
 - **summary: a paper on dirty real-world data, data cleansing, and the merge and purge problem.**
-- **usage in draft:**
+- **usage in draft:** use in `Introduction`, `Related Work`, and `Data` to support the baseline claim that real-world corpora are dirty and that cleaning becomes difficult when irrelevant or mixed content is embedded in otherwise valid text.
 - locations:
+\section{Introduction}\label{introduction}
+paragraph on messy and noisy inherited texts.
+line: 49
 \subsection{Non-LLM Methods for Messy
 Text}\label{non-llm-methods-for-messy-text}
-all paragraphs. foundational reference for non-LLM data cleaning approaches.
-line: 103-116
+paragraphs on conventional data cleaning approaches and their limits.
+line: 110-116
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraph on why rule-based cleanup does not separate relevant article text from surrounding noise.
+line: 268-283
 
 Schafer, J., and J. Graham. 2002. "Missing data: our view of the state of the art.." *Psychological methods*. [bib:Schafer_Graham2002b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1037/1082-989X.7.2.147)
 - **summary: a paper on missing data and the state of the art.**
@@ -1650,8 +1705,12 @@ Spirling, Arthur. 2023. "Why open-source generative AI models are an ethical way
 - usage in draft:
 
 Dagdelen, John, Alexander Dunn, Sanghoon Lee, Nicholas Walker, Andrew S. Rosen, Gerbrand Ceder, Kristin A. Persson, and Anubhav Jain. 2024. "Structured information extraction from scientific text with large language models." [bib:Dagdelen_etal2024](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1038/s41467-024-45563-x)
-- summary: a cited work identified only by DOI in the local bib entry.
-- usage in draft:
+- summary: a paper on structured information extraction from text with large language models.
+- usage in draft: use in `Method` to support the claim that LLMs can return structured, field-level extractions tied to source text rather than only free-form summaries.
+- locations:
+\subsubsection{Extraction of evidence}\label{extraction-of-evidence}
+paragraph on returning verbatim spans in a structured schema with traceable evidence.
+line: 404-416
 
 Ollion, Étienne, Rubing Shen, Ana Macanovic, and Arnault Chatelain. 2024. "The dangers of using proprietary LLMs for research." [bib:Ollion_etal2024](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1038/s42256-023-00783-6)
 - summary: a cited work identified only by DOI in the local bib entry.
@@ -1670,8 +1729,17 @@ Naik, Nikhil, Scott Duke Kominers, Ramesh Raskar, Edward L. Glaeser, and César 
 - usage in draft:
 
 Gilardi, Fabrizio, Meysam Alizadeh, and Maël Kubli. 2023. "ChatGPT outperforms crowd workers for text-annotation tasks." [bib:Gilardi_etal2023](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1073/pnas.2305016120)
-- summary: a cited work identified only by DOI in the local bib entry.
-- usage in draft:
+- summary: a paper on large language models outperforming crowd workers on text-annotation tasks.
+- usage in draft: use in `Related Work` to support the discussion of LLM annotation capabilities, and use in `Implications` when arguing that the workflow can shift repetitive coding labor away from humans.
+- locations:
+\subsection{LLM Methods for Messy
+Text}\label{llm-methods-for-messy-text}
+paragraph on LLM-based text annotation methods.
+line: 127-128
+\subsubsection{Compute Time vs Human
+Coding}\label{compute-time-vs-human-coding}
+paragraph on replacing repetitive manual coding with faster model-assisted processing.
+line: 676
 
 Bail, Christopher A.. 2024. "Can Generative AI improve social science?." [bib:Bail2024](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1073/pnas.2314021121)
 - summary: a cited work identified only by DOI in the local bib entry.
@@ -1683,12 +1751,18 @@ Stuhler, Oscar. 2024. "The gender agency gap in fiction writing (1850 to 2010)."
 
 Fellegi, I., and A. Sunter. 1969. "A Theory for Record Linkage." [bib:Fellegi_Sunter1969b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1080/01621459.1969.10501049)
 - **summary: a paper titled A Theory for Record Linkage.**
-- **usage in draft:**
+- **usage in draft:** use in `Introduction`, `Related Work`, and `Method` to frame the victim-document mismatch as a linkage and alignment problem across records rather than only a summarization problem.
 - locations:
+\section{Introduction}\label{introduction}
+paragraph on unit-of-analysis mismatch, de-duplication, and aggregation across reports.
+line: 57-68
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 paragraphs on entity matching and data integration.
 line: 129, 141-143
+\subsection{Unit of Analysis}\label{unit-of-analysis}
+paragraphs on aligning victim-level annotations with document-level sources.
+line: 346-372
 
 Bytheway, Bill, and Julia Johnson. 1996. "Valuing lives? Obituaries and the life course." [bib:Bytheway_Johnson1996](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1080/713685833)
 - summary: a cited work identified only by DOI in the local bib entry.
@@ -1810,12 +1884,18 @@ line: 103-116
 
 Mondal, Manuel, Julien Audiffren, Ljiljana Dolamic, Gérôme Bovet, and Philippe Cudré-Mauroux. 2024. "Cleaning Semi-Structured Errors in Open Data Using Large Language Models." *Swiss Conference on Data Science*. [bib:Mondal_etal2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1109/SDS60720.2024.00047)
 - **summary: a paper on cleaning semi-structured errors in open data using large language models.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work`, `Data`, and `Error Analysis` to support the claim that LLMs can clean semi-structured and heterogeneous inputs more effectively than purely rule-based preprocessing.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
-paragraphs on data standardization using LLMs.
-line: 133, 135
+paragraphs on LLM-based standardization and cleaning of heterogeneous data.
+line: 133-137
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraphs on noisy webpage structure and semantically irrelevant text.
+line: 258-283
+\subsection{Error Analysis}\label{error-analysis}
+paragraph on contextual extraction as the way the pipeline handles document-level noise.
+line: 661-662
 
 Elmagarmid, A., Panagiotis G. Ipeirotis, and V. Verykios. 2007. "Duplicate Record Detection: A Survey." *IEEE Transactions on Knowledge and Data Engineering*. [bib:Elmagarmid_etal2007b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1109/TKDE.2007.9)
 - **summary: a survey on duplicate record detection.**
@@ -1853,12 +1933,15 @@ line: 103-116
 
 Dallachiesa, Michele, Amr Ebaid, Ahmed Eldawy, A. Elmagarmid, Ihab F. Ilyas, M. Ouzzani, and N. Tang. 2013. "NADEEF: a commodity data cleaning system." *ACM SIGMOD Conference*. [bib:Dallachiesa_etal2013b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/2463676.2465327)
 - **summary: a paper on NADEEF as a commodity data cleaning system.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` and `Data` as an example of systematic non-LLM cleaning infrastructure that still does not resolve the corpus's semantically mixed text.
 - locations:
 \subsection{Non-LLM Methods for Messy
 Text}\label{non-llm-methods-for-messy-text}
-all paragraphs. foundational reference for non-LLM data cleaning approaches.
-line: 103-116
+paragraphs on non-LLM cleaning systems and their limits on heterogeneous sources.
+line: 110-116
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraph on why structural cleanup still leaves semantically irrelevant text inside the corpus.
+line: 268-283
 
 Hulsebos, Madelon, K. Hu, Michiel A. Bakker, Emanuel Zgraggen, Arvind Satyanarayan, Tim Kraska, cCaugatay Demiralp, and César A. Hidalgo. 2019. "Sherlock: A Deep Learning Approach to Semantic Data Type Detection." *Knowledge Discovery and Data Mining*. [bib:Hulsebos_etal2019b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/3292500.3330993)
 - summary: a paper on Sherlock, a deep learning approach to semantic data type detection.
@@ -1908,12 +1991,18 @@ Huang, Zezhou, and Eugene Wu. 2024. "Cocoon: Semantic Table Profiling Using Larg
 
 Ni, Wei, Kaihang Zhang, Xiaoye Miao, Xiangyu Zhao, Yangyang Wu, and Jianwei Yin. 2024. "IterClean: An Iterative Data Cleaning Framework with Large Language Models." *ACM Turing Celebration Conference*. [bib:Ni_etal2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/3674399.3674436)
 - **summary: a paper on IterClean as an iterative data cleaning framework with large language models.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work`, `Data`, and `Error Analysis` to support iterative LLM-based cleaning workflows for noisy inputs that cannot be fixed with one-shot rules alone.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 paragraphs on LLM-based data error processing and detection.
-line: 133, 137
+line: 133-137
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraphs on repeated attempts to recover usable text from noisy documents.
+line: 258-283
+\subsection{Error Analysis}\label{error-analysis}
+paragraph on using extraction itself as the cleaning step.
+line: 661-662
 
 Yan, Mengyi, Yaoshu Wang, Yue Wang, Xiaoye Miao, and Jianxin Li. 2024. "GIDCL: A Graph-Enhanced Interpretable Data Cleaning Framework with Large Language Models." *Proc. ACM Manag. Data*. [bib:Yan_etal2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.1145/3698811)
 - **summary: a paper on GIDCL as a graph-enhanced interpretable data cleaning framework with large language models.**
@@ -2290,11 +2379,30 @@ Bansal, Parikshit, and Amit Sharma. 2023. "Large Language Models as Annotators: 
 
 Zhang, Haochen, Yuyang Dong, Chuan Xiao, and M. Oyamada. 2023. "Large Language Models as Data Preprocessors." *VLDB Workshops*. [bib:Zhang_etal2023b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2308.16361)
 - summary: a VLDB Workshops paper on large language models as data preprocessors.
-- usage in draft:
+- usage in draft: use in `Related Work`, `Data`, and `Error Analysis` to support the broader claim that LLMs can act as preprocessors for heterogeneous noisy inputs when rule-based cleaning is too brittle.
+- locations:
+\subsection{LLM Methods for Messy
+Text}\label{llm-methods-for-messy-text}
+general discussion of LLM capabilities for data preparation tasks.
+line: 123-137
+\subsubsection{Scraped File Errors}\label{scraped-file-errors}
+paragraphs on noisy web pages and preprocessing limits.
+line: 258-283
+\subsection{Error Analysis}\label{error-analysis}
+paragraph on filtering noise during extraction rather than in a separate preprocessing stage.
+line: 661-662
 
 Peeters, R., and Christian Bizer. 2023. "Entity Matching using Large Language Models." *International Conference on Extending Database Technology*. [bib:Peeters_Bizer2023](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2310.11244)
 - summary: an EDBT paper on entity matching using large language models.
-- usage in draft:
+- usage in draft: use in `Related Work` and `Method` to support the claim that LLMs can align information across heterogeneous records, which is analogous to matching victim-level annotations back to document-level evidence.
+- locations:
+\subsection{LLM Methods for Messy
+Text}\label{llm-methods-for-messy-text}
+paragraphs on entity matching and data integration.
+line: 129, 141-143
+\subsection{Unit of Analysis}\label{unit-of-analysis}
+paragraphs on aligning victim-level annotations with multiple source documents.
+line: 346-372
 
 Zhang, Tianshu, Xiang Yue, Yifei Li, and Huan Sun. 2023. "TableLlama: Towards Open Large Generalist Models for Tables." *North American Chapter of the Association for Computational Linguistics*. [bib:Zhang_etal2023c](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2311.09206)
 - summary: an NAACL paper on TableLlama as an open large generalist model for tables.
@@ -2319,12 +2427,16 @@ Ding, Bosheng, Chengwei Qin, Ruochen Zhao, Tianze Luo, Xinze Li, Guizhen Chen, W
 
 Qi, Danrui, and Jiannan Wang. 2024. "CleanAgent: Automating Data Standardization with LLM-based Agents." *arXiv.org*. [bib:Qi_Wang2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2403.08291)
 - **summary: an arXiv paper on CleanAgent for automating data standardization with LLM-based agents.**
-- **usage in draft:**
+- **usage in draft:** use in `Related Work` to support the discussion of LLM-based standardization and agent-style cleaning, and use in `Method` when describing a multi-step stateful workflow that updates outputs across documents.
 - locations:
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 paragraphs on data standardization and agent-style workflows.
 line: 135, 139
+\subsubsection{Updating Summary with
+state}\label{updating-summary-with-state}
+paragraphs on preserving and updating state across multiple document turns.
+line: 442-456
 
 Choi, Juhwan, Jungmin Yun, Kyohoon Jin, and YoungBin Kim. 2024. "Multi-News+: Cost-efficient Dataset Cleansing via LLM-based Data Annotation." *Conference on Empirical Methods in Natural Language Processing*. [bib:Choi_etal2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2404.09682)
 - summary: an EMNLP paper on Multi-News+ for cost-efficient dataset cleansing via LLM-based data annotation.
@@ -2386,7 +2498,15 @@ Su, Aofeng, Aowen Wang, Chaonan Ye, Chengcheng Zhou, Gabriel Zhang, Gang Chen, G
 
 Horych, Tomás, Christoph Mandl, Terry Ruas, André Greiner-Petter, Bela Gipp, Akiko Aizawa, and Timo Spinde. 2024. "The Promises and Pitfalls of LLM Annotations in Dataset Labeling: a Case Study on Media Bias Detection." *North American Chapter of the Association for Computational Linguistics*. [bib:Horych_etal2024](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2411.11081)
 - summary: a case study on promises and pitfalls of LLM annotations for dataset labeling in media bias detection.
-- usage in draft:
+- usage in draft: use in `Related Work` to position annotation studies as relevant but not identical to this paper's task, and use in `Human Gold Standard` to support a cautious interpretation of agreement between LLM outputs and human labels.
+- locations:
+\subsection{LLM Methods for Messy
+Text}\label{llm-methods-for-messy-text}
+paragraph on LLM-based text annotation methods.
+line: 127-128
+\subsubsection{Human Gold Standard}\label{human-gold-standard}
+paragraph on using human annotations as ground truth while recognizing evaluation limits.
+line: 469-476
 
 Hausenloy, J., Duncan McClements, and Madhavendra Thakur. 2024. "Towards Data Governance of Frontier AI Models." *arXiv.org*. [bib:Hausenloy_etal2024b](../references/literature_review/extracted_all_citations.bib) [doi](https://doi.org/10.48550/arXiv.2412.03824)
 - summary: a paper toward data governance of frontier AI models.
