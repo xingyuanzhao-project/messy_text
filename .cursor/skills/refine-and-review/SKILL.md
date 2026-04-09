@@ -66,6 +66,51 @@ If challenged on a prior action or interpretation:
 - Do not narrate the reasoning process as a substitute for the deliverable.
 - Do not produce mid-reasoning output.
 
+### Citation placement in corrected formulations
+
+When a corrected claim or formulation includes citations, distribute them per claim. Each assertion must carry its own citation at the point where the claim appears. Do not bundle multiple citations at the end of a multi-claim passage.
+
+#### Rule
+
+Do:
+- Attach each `\cite{}` to the sentence or clause that makes the claim it supports. The reader must be able to trace each specific claim to its source.
+- If two claims share the same source, cite that source independently at each claim's location.
+- Bundle multiple citations after a single claim when all cited sources support that same claim. One claim with multiple sources is not bundling because attribution is unambiguous.
+- Verify which source supports which claim before distributing citations.
+
+Do not:
+- Bundle citations from multiple distinct claims at the end of a passage. This forces the reader to guess which source supports which claim.
+- Distribute citations per claim without knowing which source supports which claim. Distributing without verified mapping will expose the uncertainty as misattribution.
+
+#### Examples
+
+Wrong — bundled citations after multiple claims:
+
+```latex
+Measurement error can attenuate estimates, and the bias direction
+depends on whether errors are classical or differential, with recent
+work showing that LLM classifiers produce non-classical errors
+\cite{Fong2021, Egami2022, Grimmer2022, Keith2020}.
+```
+
+Correct — per-claim attribution:
+
+```latex
+Measurement error can attenuate effect estimates \cite{Fong2021}.
+The bias direction depends on whether errors are classical or
+differential \cite{Egami2022, Grimmer2022}. Recent work shows
+that LLM classifiers produce non-classical errors correlated with
+document length and topic \cite{Keith2020}.
+```
+
+Acceptable — multiple sources for one claim:
+
+```latex
+Several studies have documented racial disparities in lending
+outcomes across U.S. metropolitan areas
+\cite{Ross2002, Munnell1996, Ladd1998}.
+```
+
 ## Correction handling
 
 ### Treat corrections as conceptual, not token-level

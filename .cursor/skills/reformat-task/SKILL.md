@@ -43,6 +43,51 @@ If the target contains bullets:
 - Replace the bullet list with the paragraph.
 - Do not drop any bullet substance to eliminate bullet formatting.
 
+### Citation placement
+
+When reformatted text contains citations, ensure each citation is attached to the specific claim it supports. If the original text bundles multiple citations at the end of a multi-claim passage, redistribute them during the reformat so each claim carries its own `\cite{}`.
+
+#### Rule
+
+Do:
+- Attach each `\cite{}` to the sentence or clause that makes the claim it supports. The reader must be able to trace each specific claim to its source.
+- If two claims share the same source, cite that source independently at each claim's location.
+- Bundle multiple citations after a single claim when all cited sources support that same claim. One claim with multiple sources is not bundling because attribution is unambiguous.
+- Verify which source supports which claim before distributing citations.
+
+Do not:
+- Bundle citations from multiple distinct claims at the end of a passage. This forces the reader to guess which source supports which claim.
+- Distribute citations per claim without knowing which source supports which claim. Distributing without verified mapping will expose the uncertainty as misattribution.
+
+#### Examples
+
+Before reformat — bundled citations after multiple claims:
+
+```latex
+Measurement error can attenuate estimates, and the bias direction
+depends on whether errors are classical or differential, with recent
+work showing that LLM classifiers produce non-classical errors
+\cite{Fong2021, Egami2022, Grimmer2022, Keith2020}.
+```
+
+After reformat — per-claim attribution:
+
+```latex
+Measurement error can attenuate effect estimates \cite{Fong2021}.
+The bias direction depends on whether errors are classical or
+differential \cite{Egami2022, Grimmer2022}. Recent work shows
+that LLM classifiers produce non-classical errors correlated with
+document length and topic \cite{Keith2020}.
+```
+
+No redistribution needed — multiple sources for one claim:
+
+```latex
+Several studies have documented racial disparities in lending
+outcomes across U.S. metropolitan areas
+\cite{Ross2002, Munnell1996, Ladd1998}.
+```
+
 ## Goal vs constraint
 
 When a constraint is given, identify the positive goal it serves and satisfy the goal. A constraint against bullets must be satisfied by prose conversion, not deletion of bullet content.
