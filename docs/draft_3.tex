@@ -46,9 +46,9 @@ Results suggest that hours of computation can approximate weeks of human coding 
 
 Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research. These materials preserve costly human judgment and domain knowledge, yet they were often not gathered, organized, or annotated in ways that make them directly usable for contemporary computational workflows. This creates a central research problem: how can researchers use or reuse legacy texts and annotations without losing their original knowledge while making them usable for modern LLM based analysis.
 
-Our goal is to reuse the prior data collection and annotations to create a balanced and clean corpus. Addressing downstream tasks using real-world data, researchers often must work with a messy and noisy texts. These texts can contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods.
+Our goal is to reuse the prior data collection and annotations to create a balanced and clean corpus. Addressing downstream tasks using real-world data, researchers often must work with a messy and noisy texts. These texts are scraped websites and documents from previous works that may contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content, creating noise that will distract the model from the useful content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page, introducing hallucinations and conflation of events for the LLMs. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods, making it unsuitable for the LLMs for it will further confuse the model.
 
-\emph{Humans can easily filter and extract around this noise and may have already done so to produce annotations}.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document) (\cite{olsen-etal-2024-socio}). 
+\emph{Humans can easily filter and extract around this noise and may have already done so to produce annotations}.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document) (\cite{olsen-etal-2024-socio}). The core problem here is therefore not only cleaning noisy text, but also aligning annotations created by human coders who can infer structure from dispersed evidence across multiple documents, with the exact source spans where these annotations come from, using LLM workflows.
 
 Solving these problems allows researchers to work with and re-use texts for their research but that are currently messy and not well-structured. Our application is a corpus on disappearance cases that is valuable and significant for human rights' research as well as serving training for the classification and prediction of future abduction cases. We propose a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
 
@@ -481,6 +481,26 @@ Recent work has proposed LLM-as-judge evaluators for summarization that compare 
 
 In our setting, however, these methods are difficult to use in a meaningful way because the source reports are themselves messy, noisy, and often mixed with irrelevant but topically related material. A source to summary consistency score may therefore reward a system for preserving noise, or penalize a cleaned and focused summary for leaving out distractive content that should not be carried forward. For that reason, these evaluator scores alone cannot answer the main question of this paper. The more informative comparison is between directly generated summarization from the messy reports and the structured extractive summary from the proposed method, because this shows whether the structured extractive pipeline preserves the information needed for downstream coding better than a simpler generative baseline under the actual conditions of this corpus.
 
+% **Comment: Why G-Eval is not suitable for this task**
+% - Both SummaC and G-Eval measure source-to-summary consistency, but our task
+%   deliberately filters noise from the source. Any source-grounding metric will
+%   penalize good noise removal and reward noise preservation.
+% - G-Eval requires an LLM to judge LLM output. When the evaluator and generator
+%   share the same model family, self-preference bias inflates scores, a problem
+%   the G-Eval paper itself identifies.
+% - G-Eval's fine-grained scoring relies on token-level probabilities, which are
+%   not exposed through standard vLLM chat completion endpoints. Without logprobs,
+%   scores collapse to coarse integers with many ties.
+% - Classification accuracy against human annotations directly tests whether the
+%   summary preserves codeable information, which is the core question. Source
+%   consistency is tangential at best and inversely correlated at worst.
+% - The codebase uses DeepEval's SummarizationMetric and HallucinationMetric,
+%   which are different algorithms from the G-Eval paper. Switching to the actual
+%   GEval class in DeepEval would still not resolve the source-noise problem above.
+% - Verdict: do not switch to G-Eval. If a supplementary consistency check is
+%   needed, SummaC in a separate environment is preferable because it is
+%   deterministic, sentence-level, and does not add LLM-judge bias.
+
 \subsubsection{Hallucination Evaluation
 }\label{hallucination-evaluation-literature}
 
@@ -493,6 +513,29 @@ LLM based methods then approximate this process in different ways. Large Languag
 Hallucination evaluation matters in our project because the outcome of the proposed method is extractive summarization that should preserve the information from the source text while leaving out the noise. The generation part opens up the risk of hallucination, so evaluation of hallucination is necessary to ensure the quality of the output~\cite{Zhang_etal2025}.
 
 This is not only a language quality issue but also critical for downstream tasks. In political science and computational social science setups, unsupported or even entirely fabricated generated details can change coded variables, weaken traceability, and distort substantive conclusions. A careful evaluation of hallucination therefore contributes to the field by making LLM based extraction more transparent, more reproducible, and more defensible as empirical evidence.
+
+% **Comment: Hallucination evaluation strategy**
+% The pipeline does not run a standalone hallucination benchmark. The accurate
+% claim is: we preserve evidence spans and source positions, which makes future
+% source-support or hallucination evaluation possible.
+%
+% - **No formal hallu eval needed now**: G-Eval and SummaC both measure
+%   source-to-summary consistency, which penalizes correct noise removal in our
+%   messy-source setting. Writing a section around methods we do not use is worse
+%   than being honest about scope.
+% - **Existing infrastructure supports future eval**: the pipeline already records
+%   exact sentence-level spans, doc_ids, and character offsets (compute_span_offsets
+%   in src/utils.py; _attach_span_offsets_to_result in src/processors.py;
+%   flatten_spans_from_state in src/recorders.py). These traces make every summary
+%   claim auditable at the span level.
+% - **Frame as limitation + capability**: say the extractive design reduces hallu
+%   risk by construction (verbatim spans, not paraphrase), and that the recorded
+%   offsets enable future formal source-support evaluation. Do not claim the eval
+%   is already done.
+% - **Prose direction**: rewrite the paragraph above to pivot from "evaluation is
+%   necessary" to "the pipeline addresses this by design through extractive spans
+%   and source traceability, and these records provide the foundation for future
+%   formal hallucination auditing."
 
 \section{Results}\label{results}
 
