@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[backend=biber,style=authoryear,
 sorting=nyt]{biblatex}
+\usepackage{subcaption}
 
 
 \bibliography{refs}
@@ -48,32 +49,19 @@ Many valuable text data and annotations were created before the standards and da
 
 Our goal is to reuse the prior data collection and annotations to create a balanced and clean corpus. Addressing downstream tasks using real-world data, researchers often must work with a messy and noisy texts. These texts are scraped websites and documents from previous works that may contain irrelevant formatting and information resulting from poor web scraping, connection errors, or faulty parsing, such as navigation menus, error pages, cookie consent notices, and social media sharing buttons interspersed with article content, creating noise that will distract the model from the useful content. What might be worse is that, these texts might contain seemingly related but essentially unrelated information as distractions, originating from suggested articles or user comments on the article page, introducing hallucinations and conflation of events for the LLMs. Additionally, these texts might not be organized or structured in a way that is ready for processing by modern text-as-data methods, making it unsuitable for the LLMs for it will further confuse the model.
 
+On the dataset side, the original dataset was coded with the victim as the unit of analysis because human coders annotated features about each kidnapping victim such as method of capture, who carried out the threats, how the person was captured etc.
+
+On the source data side, the original scraped reports were organized by documents. A single victim may appear across multiple documents, and those documents were collected by news source or origin, not by victim. However, the annotations were made at the victim level, not the document level, and the knowledge between the annotations and the source data is not realistically recoverable by human labor.
+
+On the downstream task side, the downstream tasks may include fine-tuning, annotation or classifications for other reports that domain experts might gathered, so the output must be organized and labeled in a way that can be directly consumed by an LLM or classifier operating on individual documents, document level preferably. However, the original annotations were not coded at the document level, so it is unclear which document should carry which annotation. For example, a victim's method of capture may be mentioned in one document while the identity of who carried out the threats appears in another, yet both were annotated at the victim level, without reference to a specific document. If victim-level annotations are simply propagated down to the document level, future LLM training tasks will receive incorrect signals, as each document would be labeled with information it does not necessarily contain.
+
 \emph{Humans can easily filter and extract around this noise and may have already done so to produce annotations}.  But to extend this with the latest LLMs one needs to a) clean the texts (explicitly) and b) reconnect the human annotations to the modern needs to LLMs (e.g., span annotations rather than just words or linkages to actual images in a larger document) (\cite{olsen-etal-2024-socio}). The core problem here is therefore not only cleaning noisy text, but also aligning annotations created by human coders who can infer structure from dispersed evidence across multiple documents, with the exact source spans where these annotations come from, using LLM workflows.
 
-Solving these problems allows researchers to work with and re-use texts for their research but that are currently messy and not well-structured. Our application is a corpus on disappearance cases that is valuable and significant for human rights' research as well as serving training for the classification and prediction of future abduction cases. We propose a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
+Solving these problems allows researchers to work with and re-use texts for their research but that are currently messy and not well-structured. For example, legacy annotated corpora may suffer from that the codings are not linked to the spans or chunks in a level that is suitable for modern text as data research \cite{Escott2018}. Corpora that has multi-document aligned with other units of analysis may suffer from that evidence about a single case is dispersed across thousands of pages and many persons, making the material hard to navigate and requires additional retrieval structures that can be solved by using LLMs \cite{Gibbs_etal2010}. And digitized archives and other scraped web corpora also face semantic confounding contents that cannot be simply removed by rule-based approaches \cite{HurtadoBodell_etal2022, Molina_etal2025}. Our application is a corpus on disappearance cases that is valuable and significant for human rights' research as well as serving training for the classification and prediction of future abduction cases. We propose a multi-turn extractive summarization method that sequentially processes the original messy and disorganized documents for each unit of analysis (victim).  This is done with a conversation state that iteratively updates the running summary with exact text spans from new documents, generating a summary by item for each victim, comprised of sentences extracted from the report that are directly relevant to the item.
 
 %\subsection{Contributions}\label{contributions}
 
-Researchers may encounter a mismatch between collected data and the
-target unit of analysis. Since this work addresses this problem through
-LLM-based alignment, our work contributes a generalizable approach so
-that other source-task or annotation-task discrepancy can be resolved
-without re-collection using human coders that is expensive,
-time-consuming and vulnerable to knowledge loss. Researchers may also
-encounter the need to perform document level de-duplication and
-information extraction across sources reporting the same events. Our
-work addresses the case where multiple reports must be aggregated into
-unified data fields, it contributes an extractive AI approach so that
-redundant information across documents can be consolidated and traced
-back to the original sources without manual effort.
-
-This work also demonstrates a better way of using LLMs to assist social
-science research. LLMs are powerful tools but are also
-vulnerable to hallucination and other biases if not used carefully. We provided a framework that is more robust to hallucination and other biases by using a multi-turn stateful workflow framework that maintains
-context across operations. The more important part is that our framework
-allows tracking the source and evidence of the information extracted
-from the text, which bridges the gap between the annotations and the
-lost knowledge of the original coders.
+From a broader point of view, this work contributes a generalizable approach through LLM-based alignment by proposing a pipeline so that other annotation discrepancy can be resolved without re-collection using human coders, which is expensive, time-consuming and vulnerable to knowledge loss, with supporting spans providing traceability to the original source text. This work also demonstrates a better way of using LLMs to assist social science research because LLMs are powerful tools but are also vulnerable to hallucination and other biases if not used carefully, and we provided a framework that is more robust to hallucination and other biases by using a multi-turn stateful workflow framework that maintains context across operations and allows tracking the source and evidence of the information extracted from the text.
 
 \medskip
 
@@ -85,15 +73,12 @@ models. (Shreyas)
 
 \medskip
 
-Human rights research relies on vast bodies of documentation—including court records, testimonies, NGO reports, forensic evidence, media archives, and government materials—that often exceed the capacity of traditional qualitative methods. Cleaned and well-organized corpora transform these fragmented materials into searchable datasets, enabling researchers and organizations to navigate complex documentation more efficiently and connect sources that would otherwise remain dispersed across institutions, languages, and formats.
+Many valuable text data and annotations were created before the standards and data structures now expected in LLM based research, even though they preserve costly human judgment and domain knowledge. This creates a central methodological problem for contemporary LLM workflows that how can researchers reuse prior data collection and annotations without losing their original knowledge while making them directly usable for modern computational analysis? The UMN-ODIM corpus is a special case of this broader problem, since it preserves important earlier annotations but was not originally gathered, organized, or annotated in the form that contemporary extraction and summarization workflows require. Our task, therefore, is not simply to process a human rights corpus, but to reconnect prior annotations to source grounded evidence in a way that preserves both usability and traceability.
 
-Once documentation is systematically organized, computational tools such as large language models (LLMs) can significantly expand analytical capacity. They assist with tasks such as entity extraction, document classification, timeline reconstruction, and cross-referencing events across large collections of records. Rather than replacing expert judgment, these tools reduce the time required for large-scale document review and allow human rights investigators to concentrate on verification, contextual interpretation, and legal analysis.
 
-Standardized documentation systems also strengthen methodological consistency across research projects. Human rights investigations are often collaborative and extend across long periods of time. Using common variables, metadata structures, and coding protocols allows multiple researchers and institutions to contribute to a shared body of evidence. This facilitates cumulative research, improves transparency, and ensures that documentation collected today remains usable for future investigations, historical analysis, and accountability processes.
+% These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.
 
-These systems are particularly important for local NGOs and independent human rights researchers, who frequently operate with limited funding, infrastructure, and personnel. Grassroots organizations are often the primary collectors of crucial evidence—such as testimonies, photographs, and local reports of abuses—but may lack the capacity to process large archives of material. Clear and standardized datasets make it easier for these organizations to integrate the information they gather into broader evidentiary frameworks without requiring extensive technical resources.
-
-Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.
+% Accessible and well-structured documentation systems also help empower victims and affected communities. When information is organized through clear categories—such as dates, locations, types of violations, and responsible actors—it becomes easier to understand what kinds of information are most relevant to collect and preserve. Because many victims lack the economic resources, technical skills, or literacy needed to manage complex documentation systems, accessible formats lower these barriers and allow communities to store, access, and interpret the evidence they produce. In this way, structured corpora not only strengthen research capacity but also support victims’ participation in processes of truth, historical reconstruction, and justice.
 
 
 \section{Related Work}\label{related-work}
@@ -115,6 +100,9 @@ Human labor represents the alternative approach, typically involving trained cod
 
 Both rule-based preprocessing and human labor are insufficient for handling the noisy corpus examined in this paper, as the volume, heterogeneity, and semantic complexity exceed what non-LLM methods can realistically manage.
 
+version 2:
+Producing a clean, structured dataset from noisy web-scraped text while preserving traceable connections to the original source material has typically relied on rule-based preprocessing, manual data cleaning, or a combination of both~\cite{Bohannon_etal2007,OpenRefine2025}. Rule-based methods can remove structural elements, but because each source website uses a different page layout they do not generalize reliably across heterogeneous sources and cannot handle semantically related but contextually irrelevant content such as suggested article previews or reader comment threads~\cite{Rahm2011,Ma_etal2025}. Human labor can handle these contextual distinctions, but at the volume of a large web-scraped corpus it becomes prohibitively slow, expensive, and inconsistent, making both approaches insufficient for the noisy corpus examined in this paper~\cite{Ma_etal2025,Ni_etal2024}.
+
 \subsection{LLM Methods for Messy
 Text}\label{llm-methods-for-messy-text}
 
@@ -129,6 +117,14 @@ LLMs can also perform the data standardization and data error processing tasks t
 Another problem the LLM can solve is data integration, especially entity matching, which is to extract and align same real-world entities but with different names or structures~\cite{Peeters_etal2025,Wang_etal2025,Fan_etal2024}. This also supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates. LLMs are also widely used for data imputation, which is to fill in missing values from the surrounding context in a dataset~\cite{Ding_etal2024,He_etal2025}. While this is useful for tasks that require restoring incomplete records, it does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text. In our setting, generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs.
 
 Taken together, these existing works suggest that LLMs are capable of distinguishing relevant content from noise and of addressing these data preparation problems in heterogeneous text~\cite{Zhou_etal2026}. This makes it possible to address the issues in this paper with LLMs, and provides the foundation for the design developed in the following sections.
+
+version 2:
+
+Recent work suggests that LLMs are well suited to messy text beyond the limits of rule based methods because they can use contextual reasoning to distinguish relevant content from noise across heterogeneous sources. These literature include both direct cleaning tasks and related annotation tasks, together showing that LLMs can support data preparation when rule based methods are too rigid for noisy text.
+
+LLM based work has been applied to messy news text. For example, Multi-News+ uses LLMs to classify noisy news reports into categories, which makes it similar to our task in the basic sense that both use LLMs to separate useful text from noise (\cite{Choi_etal2024}). It does not directly solve our problem, however, because our goal is not to classify already defined document inputs, but to identify and preserve relevant information within noisy documents while keeping it traceable to the source text. This work contributes by showing that LLMs can handle messy text and support data quality tasks.
+
+LLMs can also perform the data standardization and data error processing tasks that rule based preprocessing was originally meant to provide, because they can infer these transformations from context rather than relying on site specific rules~\cite{Ma_etal2023,Zhang_etal2024,Choi_etal2024,Biester_etal2024,Li_etal2024,Yan_etal2024}. LLMs can also perform data integration, especially entity matching, and this supports annotation source tracing by preserving the link between each extracted annotation and the source document or spans from which it originates~\cite{Peeters_etal2025,Wang_etal2025,Fan_etal2024}. By contrast, data imputation does not fit our purpose because our goal is not to infer absent information, but to identify and preserve information that is already present in noisy text, and generating plausible missing values would weaken traceability to the source text and increase the risk of unsupported outputs~\cite{Ding_etal2024,He_etal2025}. Taken together, these existing works suggest that LLMs are capable of distinguishing relevant content from noise and of addressing these data preparation problems in heterogeneous text, providing the foundation for the design developed in the following sections~\cite{Zhou_etal2026}.
 
 \subsection{Extraction and
 Summarization}\label{extraction-and-summarization}
@@ -146,6 +142,12 @@ On one side, the earlier annotations preserve costly human judgment about the ca
 That option is not realistic in this project. Reannotation would require time, funding, and domain expertise that are no longer available at the necessary scale, while leaving the legacy annotations untouched would preserve the same gap between old coding work and modern LLM inputs. The methodological problem is therefore to design a workflow that recovers traceable evidence from messy text, produces clean summaries for downstream use, and reuses prior annotations without pretending that the original human process can be recreated.
 
 Taken together, the related work shows that this task is feasible with LLMs, but not through conventional cleaning methods or unconstrained generation alone. Non LLM methods cannot reliably resolve the messy structure of this corpus, while most existing extraction and summarization approaches assume cleaner and more standardized inputs than the ones available here. We therefore choose a combined approach that uses LLMs to extract source grounded evidence and produce clean structured summaries, so that prior annotations can be reused without full reannotation and downstream tasks can operate on text that is both traceable and usable.
+
+version 2:
+
+The literature that does summarization using LLMs usually assumes cleaner and more standardized inputs than the corpus examined in this paper. Many methods operate on texts that already have stable document boundaries~\cite{Choi_etal2024}, clearer annotation targets~\cite{Ma_etal2023}, or outputs defined at the same level as the input text~\cite{Zhang_etal2024}. Our setting differs because the corpus is messy, the source documents were not aligned with the unit of analysis for the downstream tasks, which creates a specific methodological choice for the paper. Pure cleaning is not enough because it does not recover the missing link between earlier annotations and the source text, in the meantime, unconstrained generation is not enough because paraphrase can weaken grounding and traceability~\cite{Brandt_etal2025}. The task instead requires a hybrid design that extracts source grounded evidence from messy documents~\cite{Dagdelen_etal2024} and uses that evidence to produce clean structured summaries for downstream use~\cite{olsen-etal-2024-socio}. On one side, the earlier valuable human created annotations will be preserved, on the other side, they will produced in the form that current extraction and summarization workflows require. Reannotation would require time, funding, and domain expertise that are no longer available at the necessary scale, while leaving the legacy annotations untouched would preserve the same gap between old coding work and modern LLM inputs.
+
+The methodological problem is therefore to design a workflow that recovers traceable evidence from messy text, produces clean summaries for downstream use, and reuses prior annotations without pretending that the original human process can be recreated. Even though the related work has already shown LLMs are suitable for this task, but the others approaches cannot be simply reapplied here. We therefore choose a combined approach that uses LLMs to extract source grounded evidence and produce clean structured summaries, so that prior annotations can be reused without full reannotation and downstream tasks can operate on text that is both traceable and usable.
 
 \section{Need a section here on the method(s)}
 
@@ -184,28 +186,37 @@ The codebook itself is extensive, spanning seven sections that cover victim demo
 
 For this study, we select a subset of categorical labels that have relatively low rates of missing values and that capture information relevant to a broad audience rather than to a single specialized subfield.
 
-Three labels meet these criteria. The variable / colum \emph{Desenlace} records the outcome of the disappearance as reported in the press. Of the 575 victims, 393 have an annotation for this field, and the distribution across its seven original categories is heavily concentrated: 254 victims are recorded as still disappeared and 91 as found dead, while the remaining five categories, including liberation by captors or authorities, found alive, self-liberation, and found without specification of condition, each contain fewer than 25 cases as shown in Figure~\ref{fig:desenlace_distribution}. \emph{Captura tipo} records the type of place where the victim was captured, using place categories from the HURIDOCS micro-thesaurus. This field has 243 annotated victims and eight original categories, with the two most frequent being means and routes of transport and places of connection at 90 cases and places related to the victim such as the home or workplace at 81, while the remaining six categories range from 1 to 28 cases as shown in Figure~\ref{fig:captura_tipo_distribution}. \emph{Vic grupo} social records the social group to which the victim belongs. This field has 273 annotated victims and ten original categories, with the most frequent being people who work in service industries at 95 cases, followed by civil servants at 49 and students at 45, and smaller counts for professionals, activists, people associated with politics, organized crime, land workers, and others as shown in Figure~\ref{fig:vic_grupo_social_distribution}.
+Three labels meet these criteria. The variable / colum \emph{Desenlace} records the outcome of the disappearance as reported in the press. Among the 575 victims, 393 have an annotation for this variable, each recording has one of the seven possible categories. The distribution is heavily concentrated. 254 victims are recorded as still disappeared and 91 as found dead, together accounting for nearly 88 percent of annotated cases, while the remaining five categories, including liberation by captors or authorities, found alive, self-liberation, and found without specification of condition, each contain fewer than 25 cases, as shown in Figure~\ref{fig:selected_labels_distribution_before}The \emph{Captura tipo} label records the type of place where the victim was captured, using place categories from the HURIDOCS micro-thesaurus. Among the 575 victims, 243 have an annotation for this field, each recording has one of the eight possible categories. The distribution is heavily concentrated. 90 victims are recorded as means and routes of transport and places of connection and 81 as places related to the victim such as the home or workplace, together accounting for over 70 percent of annotated cases, while the remaining six categories range from 1 to 28 cases, as shown in Figure~\ref{fig:selected_labels_distribution_before}. The third label that meets these criteria, \emph{Vic grupo social}, records the social group to which the victim belongs. Among the 575 victims, 273 have an annotation for this field, each recording has one of the ten possible categories. The distribution is heavily concentrated. 95 victims are recorded as people who work in service industries, 49 as civil servants, and 45 as students, together accounting for nearly 70 percent of annotated cases, while the remaining seven categories, including professionals, activists, people associated with politics, organized crime, land workers, and others, each contain smaller counts, as shown in Figure~\ref{fig:selected_labels_distribution_before}.
 
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/desenlace_distribution_by_victim_before_merging.png}
-\caption{Distribution of desenlace categories per victim before merging.}
-\label{fig:desenlace_distribution}
-\end{figure}
+    \centering
+    \includegraphics[width=\textwidth]{plots/descriptive_statistics/selected_labels_distribution_by_victim_before_merging_v2.png}
+    \caption{Distribution of the three selected labels per victim before merging.}
+    \label{fig:selected_labels_distribution_before}
+    \end{figure}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/captura_tipo_distribution_by_victim_before_merging.png}
-\caption{Distribution of captura tipo categories per victim before merging.}
-\label{fig:captura_tipo_distribution}
-\end{figure}
 
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/vic_grupo_social_distribution_by_victim_before_merging.png}
-\caption{Distribution of vic grupo social categories per victim before merging.}
-\label{fig:vic_grupo_social_distribution}
-\end{figure}
+% \begin{figure}[tbp]
+% \centering
+% \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/desenlace_distribution_by_victim_before_merging.png}
+% \caption{Distribution of desenlace categories per victim before merging.}
+% \label{fig:desenlace_distribution}
+% \end{figure}
+
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/captura_tipo_distribution_by_victim_before_merging.png}
+% \caption{Distribution of captura tipo categories per victim before merging.}
+% \label{fig:captura_tipo_distribution}
+% \end{figure}
+
+% \begin{figure}[tbp]
+% \centering
+% \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/vic_grupo_social_distribution_by_victim_before_merging.png}
+% \caption{Distribution of vic grupo social categories per victim before merging.}
+% \label{fig:vic_grupo_social_distribution}
+% \end{figure}
+
 
 
 \subsection{Challenges in the Data}\label{challenges-in-the-data}
@@ -224,7 +235,9 @@ topically adjacent but are substantially irrelevant, such as suggested
 article previews or user comment threads appended to the original
 report.
 \end{description}
- 
+
+Representative examples of these three error types are provided in Appendix~\ref{appendix}.
+
 Each of these error types introduces noise that can mislead or
 degrade downstream text processing. Each error type has consequences for downstream tasks such as fine-tuning based on a noisy corpus.\footnote{Error pages yield no usable content, causing the model to process an empty or irrelevant document as if it were a valid report when the document or victim was linked to a set of annotations, which can establish a false connection
 between the the annotation and empty documents. Page elements such as
@@ -239,32 +252,7 @@ topically connected to disappearance reporting and can cause the model
 to attribute information from unrelated cases to the victim under
 analysis, resulting in hallucinated or incorrectly sourced output.
 
-To address these noise sources, the authors attempted to rescrape
-the original URLs to obtain cleaner versions of the documents. However,
-a portion of the original URLs were no longer accessible at the time of
-rescraping. For those that remained available, the structural issues
-persisted, as the noise originates from the design of the source
-websites themselves rather than from the scraping process. Navigation
-menus, comment sections, and related article modules are integral parts
-of the page layout and are captured by any general-purpose scraper that
-retrieves the full page body.
-
-The authors also attempted rule-based preprocessing to remove known
-sources of noise, targeting HTML tags, residual markup, and other
-structural elements. While this reduced formatting noise, it could not
-reliably eliminate all types of errors such as navigation text or other
-irrelevant information, because each webpage were designed differently.
-As for related content such as suggested articles or comment threads
-which appear as valid plain text, are almost indistinguishable from
-article content by pattern-matching rules. Processing them requires
-substantive human hours and is not scalable. Approaches such as optical
-character recognition (OCR), which convert image-based documents to
-machine-readable text, are not applicable here, as the documents were
-already scraped as plain text. The noise in this corpus is not a
-accessibility problem but a content boundary or scope problem, and no
-rule-based or format-conversion method can reliably locate where the
-article body ends and extraneous content begins without semantic
-understanding of the text.
+Attempts to address these noise sources through rescraping and rule-based preprocessing were unsuccessful are detailed in Appendix~\ref{app:preprocessing}.
 
 \subsubsection{Ambiguity for
 Classification}\label{ambiguity-for-classification}
@@ -293,9 +281,18 @@ ambiguity, the original categories were collapsed into broader groupings
 that reduce the number of cases where two valid answers fall into
 different classes.
 
-\section{Method}\label{method}
+\section{Method}\label{method}  
 
 % DEFINE THE TASKS!  THEN HOW THEY ARE ACCOMPLISHED.
+
+To address the mismatch between victim level annotations and document level source reports while providing a clean summarization, the workflow is organized into three linked tasks. For each report, it identifies source grounded evidence, converts that evidence into a structured document level summary, and then revises the running summary as later reports add or refine information. Figure~\ref{fig:workflow_diagram_1} illustrates this document to summary update process, and the following subsections explain each stage.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{plots/diagrams/workflow_diagram_1.png}
+    \caption{Workflow for extracting evidence, generating a structured summary, and updating the running summary across sequential documents.}
+    \label{fig:workflow_diagram_1}
+\end{figure}
 
 This method addresses a unit of analysis mismatch between victim level annotations and document level source reports. The task is to reuse the existing codebook and human annotations by aligning them with the original texts, extracting source grounded evidence for each coded field, producing clean structured document level summaries, and updating those summaries across multiple reports while preserving traceability to the supporting spans. The following subsections explain how each of these tasks is implemented.
 
@@ -320,33 +317,11 @@ All LLM calls were executed using instruction tuned models served through vLLM~\
 
 \subsection{Unit of Analysis}\label{unit-of-analysis}
 
-On the dataset side, the original dataset was coded with the victim as
-the unit of analysis. To be specific, human coders annotated features
-about each kidnapping victim such as method of capture, who carried out
-the threats, how the person was captured etc. The annotations are
-structured around victim records.
+On the dataset side, the original dataset was coded with the victim as the unit of analysis. To be specific, human coders annotated features about each kidnapping victim such as method of capture, who carried out the threats, how the person was captured etc. The annotations are structured around victim records.
 
-On the source data side, the original scraped reports were organized by
-documents. A single victim may appear across multiple documents, and
-those documents were collected by news source or origin, not by victim.
-However, the annotations were made at the victim level, not the document
-level, and the knowledge between the annotations and the source data is
-not realistically recoverable by human labor.
+On the source data side, the original scraped reports were organized by documents. A single victim may appear across multiple documents, and those documents were collected by news source or origin, not by victim. However, the annotations were made at the victim level, not the document level, and the knowledge between the annotations and the source data is not realistically recoverable by human labor.
 
-On the downstream task side, the downstream tasks may include
-fine-tuning, annotation or classifications for other reports that domain
-experts might gathered, so the output must be organized and labeled in a
-way that can be directly consumed by an LLM or classifier operating on
-individual documents, document level preferably. However, the original
-annotations were not coded at the document level, so it is unclear which
-document should carry which annotation. For example, a victim's method
-of capture may be mentioned in one document while the identity of who
-carried out the threats appears in another, yet both were annotated at
-the victim level, without reference to a specific document. If
-victim-level annotations are simply propagated down to the document
-level, future LLM training tasks will receive incorrect signals, as each
-document would be labeled with information it does not necessarily
-contain.
+On the downstream task side, the downstream tasks may include fine-tuning, annotation or classifications for other reports that domain experts might gathered, so the output must be organized and labeled in a way that can be directly consumed by an LLM or classifier operating on individual documents, document level preferably. However, the original annotations were not coded at the document level, so it is unclear which document should carry which annotation. For example, a victim's method of capture may be mentioned in one document while the identity of who carried out the threats appears in another, yet both were annotated at the victim level, without reference to a specific document. If victim-level annotations are simply propagated down to the document level, future LLM training tasks will receive incorrect signals, as each document would be labeled with information it does not necessarily contain.
 
 \subsection{Extraction vs
 Summarization}\label{extraction-vs-summarization}
@@ -452,6 +427,12 @@ Another issue discussed above is that the original codebook contains fine-graine
 
 The second issue about the fine-grained categories is that some of the source texts themselves are ambiguous, where a single entity or event can validly map to more than one category, even though both answers can be defensible. In such a case, the model and the human coder may generate different results, even though both may capture the same spans. And even for the models themselves, run on ambiguous texts, can lead to different results even parameters are fixed. One typical example of the text ambiguity is the bus station. It is both an infrastructure that holds high economic value, and a place in close proximity to where the victim lived. Due to these nature of the text, the performance might be greatly reduced if not properly handled. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation. The detailed distribution of the collapsed categories is shown in Figure~\ref{fig:desenlace_distribution_after}, Figure~\ref{fig:captura_tipo_distribution_after}, and Figure~\ref{fig:vic_grupo_social_distribution_after}.
 
+version 2:
+
+The dataset contains human annotations coded at the victim level, and these annotations are used as ground truth. Should the research use the source documents as reference texts, the output generated from original text will be heavily influenced by the noise, so that the difference between the result of original text and the result from cleaned summaries will be inflated, making the evaluation not reliable. Instead, evaluation proceeds by classifying the generated summary text and comparing the resulting labels against the human annotations, testing whether the summaries preserve the same information that human coders recorded between the results from a direct generative summarization and across multiple models.
+
+As described in Section~\ref{ambiguity-for-classification}, the original codebook contains fine-grained categories, and the inherent ambiguity of the source text means that the model and the human coder may generate different but equally defensible results from the same spans. Some distinctions, such as general kidnappings versus special type kidnappings like Levantón, are also difficult for the model without external context plugged in or domain-specific fine-tuning. Evaluating directly against the fine-grained categories would penalize valid model outputs. To reduce the number of categories where multiple valid answers fall into different classes, the original categories are collapsed into broader groupings before evaluation. The detailed distribution of the collapsed categories is shown in Figure~\ref{fig:desenlace_distribution_after}, Figure~\ref{fig:captura_tipo_distribution_after}, and Figure~\ref{fig:vic_grupo_social_distribution_after}.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{plots/descriptive_statistics/desenlace_distribution_by_victim_after_merging.png}
@@ -541,21 +522,26 @@ This is not only a language quality issue but also critical for downstream tasks
 
 \begin{figure}[htbp]
 \centering
-\begin{minipage}{0.32\textwidth}
+\begin{subfigure}{0.49\textwidth}
 \centering
 \includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_captura_tipo.png}
-\end{minipage}
+\caption{Type of place of disappearance}
+\end{subfigure}
 \hfill
-\begin{minipage}{0.32\textwidth}
+\begin{subfigure}{0.49\textwidth}
 \centering
 \includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_desenlace.png}
-\end{minipage}
-\hfill
-\begin{minipage}{0.32\textwidth}
+\caption{Outcome of the disappearance}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}{0.49\textwidth}
 \centering
 \includegraphics[width=\textwidth]{plots/evaluation/benchmarks/less_labels_multi_models/metrics_vic_grupo_social.png}
-\end{minipage}
-\caption{Classification metrics by label across models (collapsed categories). Left: captura tipo. Center: desenlace. Right: vic grupo social.}
+\caption{Social group membership}
+\end{subfigure}
+\caption{Classification metrics by label across models with collapsed categories. In each panel, teal bars show simple summarization accuracy, blue bars show extractive summarization accuracy, and green bars show the accuracy improvement over the baseline.}
 \label{fig:metrics_by_label}
 \end{figure}
 
@@ -719,6 +705,37 @@ Future work can build on this recovered representation as research infrastructur
 
 \appendix
 \section{Appendix}\label{appendix}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.9\textwidth]{plots/sample_reports/Guerrero_Abel_A_G_2.png}
+    \caption{Example of an HTTP error page in the scraped corpus.}
+    \label{fig:appendix_http_error_page}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.9\textwidth]{plots/sample_reports/Coahuila_Abel_M_H_1.png}
+    \caption{Example of ancillary website formatting interleaved with report content.}
+    \label{fig:appendix_website_formatting}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.9\textwidth]{plots/sample_reports/Coahuila_Bernando_A.png}
+    \caption{Example of distractive but topically adjacent content appended to a report.}
+    \label{fig:appendix_distractive_content}
+\end{figure}
+
+\clearpage
+
+\subsection{Why Standard Preprocessing Cannot Resolve Corpus Noise}\label{app:preprocessing}
+
+To address these noise sources, the authors attempted to rescrape the original URLs to obtain cleaner versions of the documents. However, a portion of the original URLs were no longer accessible at the time of rescraping. For those that remained available, the structural issues persisted, as the noise originates from the design of the source websites themselves rather than from the scraping process. Navigation menus, comment sections, and related article modules are integral parts of the page layout and are captured by any general-purpose scraper that retrieves the full page body.
+
+The authors also attempted rule-based preprocessing to remove known sources of noise, targeting HTML tags, residual markup, and other structural elements. While this reduced formatting noise, it could not reliably eliminate all types of errors such as navigation text or other irrelevant information, because each webpage were designed differently. As for related content such as suggested articles or comment threads which appear as valid plain text, are almost indistinguishable from article content by pattern-matching rules. Processing them requires substantive human hours and is not scalable. Approaches such as optical character recognition (OCR), which convert image-based documents to machine-readable text, are not applicable here, as the documents were already scraped as plain text. The noise in this corpus is not an accessibility problem but a content boundary or scope problem, and no rule-based or format-conversion method can reliably locate where the article body ends and extraneous content begins without semantic understanding of the text.
+
+\clearpage
 
 \newpage
 \printbibliography

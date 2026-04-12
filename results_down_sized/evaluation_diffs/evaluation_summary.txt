@@ -1,7 +1,7 @@
 === DATA SUMMARY ===
 Old rows loaded: 1633
-New rows loaded (raw): 3835
-New rows after final-turn collapse: 1135
+New rows loaded (raw): 3864
+New rows after final-turn collapse: 1146
 Models evaluated: gaunernst/gemma-3-12b-it-int4-awq, hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, mistralai/Ministral-3-8B-Instruct-2512
 
 === OLD BENCHMARKS (full old data per model, as-is) ===
@@ -16,26 +16,26 @@ Models evaluated: gaunernst/gemma-3-12b-it-int4-awq, hugging-quants/Meta-Llama-3
   mistralai/Ministral-3-8B-Instruct-2512, desenlace (N=575): Accuracy=0.459
 
 === NEW BENCHMARKS (full new final-turn data per model) ===
-  gaunernst/gemma-3-12b-it-int4-awq, vic_grupo_social (N=399): Accuracy=0.674
-  gaunernst/gemma-3-12b-it-int4-awq, captura_tipo (N=399): Accuracy=0.376
-  gaunernst/gemma-3-12b-it-int4-awq, desenlace (N=399): Accuracy=0.799
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, vic_grupo_social (N=368): Accuracy=0.611
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, captura_tipo (N=368): Accuracy=0.361
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, desenlace (N=368): Accuracy=0.799
-  mistralai/Ministral-3-8B-Instruct-2512, vic_grupo_social (N=368): Accuracy=0.614
-  mistralai/Ministral-3-8B-Instruct-2512, captura_tipo (N=368): Accuracy=0.405
-  mistralai/Ministral-3-8B-Instruct-2512, desenlace (N=368): Accuracy=0.840
+  gaunernst/gemma-3-12b-it-int4-awq, vic_grupo_social (N=403): Accuracy=0.429
+  gaunernst/gemma-3-12b-it-int4-awq, captura_tipo (N=403): Accuracy=0.315
+  gaunernst/gemma-3-12b-it-int4-awq, desenlace (N=403): Accuracy=0.730
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, vic_grupo_social (N=373): Accuracy=0.397
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, captura_tipo (N=373): Accuracy=0.343
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, desenlace (N=373): Accuracy=0.550
+  mistralai/Ministral-3-8B-Instruct-2512, vic_grupo_social (N=370): Accuracy=0.432
+  mistralai/Ministral-3-8B-Instruct-2512, captura_tipo (N=370): Accuracy=0.343
+  mistralai/Ministral-3-8B-Instruct-2512, desenlace (N=370): Accuracy=0.757
 
 === DIFFS (new_accuracy - old_accuracy) ===
-  gaunernst/gemma-3-12b-it-int4-awq, vic_grupo_social: old=0.329 (N=483), new=0.674 (N=399), Delta=+0.345
-  gaunernst/gemma-3-12b-it-int4-awq, captura_tipo: old=0.224 (N=483), new=0.376 (N=399), Delta=+0.152
-  gaunernst/gemma-3-12b-it-int4-awq, desenlace: old=0.607 (N=483), new=0.799 (N=399), Delta=+0.193
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, vic_grupo_social: old=0.435 (N=575), new=0.611 (N=368), Delta=+0.177
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, captura_tipo: old=0.230 (N=575), new=0.361 (N=368), Delta=+0.132
-  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, desenlace: old=0.478 (N=575), new=0.799 (N=368), Delta=+0.321
-  mistralai/Ministral-3-8B-Instruct-2512, vic_grupo_social: old=0.397 (N=575), new=0.614 (N=368), Delta=+0.218
-  mistralai/Ministral-3-8B-Instruct-2512, captura_tipo: old=0.313 (N=575), new=0.405 (N=368), Delta=+0.092
-  mistralai/Ministral-3-8B-Instruct-2512, desenlace: old=0.459 (N=575), new=0.840 (N=368), Delta=+0.381
+  gaunernst/gemma-3-12b-it-int4-awq, vic_grupo_social: old=0.329 (N=483), new=0.429 (N=403), Delta=+0.100
+  gaunernst/gemma-3-12b-it-int4-awq, captura_tipo: old=0.224 (N=483), new=0.315 (N=403), Delta=+0.092
+  gaunernst/gemma-3-12b-it-int4-awq, desenlace: old=0.607 (N=483), new=0.730 (N=403), Delta=+0.123
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, vic_grupo_social: old=0.435 (N=575), new=0.397 (N=373), Delta=-0.038
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, captura_tipo: old=0.230 (N=575), new=0.343 (N=373), Delta=+0.114
+  hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4, desenlace: old=0.478 (N=575), new=0.550 (N=373), Delta=+0.071
+  mistralai/Ministral-3-8B-Instruct-2512, vic_grupo_social: old=0.397 (N=575), new=0.432 (N=370), Delta=+0.036
+  mistralai/Ministral-3-8B-Instruct-2512, captura_tipo: old=0.313 (N=575), new=0.343 (N=370), Delta=+0.030
+  mistralai/Ministral-3-8B-Instruct-2512, desenlace: old=0.459 (N=575), new=0.757 (N=370), Delta=+0.298
 
 === PLOT FILES ===
   plots\post_processing_v3\metrics_vic_grupo_social.png

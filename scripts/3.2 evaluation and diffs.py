@@ -42,7 +42,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NEW_INPUT_PATH = (
     ROOT
     / "results_down_sized"
-    / "df_text_by_report_classification_consolidated_eval_supported.csv"
+    / "df_text_by_report_classification_supported.csv"
 )
 OLD_INPUT_PATH = ROOT / "df_text_multi_eval_by_victim.csv"
 TAXONOMY_PATH = ROOT / "config" / "taxonomy.json"
@@ -102,22 +102,11 @@ LABEL_DISPLAY_NAMES = {
     "desenlace": "Outcome",
 }
 
-LEGEND_OLD = "Simple Summarization"
-LEGEND_NEW = "Extractive Summarization"
-LEGEND_DIFF = "Diff"
-
 MODEL_ORDER = [
     "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
     "gaunernst/gemma-3-12b-it-int4-awq",
     "mistralai/Ministral-3-8B-Instruct-2512",
 ]
-
-LABEL_TITLES = {
-    "vic_grupo_social": "Social group membership (Accuracy)",
-    "captura_tipo": "Type of place of the disappearance (Accuracy)",
-    "desenlace": "Outcome of the disappearance (Accuracy)",
-}
-
 
 def display_path(path: Path) -> str:
     """Return a workspace-relative display string when possible."""
@@ -377,18 +366,18 @@ def plot_per_label(
 
     bars_o = ax.bar(
         x - BAR_WIDTH, o_vals, BAR_WIDTH,
-        label=LEGEND_OLD, color=COLOR_OLD,
+        color=COLOR_OLD,
         edgecolor="black", alpha=BAR_ALPHA,
     )
     bars_n = ax.bar(
         x, n_vals, BAR_WIDTH,
-        label=LEGEND_NEW, color=COLOR_NEW,
+        color=COLOR_NEW,
         edgecolor="black", alpha=BAR_ALPHA,
     )
     d_colors = [COLOR_DIFF_POS if v >= 0 else COLOR_DIFF_NEG for v in d_vals]
     bars_d = ax.bar(
         x + BAR_WIDTH, d_vals, BAR_WIDTH,
-        label=LEGEND_DIFF, color=d_colors,
+        color=d_colors,
         edgecolor="black", alpha=BAR_ALPHA,
     )
 
@@ -404,10 +393,6 @@ def plot_per_label(
     ax.set_ylabel("Accuracy")
     ax.axhline(y=0, color="black", linewidth=0.7)
     ax.axhline(y=0.5, color="gray", linestyle="--", alpha=0.5)
-    ax.legend(loc="upper right", fontsize=9)
-
-    title = LABEL_TITLES.get(label, f"{label} (Accuracy)")
-    ax.set_title(title, fontsize=14, fontweight="bold")
     fig.tight_layout()
 
     out = PLOT_DIR / f"metrics_{label}.png"
@@ -463,18 +448,18 @@ def plot_per_model(
 
     bars_o = ax.bar(
         x - BAR_WIDTH, o_vals, BAR_WIDTH,
-        label=LEGEND_OLD, color=COLOR_OLD,
+        color=COLOR_OLD,
         edgecolor="black", alpha=BAR_ALPHA,
     )
     bars_n = ax.bar(
         x, n_vals, BAR_WIDTH,
-        label=LEGEND_NEW, color=COLOR_NEW,
+        color=COLOR_NEW,
         edgecolor="black", alpha=BAR_ALPHA,
     )
     d_colors = [COLOR_DIFF_POS if v >= 0 else COLOR_DIFF_NEG for v in d_vals]
     bars_d = ax.bar(
         x + BAR_WIDTH, d_vals, BAR_WIDTH,
-        label=LEGEND_DIFF, color=d_colors,
+        color=d_colors,
         edgecolor="black", alpha=BAR_ALPHA,
     )
 
@@ -490,10 +475,6 @@ def plot_per_model(
     ax.set_ylabel("Accuracy")
     ax.axhline(y=0, color="black", linewidth=0.7)
     ax.axhline(y=0.5, color="gray", linestyle="--", alpha=0.5)
-    ax.legend(loc="upper right", fontsize=9)
-
-    display_model = MODEL_DISPLAY_NAMES.get(model, model)
-    ax.set_title(f"Accuracy: {display_model}", fontsize=14, fontweight="bold")
     fig.tight_layout()
 
     short = MODEL_SHORT_NAMES.get(model, model.split("/")[-1])

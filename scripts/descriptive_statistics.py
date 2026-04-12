@@ -421,8 +421,8 @@ def main() -> None:
     make_histogram(
         series=docs_per_victim,
         output_path=OUTPUT_DIR / "document_count_distribution_by_victim.png",
-        title="Distribution of documents_per_victim (Victim-level)",
-        x_label="documents_per_victim",
+        title="",
+        x_label="Documents per victim",
         color=VICTIM_COLOR,
         discrete=True,
     )
@@ -430,8 +430,8 @@ def main() -> None:
     make_histogram(
         series=df["text_len"],
         output_path=OUTPUT_DIR / "text_length_distribution_by_report.png",
-        title="Distribution of text_len (Report-level)",
-        x_label="text_len",
+        title="",
+        x_label="Text length per report (characters)",
         color=REPORT_COLOR,
     )
 
