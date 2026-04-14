@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INPUT_PATH = (
     ROOT
     / "results_down_sized"
-    / "df_text_by_report_classification_consolidated_eval_supported.csv"
+    / "df_text_by_report_classification_consolidated_eval.csv.csv"
 )
 OUTPUT_DIR = ROOT / "plots" / "post_processing_v3" / "supports"
 

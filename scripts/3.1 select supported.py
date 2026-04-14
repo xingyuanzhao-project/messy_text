@@ -61,9 +61,9 @@ TAXONOMY_PATH = ROOT / "config" / "taxonomy.json"
 # Feature toggles
 # ---------------------------------------------------------------------------
 
-KEEP_ONLY_SUPPORTED_ROWS = False
+KEEP_ONLY_SUPPORTED_ROWS = True
 FLAG_SUPPORTS = True
-MASK_UNSUPPORTED = False
+MASK_UNSUPPORTED = True
 
 # ---------------------------------------------------------------------------
 # Column naming conventions
