@@ -180411,3 +180411,17 @@ OUTPUT:
 2026-03-24 23:21:37,886 - INFO - Classification complete. Processed 2229 rows.
 2026-03-24 23:21:39,191 - INFO - Output saved to results_down_sized/df_text_by_report_conversation_classification_consolidated.csv (6687 rows)
 2026-03-24 23:21:39,191 - INFO - Output saved to results_down_sized/df_text_by_report_conversation_classification_consolidated.csv (6687 rows)
+2026-04-16 17:55:48,410 - INFO - Flow 'conversation_summary' loaded with 1 resource(s) and 2 step(s).
+2026-04-16 17:55:48,523 - INFO - Dispatching step 1/2: type=conversation_summary_first unit=document
+2026-04-16 17:57:53,124 - INFO - Dispatching step 2/2: type=conversation_summary_update unit=document
+2026-04-16 17:57:53,130 - INFO - Summary output saved to results_custom/summary.csv (5 rows)
+2026-04-16 17:57:53,134 - INFO - Results records saved to results_custom/results.csv (5 rows)
+2026-04-16 17:57:53,135 - INFO - State records saved to results_custom/states.csv (1 rows)
+2026-04-16 17:57:53,136 - INFO - Span records saved to results_custom/spans.csv (10 rows)
+2026-04-16 19:50:01,575 - INFO - Flow 'conversation_summary' loaded with 1 resource(s) and 2 step(s).
+2026-04-16 19:50:01,719 - INFO - Dispatching step 1/2: type=conversation_summary_first unit=document
+2026-04-16 19:51:33,921 - INFO - Dispatching step 2/2: type=conversation_summary_update unit=document
+2026-04-16 19:51:33,925 - INFO - Summary output saved to results_custom/summary.csv (5 rows)
+2026-04-16 19:51:33,930 - INFO - Results records saved to results_custom/results.csv (5 rows)
+2026-04-16 19:51:33,931 - INFO - State records saved to results_custom/states.csv (1 rows)
+2026-04-16 19:51:33,932 - INFO - Span records saved to results_custom/spans.csv (12 rows)
