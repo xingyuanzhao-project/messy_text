@@ -135,7 +135,7 @@ def draw_document(ax, x, y, label):
 
 
 def draw_summary(ax, x, y, title, body_text):
-    width = 28
+    width = 38
     height = 13.5
     outer = FancyBboxPatch(
         (x, y),
@@ -175,22 +175,23 @@ def draw_summary(ax, x, y, title, body_text):
 
 
 def build_diagram():
-    fig, ax = plt.subplots(figsize=(13.6, 7.68), dpi=100)
+    fig, ax = plt.subplots(figsize=(13.6, 4.6), dpi=100)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
-    ax.set_xlim(0, 130)
-    ax.set_ylim(100, 0)
+    ax.set_xlim(0, 165)
+    ax.set_ylim(60, 0)
+    ax.set_aspect("equal")
     ax.axis("off")
 
     docs = {
         "Doc 1": (7, 6),
-        "Doc 2": (46.0, 6),
-        "Doc 3": (85.0, 6),
+        "Doc 2": (60.0, 6),
+        "Doc 3": (113.0, 6),
     }
     summaries = {
         "Summary 1": (7, 42),
-        "Summary 2": (49, 42),
-        "Summary 3": (91, 42),
+        "Summary 2": (60, 42),
+        "Summary 3": (113, 42),
     }
 
     draw_document(ax, *docs["Doc 1"], "Doc 1")
@@ -207,10 +208,10 @@ def build_diagram():
     green_glow = "#6ee7a0"
 
     extract_points = [(16.0, 13.8), (19.5, 13.8), (19.5, 42.0)]
-    update_2_points = [(55.0, 13.8), (61.5, 13.8), (61.5, 42.0)]
-    update_3_points = [(94.0, 13.8), (103.5, 13.8), (103.5, 42.0)]
-    feed_1_points = [(32.0, 49.0), (49.0, 49.0)]
-    feed_2_points = [(74.0, 49.0), (91.0, 49.0)]
+    update_2_points = [(69.0, 13.8), (72.5, 13.8), (72.5, 42.0)]
+    update_3_points = [(122.0, 13.8), (125.5, 13.8), (125.5, 42.0)]
+    feed_1_points = [(42.0, 49.0), (60.0, 49.0)]
+    feed_2_points = [(95.0, 49.0), (113.0, 49.0)]
 
     for points in (extract_points, update_2_points, update_3_points):
         add_glow_line(ax, points, blue, blue_glow, width=6, glow_width=11)
