@@ -401,6 +401,52 @@ def make_before_order(
     return ordered
 
 
+def make_corpus_overview(
+    docs_per_victim: pd.Series,
+    text_len: pd.Series,
+    output_path: Path,
+) -> None:
+    fig, axes = plt.subplots(1, 2, figsize=(14, 4))
+    fig.suptitle("Document and Text Summaries", fontsize=13)
+
+    data_a = docs_per_victim.dropna()
+    bins_a = range(int(data_a.min()), int(data_a.max()) + 2)
+    axes[0].hist(data_a, bins=bins_a, color=VICTIM_COLOR, edgecolor="white", alpha=0.8)
+    mean_a = data_a.mean()
+    median_a = data_a.median()
+    axes[0].axvline(mean_a, color="red", linestyle="--", linewidth=1.5, label=f"Mean: {mean_a:,.0f}")
+    axes[0].axvline(median_a, color="orange", linestyle="-", linewidth=1.5, label=f"Median: {median_a:,.0f}")
+    axes[0].set_ylabel("Count")
+    axes[0].set_xlabel("Documents per victim")
+    axes[0].set_title("(a)", loc="left")
+    axes[0].legend(loc="upper center")
+    axes[0].text(
+        0.97, 0.97, numeric_stats_text(docs_per_victim),
+        transform=axes[0].transAxes, fontsize=9,
+        verticalalignment="top", horizontalalignment="right", bbox=STATS_BOX,
+    )
+
+    data_b = text_len.dropna()
+    axes[1].hist(data_b, bins=30, color=REPORT_COLOR, edgecolor="white", alpha=0.8)
+    mean_b = data_b.mean()
+    median_b = data_b.median()
+    axes[1].axvline(mean_b, color="red", linestyle="--", linewidth=1.5, label=f"Mean: {mean_b:,.0f}")
+    axes[1].axvline(median_b, color="orange", linestyle="-", linewidth=1.5, label=f"Median: {median_b:,.0f}")
+    axes[1].set_ylabel("Count")
+    axes[1].set_xlabel("Text length per report (characters)")
+    axes[1].set_title("(b)", loc="left")
+    axes[1].legend(loc="upper center")
+    axes[1].text(
+        0.97, 0.97, numeric_stats_text(text_len),
+        transform=axes[1].transAxes, fontsize=9,
+        verticalalignment="top", horizontalalignment="right", bbox=STATS_BOX,
+    )
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -433,6 +479,12 @@ def main() -> None:
         title="",
         x_label="Text length per report (characters)",
         color=REPORT_COLOR,
+    )
+
+    make_corpus_overview(
+        docs_per_victim=docs_per_victim,
+        text_len=df["text_len"],
+        output_path=OUTPUT_DIR / "corpus_distributions.png",
     )
 
     for label in label_configs:
