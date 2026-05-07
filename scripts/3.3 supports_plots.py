@@ -51,12 +51,12 @@ THRESHOLD_LAYER_COLORS: List[str] = [
     "#3ba272",
 ]
 THRESHOLD_LINESTYLES: list = [
-    "-",
-    (0, (5, 2)),
-    "--",
-    (0, (5, 5)),
-    "-.",
-    (0, (1, 1)),
+    "-",           # solid          — Full (100%)
+    (0, (8, 2)),   # long dashes    — ≥75%
+    (0, (5, 3)),   # medium dashes  — ≥50%
+    (0, (3, 3)),   # short dashes   — ≥25%
+    ":",           # dotted         — ≥10%
+    (0, (1, 1)),   # dense dots     — fallback
 ]
 
 MODEL_DISPLAY_NAMES: Dict[str, str] = {
@@ -142,7 +142,7 @@ CONFIGS: List[RunConfig] = [
             "proced_sent_tipo",
             "soc_civil",
         ],
-        support_thresholds=[0.9, 0.75, 0.5, 0.25, 0.1],
+        support_thresholds=[0.1, 0.25, 0.5, 0.75],
         input_path=(
             ROOT
             / "df_text_by_report_conversation_classification (2)_eval_supported.csv"
