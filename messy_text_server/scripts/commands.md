@@ -40,8 +40,8 @@ python --version
 ```bash
 cd /scratch/bbov/xzhao16/messy_text_server/
 module purge
-# module load cray-python/3.11.7
-# module avail cuda
+module load cray-python/3.11.7
+module avail cuda
 module load cuda/12.8
 rm -rf venv
 python -m venv venv
@@ -93,14 +93,15 @@ ls ~/.cache/huggingface/hub/
 du -sh ~/.cache/huggingface/hub/*
 /scratch/bbov/xzhao16/messy_text_server/venv/bin/pip show vllm
 
-vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --quantization awq --port 8000 --host 0.0.0.0 --max-model-len 49152
+
+vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4 \
-  --quantization awq \
-  --tensor-parallel-size 4 \
+  --quantization awq_marlin \
   --host 0.0.0.0 \
   --port 8000 \
   --max-model-len 49152 \
   --gpu-memory-utilization 0.90
+
 
 vllm serve gaunernst/gemma-3-12b-it-int4-awq --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --config_format mistral --load_format mistral --port 8000 --host 0.0.0.0 --max-model-len 49152
@@ -125,7 +126,7 @@ vllm serve mistralai/Ministral-3-8B-Instruct-2512 --tokenizer_mode mistral --con
 #   --host 0.0.0.0 \
 #   --max-model-len 49152
 
-# vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
+vllm serve openai/gpt-oss-20b --port 8000 --host 0.0.0.0 --max-model-len 49152
 vllm serve openai/gpt-oss-20b --async-scheduling --port 8000 --host 0.0.0.0 --max-model-len 49152
 
 vllm serve hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4 \
@@ -152,11 +153,10 @@ python scripts/run_summary_conversation_gemma.py
 python scripts/run_summary_conversation_mistral.py
 python scripts/run_summary_conversation_gptoss.py
 # python scripts/run_summary_conversation_qwen.py
-
 # python scripts/run_summary_conversation_by_label.py
 # sleep 3600 && python scripts/run_summary_conversation_by_label.py
-# python scripts/run_classification.py
-# python scripts/run_evaluation.py
+python scripts/run_classification.py
+python scripts/run_evaluation.py
 
 
 ```
