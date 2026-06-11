@@ -1,0 +1,23 @@
+why models?
+https://arthurspirling.org/documents/BarriePalmerSpirling_TrustMeBro.pdf
+
+why not smaller or larger?
+they are the largest to run on local machine, better for replicate for low resource env for Mexico etc.
+
+fix orphane words in new lines.
+
+6.5 early: this is a framing issue. need to put them early so ppl know this framing. they need to know the need early on. "what is the input req"
+
+start reading from sec 2 related w, then rethink the sec 1.
+
+read THEIR recent llm papers.
+
+method: codebooks papers.
+https://arxiv.org/abs/2606.06781
+Yibo Hu, Erick Skorupa Parolin, Latifur Khan, Patrick T.
+Brandt, Javier Osorio, and Vito J. D’Orazio. 2024.
+Leveraging codebook knowledge with NLI and ChatGPT for zero-shot political relation classification. InProceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1:
+Long Papers), pages 583–603.
+Halterman, A. and Keith, K.A. (2026) ‘Codebook LLMs: Evaluating LLMs as Measurement Tools for Political Science Concepts’, Political Analysis, 34(2), pp. 188–204. doi:10.1017/pan.2025.10017.
+
+add theory papers from paula. maybe these papers need our method.(FOR INTRO/MOTIVATION)
